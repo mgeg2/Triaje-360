@@ -6,13 +6,16 @@ const admin  = require('../config').admin;
 
 const login = () => {
   return new Promise((resolve, reject) => {
-    db.query('SELECT * FROM users', (err, results) => {
+    db.query('SELECT COUNT (*) as numusuarios FROM users', (err, results) => {
       if (err) return reject(err);
+      var numusuarios = results[0].numusuarios;
+      if (numusuarios === undefined) {
+        return reject({ status: 500, message: "Error al obtener el número de usuarios" });
+      }
+      console.log(numusuarios);
 
-      if (results.length == 0) {
+      if (numusuarios == 0) {
         const id = Date.now().toString(30) + Math.random().toString(30).substring(2);
-       
-
         bcrypt.hash(admin.password, config.SALT_ROUNDS, function (err, hash) {
           if (err) return reject({ status: 500, message: "Error al encriptar la contraseña" });
 
