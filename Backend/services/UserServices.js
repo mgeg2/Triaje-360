@@ -7,10 +7,12 @@ const admin  = require('../config').admin;
 const login = (body) => {
 return new Promise((resolve, reject) => {
   const { email, password } = body;
-  console.log(email, password);
+  if (!email || !password) {
+    return reject({ status: 400, message: 'Email y contraseña son requeridos' });
+  }
   db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
     if (err) return reject(err);
-    console.log(results);
+    
     if (results.length == 0) {
       return reject({ status: 404, message: 'Usuario no encontrado' });
     }
