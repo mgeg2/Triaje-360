@@ -67,10 +67,10 @@ export class AuthSignInComponent implements OnInit {
         // Create the form
         this.signInForm = this._formBuilder.group({
             email: [
-                ,
+                '',
                 [Validators.required, Validators.email],
             ],
-            password: [, Validators.required],
+            password: ['', Validators.required],
             rememberMe: [''],
         });
     }
@@ -96,20 +96,21 @@ export class AuthSignInComponent implements OnInit {
 
         // Sign in
         this._authService.signIn(this.signInForm.value).subscribe(
-            () => {
-                // Set the redirect url.
-                // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
-                // to the correct page after a successful sign in. This way, that url can be set via
-                // routing file and we don't have to touch here.
-                const redirectURL =
-                    this._activatedRoute.snapshot.queryParamMap.get(
-                        'redirectURL'
-                    ) || '/signed-in-redirect';
-
-                // Navigate to the redirect url
-                this._router.navigateByUrl(redirectURL);
-            },
             (response) => {
+                console.log(response);
+                // Re-enable the form
+               
+                if(response.message=="Inicio de sesión exitoso"){
+            
+                    // Navigate to the return URL
+                    const returnUrl =''
+                    this._activatedRoute.snapshot.queryParamMap.get('returnUrl') ||
+                    '/signed-in-redirect';
+                this._router.navigate([returnUrl]);
+                }
+            },
+            (error) => {
+                console.log(error);
                 // Re-enable the form
                 this.signInForm.enable();
 
@@ -119,7 +120,7 @@ export class AuthSignInComponent implements OnInit {
                 // Set the alert
                 this.alert = {
                     type: 'error',
-                    message: 'Wrong email or password',
+                    message: 'Email o contraseña incorrectos',
                 };
 
                 // Show the alert
