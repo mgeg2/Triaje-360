@@ -64,13 +64,14 @@ export class AuthService {
             switchMap((response: any) => {
                 console.log(response);
                 // Store the access token in the local storage
-                // this.accessToken = response.accessToken;
-
+                 this.accessToken = response.token;
+                console.log(this.accessToken)
                 // // Set the authenticated flag to true
                  this._authenticated = true;
-
+                console.log(response.user)
                 // // Store the user on the user service
-                // this._userService.user = response.user;
+                this._userService.user = response.user;
+                console.log(this._userService.user$);
 
                 // Return a new observable with the response
                 return of(response);

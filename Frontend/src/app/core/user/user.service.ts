@@ -18,8 +18,12 @@ export class UserService {
      * @param value
      */
     set user(value: User) {
+        console.log(value);
         // Store the value
         this._user.next(value);
+        sessionStorage.setItem ("role",value.role);
+        sessionStorage.setItem ("email",value.email);
+        
     }
 
     get user$(): Observable<User> {
