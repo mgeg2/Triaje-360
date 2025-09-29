@@ -10,11 +10,11 @@ export const adminNavigation: FuseNavigationItem[] = [
         link : '/example'
     },
     {
-        id   : 'example',
-        title: 'Example',
+        id   : 'asignaturas',
+        title: 'Asignaturas',
         type : 'basic',
         icon : 'heroicons_outline:chart-pie',
-        link : '/example'
+        link : '/asignaturas'
     }
 ];
 export const profNavigation: FuseNavigationItem[] = [
@@ -25,6 +25,13 @@ export const profNavigation: FuseNavigationItem[] = [
         icon : 'heroicons_outline:chart-pie',
         link : '/example'
     },
+    {
+        id:'alumnos',
+        title: 'Alumnos',
+        type: 'basic',
+        icon: 'heroicons_outline:users',
+        link: '/alumnos'
+    }
     
 ];
 export const aluNavigation: FuseNavigationItem[] = [

@@ -88,7 +88,7 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
-            {path: 'asigaturas', loadChildren: () => import('app/modules/asignaturas/asignaturas.routes')},
+            {path: 'asignaturas', loadChildren: () => import('app/modules/asignaturas/asignaturas.routes')},
         ]
     }
 ];
