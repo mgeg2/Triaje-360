@@ -68,6 +68,19 @@ const iniUser0 = () => {
   });
 };
 
+const getAllUsers = () => {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT id, email, nickname, role FROM users', (err, results) => {
+      if (err) return reject(err);
+      resolve({ 
+        message: 'usuarios obtenidos',
+        user:results
+       });
+    }
+    );
+  });
+}
+
 module.exports = {
-  iniUser0, login
+  iniUser0, login, getAllUsers
 };
