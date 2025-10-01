@@ -22,7 +22,8 @@ return new Promise((resolve, reject) => {
       if (!isMatch) {
         return reject({ status: 401, message: 'Contraseña incorrecta' });
       }
-      const token = jwt.sign({ id: user.id }, config.JWT_SECRET, { expiresIn: '1h' });
+      
+      const token = jwt.sign({ id: user.id,email:user.email, nickname:user.nickname,role:user.role }, config.JWT_SECRET, { expiresIn: '1h' });
       resolve({ 
         message: 'Inicio de sesión exitoso',
         user: {
@@ -81,6 +82,41 @@ const getAllUsers = () => {
   });
 }
 
+const getUsersfromAsignature = (idAsignatura) => {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT u.id, u.email, u.nickname FROM users u JOIN users_asignatura ua ON u.id = ua.alumno WHERE asignatura = ?', [idAsignatura], (err, results) => { 
+      if (err) return reject(err);
+      resolve({
+        message: 'usuarios obtenidos',
+        user: results
+      });
+    }
+    );
+  });
+}
+
+const postUser = (body) => {
+  return new Promise((resolve, reject) => {
+    const { email, nickname, password, role } = body;
+    if (!email || !nickname || !password || !role) {
+      return reject({ status: 400, message: 'Email, nickname, contraseña y rol son requeridos' });
+    }
+    const id = Date.now().toString(30) + Math.random().toString(30).substring(2);
+    bcrypt.hash(password, config.SALT_ROUNDS, function (err, hash) {
+      if (err) return reject({ status: 500, message: "Error al encriptar la contraseña" });
+      db.query(
+        'INSERT INTO users (id, email, nickname, password, role) VALUES (?, ?, ?, ?, ?)',
+        [id, email, nickname, hash, role],
+        (err) => {
+          if (err) return reject(err);
+          resolve({ message: 'Usuario creado',
+            user: { id, email, nickname, role }
+          });
+        }
+      );
+    });
+  });
+}
 module.exports = {
-  iniUser0, login, getAllUsers
+  iniUser0, login, getAllUsers, getUsersfromAsignature, postUser
 };

@@ -1,6 +1,6 @@
 const express = require('express');
 const userService = require('../services/UserServices'); // Importar el servicio de usuarios
-var jwt= require('../middleware/validar-jwt')
+var jwt = require('../middlewares/validar-jwt');
 // Obtener todos los usuarios
 const login = async (req, res) => {
   try {
@@ -14,26 +14,55 @@ const login = async (req, res) => {
 const iniUser0 = async () => {
   try {
     const result = await userService.iniUser0();
-    return( result );
+    return (result);
   } catch (error) {
-    return({ message: error.message });
+    return ({ message: error.message });
   }
 };
 
 const getAllUsers = async (req, res) => {
-  jwt.comprobartoken(req,res,next);
-  if (req.rol !== 'admin') {
+  jwt.comprobartoken(req, res, async function(){
+    console.log(req.role);
+  if (req.role !== 'admin') {
     return res.status(403).json({ message: 'Acceso denegado' });
-  }else{
+  }
+  try {
+    const users = await userService.getAllUsers();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+  });
+};
+const getUsersfromAsignature = async (req, res) => {
+  jwt.comprobartoken(req, res,function(){
+    if (req.role !== 'profesor' && req.role !== 'admin') {
+      return res.status(403).json({ message: 'Acceso denegado' });
+    } 
+  });
     try {
-      const users = await userService.getAllUsers();
+      const users = await userService.getUsersfromAsignature(req.params.idAsignatura);
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
+  };
+
+const postUser = async (req, res) => {
+   jwt.comprobartoken(req, res, async function(){
+     if (req.role !== 'admin') {
+    return res.status(403).json({ message: 'Acceso denegado' });
   }
-};
+  try {
+   const user = await userService.postUser(req.body);
+   res.status(201).json(user);
+ } catch (error) {
+   res.status(500).json({ message: error.message });
+ }
+  });
+  };
 
 
 module.exports = {
-  login, iniUser0};
+  login, iniUser0, getAllUsers, getUsersfromAsignature, postUser
+};

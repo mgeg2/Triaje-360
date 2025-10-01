@@ -5,6 +5,8 @@ const userController = require('../controllers/UserController'); // Importar el 
 const router = express.Router();
 
 // Definir las rutas específicas de usuarios
-router.post('/login', userController.login);  // Ruta para obtener todos los usuarios
+router.get('', userController.getAllUsers);  // Ruta para obtener todos los usuarios
 
+router.post('/login', userController.login);  // Ruta para obtener todos los usuarios
+router.post('/', userController.postUser);  // Ruta para crear un nuevo usuario
 module.exports = router;
