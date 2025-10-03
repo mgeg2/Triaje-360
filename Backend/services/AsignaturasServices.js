@@ -25,7 +25,7 @@ const postAsignatura = (body) => {
       });
   });
 };
-const postUsertoAsignature = (idAsignatura, idUser) => {
+const postAlutoAsignature = (idAsignatura, idUser) => {
   return new Promise((resolve, reject) => {
     db.query('SELECT * FROM asignatura WHERE id = ?', [idAsignatura], (err, results) => {
       if (err) return reject(err);
@@ -37,9 +37,9 @@ const postUsertoAsignature = (idAsignatura, idUser) => {
         if (results.length === 0) {
           return reject({ status: 404, message: 'Usuario no encontrado' });
         }
-        db.query('INSERT INTO users_asignatura (alumno, asignatura) VALUES (?, ?)', [idUser, idAsignatura], (err) => {
+        db.query('INSERT INTO alus_asignatura (alumno, asignatura) VALUES (?, ?)', [idUser, idAsignatura], (err) => {
           if (err) return reject(err);
-          resolve({ message: 'Usuario asignado a la asignatura' });
+          resolve({ message: 'alumno asignado a la asignatura' });
         });
       }
       );
@@ -47,8 +47,43 @@ const postUsertoAsignature = (idAsignatura, idUser) => {
   });
 };
 
+const postProftoAsignature = (idAsignatura, idUser) => {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT * FROM asignatura WHERE id = ?', [idAsignatura], (err, results) => {
+      if (err) return reject(err);
+      if (results.length === 0) {
+        return reject({ status: 404, message: 'Asignatura no encontrada' });
+      }
+      db.query('SELECT * FROM users WHERE id = ?', [idUser], (err, results) => {
+        if (err) return reject(err);
+        if (results.length === 0) {
+          return reject({ status: 404, message: 'Usuario no encontrado' });
+        }
+        db.query('INSERT INTO prof_asignatura (profesor, asignatura) VALUES (?, ?)', [idUser, idAsignatura], (err) => {
+          if (err) return reject(err);
+          resolve({ message: 'profesor asignado a la asignatura' });
+        });
+      }
+      );
+    });
+  });
+};
+
+const getAsignaturesFromProf = (idAsignatura) => {
+  return new Promise((resolve, reject) => {
+    
+    db.query('SELECT * FROM asignatura a JOIN prof_asignatura pa ON a.id = pa.asignatura WHERE pa.profesor = ?', [idAsignatura], (err, results) => {
+      console.log(results)
+      if (err) return reject(err);
+      resolve(results);
+    });
+  })
+};
+
 module.exports = {
   getAllAsignaturas,
   postAsignatura,
-  postUsertoAsignature
+  postAlutoAsignature,
+  postProftoAsignature,
+  getAsignaturesFromProf
 };

@@ -29,14 +29,41 @@ const postAsignatura = async (req, res) => {
         }
     });
 };
-const postUsertoAsignature = async (req, res) => {
+const postAlutoAsignature = async (req, res) => {
     jwt.comprobartoken(req, res, async function () {
         if (req.role !== 'admin') {
             return res.status(403).json({ message: 'Acceso denegado' });
         }
         try {
-            const asignatura = await asignaturasService.postUsertoAsignature(req.params.idAsignatura, req.params.idUser);
+            const asignatura = await asignaturasService.postAlutoAsignature(req.params.idAsignatura, req.params.idUser);
             res.status(201).json(asignatura);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+};
+const postProftoAsignature = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'admin') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const asignatura = await asignaturasService.postProftoAsignature(req.params.idAsignatura, req.params.idUser);
+            res.status(201).json(asignatura);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+};
+const getAsignaturesFromProf = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'admin' && req.role !== 'prof') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const asignaturas = await asignaturasService.getAsignaturesFromProf(req.params.idAsignatura);
+            console.log(asignaturas);
+            res.status(200).json(asignaturas);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -45,5 +72,7 @@ const postUsertoAsignature = async (req, res) => {
 module.exports = {
     getAllAsignaturas,
     postAsignatura,
-    postUsertoAsignature,
+    postAlutoAsignature,
+    postProftoAsignature,
+    getAsignaturesFromProf
 };

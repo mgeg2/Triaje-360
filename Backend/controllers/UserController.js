@@ -62,7 +62,34 @@ const postUser = async (req, res) => {
   });
   };
 
+const getAllAlus = async (req, res) => {
+  jwt.comprobartoken(req, res, async function(){
+    if (req.role !== 'admin' && req.role !== 'profesor') { 
+    return res.status(403).json({ message: 'Acceso denegado' });
+  }
+  try {
+    const users = await userService.getAllAlus();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  } 
+  });
+};
+const getAllProfs = async (req, res) => {
+  jwt.comprobartoken(req, res, async function(){
+    if (req.role !== 'admin' && req.role !== 'profesor') {
+    return res.status(403).json({ message: 'Acceso denegado' });
+  }
+  try {
+    const users = await userService.getAllProfs();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+  });
+};
+
 
 module.exports = {
-  login, iniUser0, getAllUsers, getUsersfromAsignature, postUser
+  login, iniUser0, getAllUsers, getAlusfromAsignature, postUser, getAllAlus, getAllProfs
 };

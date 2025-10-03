@@ -117,6 +117,32 @@ const postUser = (body) => {
     });
   });
 }
+
+const getAllAlus = () => {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT id, email, nickname FROM users WHERE role = "alu"', (err, results) => {
+      if (err) return reject(err);
+      resolve({
+        message: 'usuarios obtenidos',
+        user: results
+      });
+    }
+    );
+  });
+}
+
+const getAllProfs = () => {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT id, email, nickname FROM users WHERE role = "prof"', (err, results) => {
+      if (err) return reject(err);
+      resolve({
+        message: 'usuarios obtenidos',
+        user: results
+      });
+    }
+    );
+  });
+}
 module.exports = {
-  iniUser0, login, getAllUsers, getUsersfromAsignature, postUser
+  iniUser0, login, getAllUsers, getAlusfromAsignature, postUser, getAllAlus,getAllProfs
 };

@@ -4,8 +4,11 @@ const userController = require('../controllers/UserController'); // Importar el 
 const router = express.Router();
 // Definir las rutas específicas de asignaturas
 router.get('/', asignaturasController.getAllAsignaturas);  // Ruta para obtener todas las asignaturas
-router.get('/:idAsignatura/alu', userController.getAlusfromAsignature);  // Ruta para obtener usuarios de una asignatura
-router.post('/:idAsignatura/alu/:idUser', asignaturasController.postUsertoAsignature);  // Ruta para asignar un usuario a una asignatura
 router.post('/', asignaturasController.postAsignatura);  // Ruta para crear una nueva asignatura
+
+router.get('/alu/:idAsignatura', userController.getAlusfromAsignature);  // Ruta para obtener usuarios de una asignatura
+router.get('/:idAsignatura/prof', asignaturasController.getAsignaturesFromProf);  // Ruta para obtener las asigaturas de un profesor
+router.post('/:idAsignatura/alu/:idUser', asignaturasController.postAlutoAsignature);  // Ruta para asignar un usuario a una asignatura
+router.post('/:idAsignatura/prof/:idUser', asignaturasController.postProftoAsignature);  // Ruta para asignar un usuario a una asignatura
 
 module.exports = router;
