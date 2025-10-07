@@ -123,8 +123,7 @@ const getAsignaturesFromProf = (idAsignatura) => {
 module.exports = {
   getAllAsignaturas,
   postAsignatura,
-  postAlutoAsignature,
-  postProftoAsignature,
+
   getAsignaturesFromProf,
   postUsertoAsignature
 };

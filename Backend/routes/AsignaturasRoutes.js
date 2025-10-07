@@ -8,10 +8,7 @@ router.post('/', asignaturasController.postAsignatura);  // Ruta para crear una 
 
 router.get('/alu/:idAsignatura', userController.getAlusfromAsignature);  // Ruta para obtener usuarios de una asignatura
 router.get('/:idAsignatura/prof', asignaturasController.getAsignaturesFromProf);  // Ruta para obtener las asigaturas de un profesor
-router.post('/:idAsignatura/alu/:idUser', asignaturasController.postAlutoAsignature);  // Ruta para asignar un usuario a una asignatura
-router.post('/:idAsignatura/prof/:idUser', asignaturasController.postProftoAsignature);  // Ruta para asignar un usuario a una asignatura
-
-router.post('/:idAsignatura/:idUser', asignaturasController.postProftoAsignature);  // Ruta para asignar un usuario a una asignatura
+router.post('admin/:idAsignatura/:idUser', asignaturasController.postUsertoAsignature);  // Ruta para asignar un usuario a una asignatura
 
 
 module.exports = router;

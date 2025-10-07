@@ -46,34 +46,6 @@ const postUsertoAsignature = async (req, res) => {
 };
 
 
-const postAlutoAsignature = async (req, res) => {
-    jwt.comprobartoken(req, res, async function () {
-        if (req.role !== 'admin') {
-            return res.status(403).json({ message: 'Acceso denegado' });
-        }
-        try {
-            const asignatura = await asignaturasService.postAlutoAsignature(req.params.idAsignatura, req.params.idUser);
-            res.status(201).json(asignatura);
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    });
-};
-
-
-const postProftoAsignature = async (req, res) => {
-    jwt.comprobartoken(req, res, async function () {
-        if (req.role !== 'admin') {
-            return res.status(403).json({ message: 'Acceso denegado' });
-        }
-        try {
-            const asignatura = await asignaturasService.postProftoAsignature(req.params.idAsignatura, req.params.idUser);
-            res.status(201).json(asignatura);
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    });
-};
 const getAsignaturesFromProf = async (req, res) => {
     jwt.comprobartoken(req, res, async function () {
         if (req.role !== 'admin' && req.role !== 'prof') {
@@ -91,7 +63,6 @@ const getAsignaturesFromProf = async (req, res) => {
 module.exports = {
     getAllAsignaturas,
     postAsignatura,
-    postAlutoAsignature,
-    postProftoAsignature,
+   postUsertoAsignature,
     getAsignaturesFromProf
 };
