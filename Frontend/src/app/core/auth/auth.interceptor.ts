@@ -36,10 +36,11 @@ export const authInterceptor = (
         authService.accessToken &&
         !AuthUtils.isTokenExpired(authService.accessToken)
     ) {
+        console.log('EL INTERCEPTOR METE BARER')
         newReq = req.clone({
             headers: req.headers.set(
                 'Authorization',
-                'Bearer ' + authService.accessToken
+                authService.accessToken
             ),
         });
     }

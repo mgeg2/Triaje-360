@@ -23,6 +23,7 @@ const comprobartoken = (req,res,next)=>{
         console.log(req.role );
         next();
     } catch(err) {
+        console.log(token)
         return res.status(400).json({
             ok:false,
             msg:'Token no valido',
