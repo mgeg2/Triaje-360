@@ -8,7 +8,7 @@ router.post('/', asignaturasController.postAsignatura);  // Ruta para crear una 
 router.delete('/:idAsignatura', asignaturasController.deleteAsignatura);  // Ruta para eliminar una asignatura por ID
 router.get('/:idAsignatura', asignaturasController.getOneAsignaturas);  // Ruta para obtener una asignatura por ID
 router.put('/:idAsignatura', asignaturasController.updateAsignatura);  // Ruta para actualizar una asignatura por ID
-router.get('/alu/:idAsignatura', userController.getAlusfromAsignature);  // Ruta para obtener usuarios de una asignatura
+router.get('/users/:idAsignatura', userController.getUsersfromAsignature);  // Ruta para obtener usuarios de una asignatura
 router.get('/:idAsignatura/:idprof', asignaturasController.getAsignaturesFromProf);  // Ruta para obtener las asigaturas de un profesor
 router.post('/:idAsignatura/:idUser', asignaturasController.postUsertoAsignature);  // Ruta para asignar un usuario a una asignatura
 router.delete('/:idAsignatura/:idUser', asignaturasController.deleteUserfromAsignature);  // Ruta para eliminar un usuario de una asignatura

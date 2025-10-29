@@ -29,7 +29,8 @@ return new Promise((resolve, reject) => {
         user: {
           email: user.email,
           nickname: user.nickname,  
-          role: user.role
+          role: user.role,
+          token,
         }, 
         token });
     });
@@ -82,16 +83,23 @@ const getAllUsers = () => {
   });
 }
 
-const getAlusfromAsignature = (idAsignatura) => {
+const getUsersfromAsignature = (idAsignatura, role) => {
   return new Promise((resolve, reject) => {
-    db.query('SELECT u.id, u.email, u.nickname FROM users u JOIN users_asignatura ua ON u.id = ua.alumno WHERE asignatura = ?', [idAsignatura], (err, results) => { 
+    // Construir la consulta de forma dinámica: si se proporciona `role`, filtrar por él.
+    let sql = 'SELECT u.id, u.email, u.nickname FROM users u JOIN user_asignatura ua ON u.id = ua.usuario WHERE asignatura = ?';
+    const params = [idAsignatura];
+    if (role) {
+      sql += ' AND u.role = ?';
+      params.push(role);
+    }
+
+    db.query(sql, params, (err, results) => {
       if (err) return reject(err);
       resolve({
         message: 'usuarios obtenidos',
         user: results
       });
-    }
-    );
+    });
   });
 }
 
@@ -144,5 +152,5 @@ const getAllProfs = () => {
   });
 }
 module.exports = {
-  iniUser0, login, getAllUsers, getAlusfromAsignature, postUser, getAllAlus,getAllProfs
+  iniUser0, login, getAllUsers, getUsersfromAsignature, postUser, getAllAlus,getAllProfs
 };

@@ -41,11 +41,11 @@ export class AsignaturasService {
     /**
      * Get alumnos (students) assigned to an asignatura
      */
-    getAlumnos(idAsignatura: any): Observable<any> {
+    getUsuariosAsignatura(idAsignatura: any): Observable<any> {
         const token = this._authService.accessToken;
         const headers = new HttpHeaders().set('Authorization', `${token}`);
         // Endpoint: /api/asignatures/alu/:id
-        return this._httpClient.get(`${environment.apiUrl}${environment.asig.all}/alu/${idAsignatura}`, { headers });
+        return this._httpClient.get(`${environment.apiUrl}${environment.asig.all}/users/${idAsignatura}`, { headers });
     }
 
     /**

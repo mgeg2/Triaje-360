@@ -80,24 +80,13 @@ const postUsertoAsignature = (idAsignatura, idUser) => {
           return reject({ status: 404, message: 'Usuario no encontrado' });
         }
         
-        switch (results[0].role) {
-          case 'user':
+    
             console.log('etoy aqui');
-            db.query('INSERT INTO alus_asignatura (alumno, asignatura) VALUES (?, ?)', [idUser, idAsignatura], (err) => {
+            db.query('INSERT INTO user_asignatura (usuario, asignatura) VALUES (?, ?)', [idUser, idAsignatura], (err) => {
               if (err) return reject(err);
-              resolve({ message: 'alumno asignado a la asignatura' });
+              resolve({ message: `${results[0].role} asignado a la asignatura` });
             });
-            break;
-          case 'prof':
-            db.query('INSERT INTO prof_asignatura (profesor, asignatura) VALUES (?, ?)', [idUser, idAsignatura], (err) => {
-              if (err) return reject(err);
-              resolve({ message: 'profesor asignado a la asignatura' });
-            });
-            break;
-          default:
-             reject(" rol no válido");
-            break;
-        }
+           
       });
     });
   })
@@ -106,34 +95,30 @@ const postUsertoAsignature = (idAsignatura, idUser) => {
 const deleteUserfromAsignature = (idAsignatura, idUser) => {
   return new Promise((resolve, reject) => {
     db.query('SELECT * FROM asignatura WHERE id = ?', [idAsignatura], (err, results) => {
+      
       if (err) return reject(err);
       if (results.length === 0) {
+        
         return reject({ status: 404, message: 'Asignatura no encontrada' });
-      } 
-      db.query('SELECT * FROM users WHERE id = ?', [idUser], (err, results) => {
+      }
+      db.query('SELECT * FROM users WHERE id = ?', [idUser], (err, userResults) => {
         if (err) return reject(err);
-        if (results.length != 1) {
+        if (userResults.length != 1) {
           return reject({ status: 404, message: 'Usuario no encontrado' });
-        } 
-        switch (results[0].role) {
-          case 'user':
-            db.query('DELETE FROM alus_asignatura WHERE alumno = ? AND asignatura = ?', [idUser, idAsignatura], (err) => {
-              if (err) return reject(err);
-              resolve({ message: 'alumno eliminado de la asignatura' });
-            });
-            break;
-          case 'prof':
-            db.query('DELETE FROM prof_asignatura WHERE profesor = ? AND asignatura = ?', [idUser, idAsignatura], (err) => {
-              if (err) return reject(err);
-              resolve({ message: 'profesor eliminado de la asignatura' });
-            });
-          default:
-             reject(" rol no válido");
-            break;
         }
+
+        // Delete the user-asignatura relation using a WHERE clause (correct DELETE syntax)
+        db.query('DELETE FROM user_asignatura WHERE usuario = ? AND asignatura = ?', [idUser, idAsignatura], (err, deleteResult) => {
+          if (err) return reject(err);
+          if (deleteResult.affectedRows === 0) {
+            return reject({ status: 404, message: 'Usuario no asignado a la asignatura' });
+          }
+          resolve({ message: `${results[0].role} eliminado de la asignatura` });
+        });
+
       });
     });
-  });
+  })
 };
 
 
@@ -187,7 +172,7 @@ const postProftoAsignature = (idAsignatura, idUser) => {
 const getAsignaturesFromProf = (idAsignatura) => {
   return new Promise((resolve, reject) => {
 
-    db.query('SELECT * FROM asignatura a JOIN prof_asignatura pa ON a.id = pa.asignatura WHERE pa.profesor = ?', [idAsignatura], (err, results) => {
+    db.query('SELECT * FROM asignatura a JOIN user_asignatura pa ON a.id = pa.asignatura WHERE pa.usuario = ?', [idAsignatura], (err, results) => {
       console.log(results)
       if (err) return reject(err);
       resolve(results);

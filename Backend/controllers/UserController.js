@@ -34,14 +34,16 @@ const getAllUsers = async (req, res) => {
   }
   });
 };
-const getAlusfromAsignature = async (req, res) => {
+const getUsersfromAsignature = async (req, res) => {
   jwt.comprobartoken(req, res,function(){
     if (req.role !== 'profesor' && req.role !== 'admin') {
       return res.status(403).json({ message: 'Acceso denegado' });
     } 
   });
     try {
-      const users = await userService.getAlusfromAsignature(req.params.idAsignatura);
+      // Pasar el parámetro de consulta `role` si se proporciona: ?role=prof
+      const role = req.query && req.query.role ? req.query.role : undefined;
+      const users = await userService.getUsersfromAsignature(req.params.idAsignatura, role);
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -91,5 +93,5 @@ const getAllProfs = async (req, res) => {
 
 
 module.exports = {
-  login, iniUser0, getAllUsers, getAlusfromAsignature, postUser, getAllAlus, getAllProfs
+  login, iniUser0, getAllUsers, getUsersfromAsignature, postUser, getAllAlus, getAllProfs
 };
