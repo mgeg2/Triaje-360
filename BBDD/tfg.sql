@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-11-2025 a las 08:47:14
+-- Tiempo de generación: 18-11-2025 a las 11:31:19
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `tfg`
 --
+CREATE DATABASE IF NOT EXISTS `tfg` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `tfg`;
 
 -- --------------------------------------------------------
 
@@ -27,6 +29,7 @@ SET time_zone = "+00:00";
 -- Estructura de tabla para la tabla `asignatura`
 --
 
+DROP TABLE IF EXISTS `asignatura`;
 CREATE TABLE `asignatura` (
   `id` varchar(250) NOT NULL,
   `codigo` int(11) NOT NULL,
@@ -34,6 +37,11 @@ CREATE TABLE `asignatura` (
   `curso` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Truncar tablas antes de insertar `asignatura`
+--
+
+TRUNCATE TABLE `asignatura`;
 --
 -- Volcado de datos para la tabla `asignatura`
 --
@@ -44,9 +52,36 @@ INSERT INTO `asignatura` (`id`, `codigo`, `nombre`, `curso`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `imagenes`
+--
+
+DROP TABLE IF EXISTS `imagenes`;
+CREATE TABLE `imagenes` (
+  `id` varchar(250) NOT NULL,
+  `nombre` varchar(250) NOT NULL,
+  `descripcion` varchar(250) NOT NULL,
+  `tipo` varchar(250) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Truncar tablas antes de insertar `imagenes`
+--
+
+TRUNCATE TABLE `imagenes`;
+--
+-- Volcado de datos para la tabla `imagenes`
+--
+
+INSERT INTO `imagenes` (`id`, `nombre`, `descripcion`, `tipo`) VALUES
+('2kj0ct61gghf35t0qqhf', '2kj0ct61gghf35t0qqhf.jpg', 'muerto en carretera', 'paciente');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `users`
 --
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` varchar(250) NOT NULL,
   `email` varchar(250) NOT NULL,
@@ -55,6 +90,11 @@ CREATE TABLE `users` (
   `role` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Truncar tablas antes de insertar `users`
+--
+
+TRUNCATE TABLE `users`;
 --
 -- Volcado de datos para la tabla `users`
 --
@@ -72,11 +112,17 @@ INSERT INTO `users` (`id`, `email`, `nickname`, `password`, `role`) VALUES
 -- Estructura de tabla para la tabla `user_asignatura`
 --
 
+DROP TABLE IF EXISTS `user_asignatura`;
 CREATE TABLE `user_asignatura` (
   `usuario` varchar(250) NOT NULL,
   `asignatura` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Truncar tablas antes de insertar `user_asignatura`
+--
+
+TRUNCATE TABLE `user_asignatura`;
 --
 -- Volcado de datos para la tabla `user_asignatura`
 --
@@ -93,6 +139,12 @@ INSERT INTO `user_asignatura` (`usuario`, `asignatura`) VALUES
 -- Indices de la tabla `asignatura`
 --
 ALTER TABLE `asignatura`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `imagenes`
+--
+ALTER TABLE `imagenes`
   ADD PRIMARY KEY (`id`);
 
 --
