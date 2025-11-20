@@ -6,7 +6,8 @@ JWT_SECRET: 'your_jwt_secret_key'};
 
 const routes = {
   HOME: '/',
-  API: '/api'};
+  API: '/api',
+ IMGS:'assets/images/'};
 
   const admin = {
   email: 'admin@gmail.com',

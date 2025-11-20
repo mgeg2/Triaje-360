@@ -2,6 +2,7 @@ const db = require('../db');
 
 
 const config = require('../config').config;
+const uploads = require('../controllers/uploads');
 
 const getAllImagenes = () => {
     return new Promise((resolve, reject) => {
@@ -22,21 +23,39 @@ const getOneImagen = (idImagen) => {
     });
 };
 const postImagen = (body) => {
-    return new Promise((resolve, reject) => {
-        const { nombre,descripcion,tipo } = body;
-        if (!nombre) return reject({ status: 400, message: 'Nombre son requeridos' });
-          // Extraer la extensión del nombre del archivo (sin el punto). Si no hay, dejar cadena vacía
-    const extension = nombre.includes('.') ? nombre.split('.').pop() : '';
-    console.log('Extensión extraída:', extension);
-        const id = Date.now().toString(30) + Math.random().toString(30).substring(2);
-        const nombrearchivo=id + (extension ? '.' + extension : '');
-        console.log(nombrearchivo);
-        db.query(
-            'INSERT INTO imagenes (id, nombre,descripcion,tipo) VALUES (?, ?, ?, ?)',
-            [id, nombrearchivo,descripcion,tipo], (err) => {
-                if (err) return reject(err);
-                resolve({ message: 'Imagen creada', imagen: { id, nombre, descripcion,tipo } });
-            });
+    return new Promise(async (resolve, reject) => {
+        console.log(body);
+        try {
+            const { nombre, descripcion, tipo, archivo } = body;
+            
+            if (!nombre) return reject({ status: 400, message: 'Nombre son requeridos' });
+            if (!archivo) return reject({ status: 400, message: 'El archivo es requerido' });
+
+            // Crear id único para el archivo
+            const id = Date.now().toString(30) + Math.random().toString(30).substring(2);
+
+            // Intentar subir el archivo usando la función helper
+            // Usamos el tipo 'imagenes' por defecto si no se proporciona uno
+            const tipoCarpeta = tipo || 'imagenes';
+            console.log(archivo);
+            const uploadResult = await uploads.subirArchivo(archivo, id, tipoCarpeta);
+            console.log(uploadResult);
+            if (!uploadResult || !uploadResult.ok) {
+                return reject({ status: 500, message: 'Error al subir archivo', detail: uploadResult });
+            }
+
+            const nombrearchivo = uploadResult.nombreArchivo;
+
+            db.query(
+                'INSERT INTO imagenes (id, nombre,descripcion,tipo) VALUES (?, ?, ?, ?)',
+                [id, nombrearchivo, descripcion, tipoCarpeta], (err) => {
+                    if (err) return reject(err);
+                    resolve({ message: 'Imagen creada', imagen: { id, nombre: nombrearchivo, descripcion, tipo: tipoCarpeta } });
+                });
+        } catch (err) {
+            console.error(err.message);
+            return reject(err.message || err);
+        }
     });
 };
 const deleteImagen = (idImagen) => {

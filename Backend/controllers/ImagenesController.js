@@ -31,12 +31,16 @@ const getOneImagen = async (req, res) => {
     });
 };  
 const postImagen = async (req, res) => {
+    console.log(req.body);
     jwt.comprobartoken(req, res, async function () {
+        console.log("hola");
         if (req.role !== 'admin' ) {
             return res.status(403).json({ message: 'Acceso denegado' });
         }
         try {
-            const imagen = await imagenesService.postImagen(req.body);
+            // Pasar también los archivos subidos (req.files / req.file) al servicio
+            const files = req.body.file || req.file || undefined;
+            const imagen = await imagenesService.postImagen(req.body, files);
             res.status(201).json(imagen);
         } catch (error) {
             res.status(500).json({ message: error.message });

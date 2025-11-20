@@ -2,8 +2,41 @@
     <!-- Main -->
     <div class="flex-auto p-6 sm:p-10">
         <!-- CONTENT GOES HERE -->
-        <div
-            class="h-400 max-h-400 min-h-400 rounded-2xl border-2 border-dashed border-gray-300"
-        >pepe</div>
+        <div class="h-400 max-h-400 min-h-400 rounded-2xl border-2 border-dashed border-gray-300 p-6">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium">Nombre *</label>
+                    <input formControlName="nombre" class="mt-1 block w-full rounded-md border-gray-300" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">Descripción</label>
+                    <textarea formControlName="descripcion" class="mt-1 block w-full rounded-md border-gray-300"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">Tipo</label>
+                    <select formControlName="tipo" class="mt-1 block w-full rounded-md border-gray-300">
+                        <option value="fondo">fondo</option>
+                        <option value="pacientes">pacientes</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">Archivo *</label>
+                    <input type="file" (change)="onFileChange($event)" accept="image/*" class="mt-1"  formControlName="archivo" />
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <button type="submit" [disabled]="form.invalid" class="px-4 py-2 bg-blue-600 text-white rounded">Subir</button>
+                    <div *ngIf="progress>0" class="w-64">
+                        <div class="h-2 bg-gray-200 rounded">
+                            <div class="h-2 bg-green-500 rounded" [style.width.%]="progress"></div>
+                        </div>
+                        <div class="text-xs text-gray-600">{{progress}}%</div>
+                    </div>
+                </div>
+
+                <div *ngIf="result" class="mt-2 text-sm text-green-700">Subida completada: {{result | json}}</div>
+                <div *ngIf="error" class="mt-2 text-sm text-red-700">Error: {{error}}</div>
+            </form>
+        </div>
     </div>
 </div>
