@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-11-2025 a las 08:47:14
+-- Tiempo de generación: 26-11-2025 a las 09:03:07
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -27,11 +27,13 @@ SET time_zone = "+00:00";
 -- Estructura de tabla para la tabla `asignatura`
 --
 
-CREATE TABLE `asignatura` (
+DROP TABLE IF EXISTS `asignatura`;
+CREATE TABLE IF NOT EXISTS `asignatura` (
   `id` varchar(250) NOT NULL,
   `codigo` int(11) NOT NULL,
   `nombre` varchar(250) NOT NULL,
-  `curso` varchar(10) NOT NULL
+  `curso` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -39,7 +41,30 @@ CREATE TABLE `asignatura` (
 --
 
 INSERT INTO `asignatura` (`id`, `codigo`, `nombre`, `curso`) VALUES
-('2kd9fckc7t9tla26e1cj', 21008, 'ESTRUCTURA DE DATOS Y ALGORITMIA', '24/25');
+('2kd9fckc7t9tla26e1cj', 21008, 'ESTRUCTURA DE DATOS Y ALGORITMIA', '24/25'),
+('2kjp366a8h24hm4qmnmk', 21019, 'Estructuracion de Contenidos', '24/25');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `imagenes`
+--
+
+DROP TABLE IF EXISTS `imagenes`;
+CREATE TABLE IF NOT EXISTS `imagenes` (
+  `id` varchar(250) NOT NULL,
+  `nombre` varchar(250) NOT NULL,
+  `descripcion` varchar(250) NOT NULL,
+  `tipo` varchar(250) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `imagenes`
+--
+
+INSERT INTO `imagenes` (`id`, `nombre`, `descripcion`, `tipo`) VALUES
+('2kj0ct61gghf35t0qqhf', '2kj0ct61gghf35t0qqhf.jpg', 'muerto en carretera', 'paciente');
 
 -- --------------------------------------------------------
 
@@ -47,12 +72,14 @@ INSERT INTO `asignatura` (`id`, `codigo`, `nombre`, `curso`) VALUES
 -- Estructura de tabla para la tabla `users`
 --
 
-CREATE TABLE `users` (
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
   `id` varchar(250) NOT NULL,
   `email` varchar(250) NOT NULL,
   `nickname` varchar(250) NOT NULL,
   `password` varchar(250) NOT NULL,
-  `role` varchar(250) NOT NULL
+  `role` varchar(250) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -64,7 +91,8 @@ INSERT INTO `users` (`id`, `email`, `nickname`, `password`, `role`) VALUES
 ('2kd9b6jig8531sh2lkea', 'user@gmail.com', 'userprueba', '$2b$10$wXFChU0vVMMLaVxbZ4xcE.ic6FYkfBERfoJ/L/Hrh/7h/ldDUz0Ly', 'alu'),
 ('2kdgltkglof16td6ctle', 'prof@gmail.com', 'prof', '$2b$10$TsTqXJ8.gpraYp4WRiUa2OLmiu8FZrOzG53cQZMbLGkjKa4kyaW2.', 'prof'),
 ('2kgis284nrj1cn44t1oq', 'user2@gmail.com', 'user2', '$2b$10$p/y/GFBGuZyUs13I4HQdn.4liWJWVVzh2JAs8/SDjHsWFscPVjh9K', 'alu'),
-('2kgis4j0kp5nobfp8dhs', 'prof2@gmail.com', 'prof2', '$2b$10$jztbeOAgIub4rbxQmJCgQ.MlusW8premqaxFBPox3F9oYLZ3iyeV6', 'prof');
+('2kgis4j0kp5nobfp8dhs', 'prof2@gmail.com', 'prof2', '$2b$10$jztbeOAgIub4rbxQmJCgQ.MlusW8premqaxFBPox3F9oYLZ3iyeV6', 'prof'),
+('2kjp343f38on5ig47301', 'prof3@gmail.com', 'prof3', '$2b$10$Zwd/zbp0omxhfdZ83YBmrOV1DrJkGilT2elnVbKRvCsiaBfrJk39.', 'prof');
 
 -- --------------------------------------------------------
 
@@ -72,9 +100,12 @@ INSERT INTO `users` (`id`, `email`, `nickname`, `password`, `role`) VALUES
 -- Estructura de tabla para la tabla `user_asignatura`
 --
 
-CREATE TABLE `user_asignatura` (
+DROP TABLE IF EXISTS `user_asignatura`;
+CREATE TABLE IF NOT EXISTS `user_asignatura` (
   `usuario` varchar(250) NOT NULL,
-  `asignatura` varchar(250) NOT NULL
+  `asignatura` varchar(250) NOT NULL,
+  KEY `asignatura` (`asignatura`),
+  KEY `usuario` (`usuario`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -83,30 +114,9 @@ CREATE TABLE `user_asignatura` (
 
 INSERT INTO `user_asignatura` (`usuario`, `asignatura`) VALUES
 ('2kd9b6jig8531sh2lkea', '2kd9fckc7t9tla26e1cj'),
-('2kdgltkglof16td6ctle', '2kd9fckc7t9tla26e1cj');
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `asignatura`
---
-ALTER TABLE `asignatura`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `user_asignatura`
---
-ALTER TABLE `user_asignatura`
-  ADD KEY `asignatura` (`asignatura`),
-  ADD KEY `usuario` (`usuario`) USING BTREE;
+('2kdgltkglof16td6ctle', '2kd9fckc7t9tla26e1cj'),
+('2kjp343f38on5ig47301', '2kd9fckc7t9tla26e1cj'),
+('2kjp343f38on5ig47301', '2kjp366a8h24hm4qmnmk');
 
 --
 -- Restricciones para tablas volcadas
