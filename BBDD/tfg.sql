@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-12-2025 a las 12:24:21
+-- Tiempo de generación: 03-12-2025 a las 11:48:57
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -29,7 +29,6 @@ USE `tfg`;
 -- Estructura de tabla para la tabla `asignatura`
 --
 
-DROP TABLE IF EXISTS `asignatura`;
 CREATE TABLE IF NOT EXISTS `asignatura` (
   `id` varchar(250) NOT NULL,
   `codigo` int(11) NOT NULL,
@@ -57,7 +56,6 @@ INSERT INTO `asignatura` (`id`, `codigo`, `nombre`, `curso`) VALUES
 -- Estructura de tabla para la tabla `ejercicios`
 --
 
-DROP TABLE IF EXISTS `ejercicios`;
 CREATE TABLE IF NOT EXISTS `ejercicios` (
   `id` varchar(250) NOT NULL,
   `nombre` varchar(250) NOT NULL,
@@ -80,7 +78,31 @@ TRUNCATE TABLE `ejercicios`;
 --
 
 INSERT INTO `ejercicios` (`id`, `nombre`, `descripcion`, `fechaInicio`, `fechaFin`, `numerointentos`, `asignatura`) VALUES
-('2kkgnpo88d98senc00j4', 'ntynty', 'ntntnt', '2025-12-16', '2025-12-19', 0, '2kd9fckc7t9tla26e1cj');
+('2kkgnpo88d98senc00j4', 'ntynty', 'ntntnt', '2025-12-16', '2025-12-19', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkabi295g4k3994g82b', 'tkreomr', 'frnen', '2025-12-18', '2025-12-24', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkae5t3254rrf0thgb', 'n tntb', 'vdghs ', '2025-12-09', '2025-12-18', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkai8ereoa69fm1jqm', 'thgrh', 'bggtgt', '2025-12-24', '2025-12-30', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkako5smha4q2g49q6', 'vthtcde', 'gcs cgyju', '2025-12-16', '2025-12-24', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkamgorgj3pep4tbs', 'hiuhiu', 'huigiu', '2025-12-17', '2025-12-26', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkao8d5p5g4br9j6nr', 'huigiu', 'giugiu', '2025-12-17', '2025-12-25', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkcj2a57jt3l8bf8ls', 'feringr', 'frnciuevner', '2025-12-02', '2025-12-02', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkcs1sjpde5176i23c', 'btgjibgrnith', 'vtbgrsig', '2025-12-18', '2025-12-19', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkd9h17qtelml18ade', 'rtbvegt', 'brt3', '2025-12-16', '2025-12-19', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkdm1768gmj7es2bcc', 'yter', 'bt5bteg', '2025-12-25', '2025-12-30', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkke1i7st1c795lp6h4', 'h5hj5y3', 'hnr5tn', '2025-12-25', '2025-12-30', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkg6j62ag2ofrnt1jb', 'nhiubniu', 'niubiubui', '2025-12-19', '2025-12-26', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkh26b26bspffp7btj', 'hiiub', 'vyuvyu', '2025-12-24', '2025-12-23', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkhdqorpigeni9fldq', 'nhnt', 'nhtmnyjm', '2025-12-24', '2025-12-30', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkibhot1glafkf5gjtl', 'yuyiu', 'gyugyu', '2025-12-16', '2025-12-11', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkirf7hdcr362oe3r2', 'ntnryj', 'nhyndyu', '2025-12-30', '2026-01-05', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkjd9jdgl3n539948', ',uky', 'gregstrgb', '2025-12-18', '2025-12-25', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkjegsgr6i3ci5o1dk', 'ml9oyju7mfrbg', 'ndvhy6ekn8i', '2025-12-24', '2025-12-24', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkjl0i5p08r2i9s1rf', 'hytrnjyu', 'grrbty', '2025-12-10', '2025-12-22', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkjo4gj07jtem9odqap', 'nionibui', 'nthnhny', '2025-12-10', '2025-12-16', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkjpfc6qqeh8k143kq', 'fverg', 'cfer', '2025-12-24', '2025-12-29', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkpi3elfs5khpclct9', 'buuygyu', 'hiuhyugyugvyu', '2025-12-09', '2025-12-24', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkq06ksttm33li58c6', 'jionibj', 'jerinbbgr f', '2025-12-09', '2025-12-22', 0, '2kd9fckc7t9tla26e1cj'),
+('2kkkqbgfroqa2j5pdbi8', 'jifvnninersf i', 'nveindgjr', '2025-12-08', '2025-12-16', 0, '2kd9fckc7t9tla26e1cj');
 
 -- --------------------------------------------------------
 
@@ -88,7 +110,6 @@ INSERT INTO `ejercicios` (`id`, `nombre`, `descripcion`, `fechaInicio`, `fechaFi
 -- Estructura de tabla para la tabla `imagenes`
 --
 
-DROP TABLE IF EXISTS `imagenes`;
 CREATE TABLE IF NOT EXISTS `imagenes` (
   `id` varchar(250) NOT NULL,
   `nombre` varchar(250) NOT NULL,
@@ -107,7 +128,44 @@ TRUNCATE TABLE `imagenes`;
 --
 
 INSERT INTO `imagenes` (`id`, `nombre`, `descripcion`, `tipo`) VALUES
-('2kj0ct61gghf35t0qqhf', '2kj0ct61gghf35t0qqhf.jpg', 'muerto en carretera', 'paciente');
+('1', 'paciente1', 'paciente con corte en la clavicula', 'paciente'),
+('2', 'paciente2', 'paciente sangrante con corte profundo en la clavicula', 'paciente'),
+('3', 'paciente3', 'paciente con hematoma en la cabeza', 'paciente'),
+('4', 'paciente4', 'paciente manchado de sangre', 'paciente'),
+('5 ', 'escenario1', 'escenario1', 'escenario'),
+('6', 'escenario2', 'escenario2', 'escenario'),
+('7', 'escenario3', 'escenario3', 'escenario'),
+('8', 'escenario4', 'escenario4', 'escenario');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `imagenes_ejercicio`
+--
+
+CREATE TABLE IF NOT EXISTS `imagenes_ejercicio` (
+  `imagen` varchar(250) NOT NULL,
+  `ejercicio` varchar(250) NOT NULL,
+  `orden` int(11) NOT NULL,
+  PRIMARY KEY (`ejercicio`,`orden`),
+  KEY `imagen` (`imagen`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Truncar tablas antes de insertar `imagenes_ejercicio`
+--
+
+TRUNCATE TABLE `imagenes_ejercicio`;
+--
+-- Volcado de datos para la tabla `imagenes_ejercicio`
+--
+
+INSERT INTO `imagenes_ejercicio` (`imagen`, `ejercicio`, `orden`) VALUES
+('5 ', '2kkkq06ksttm33li58c6', 1),
+('5 ', '2kkkqbgfroqa2j5pdbi8', 1),
+('6', '2kkkq06ksttm33li58c6', 2),
+('6', '2kkkqbgfroqa2j5pdbi8', 2),
+('7', '2kkkqbgfroqa2j5pdbi8', 3);
 
 -- --------------------------------------------------------
 
@@ -115,7 +173,6 @@ INSERT INTO `imagenes` (`id`, `nombre`, `descripcion`, `tipo`) VALUES
 -- Estructura de tabla para la tabla `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` varchar(250) NOT NULL,
   `email` varchar(250) NOT NULL,
@@ -148,7 +205,6 @@ INSERT INTO `users` (`id`, `email`, `nickname`, `password`, `role`) VALUES
 -- Estructura de tabla para la tabla `user_asignatura`
 --
 
-DROP TABLE IF EXISTS `user_asignatura`;
 CREATE TABLE IF NOT EXISTS `user_asignatura` (
   `usuario` varchar(250) NOT NULL,
   `asignatura` varchar(250) NOT NULL,
@@ -180,6 +236,13 @@ INSERT INTO `user_asignatura` (`usuario`, `asignatura`) VALUES
 --
 ALTER TABLE `ejercicios`
   ADD CONSTRAINT `asig` FOREIGN KEY (`asignatura`) REFERENCES `asignatura` (`id`);
+
+--
+-- Filtros para la tabla `imagenes_ejercicio`
+--
+ALTER TABLE `imagenes_ejercicio`
+  ADD CONSTRAINT `ejercicio` FOREIGN KEY (`ejercicio`) REFERENCES `ejercicios` (`id`),
+  ADD CONSTRAINT `imagen` FOREIGN KEY (`imagen`) REFERENCES `imagenes` (`id`);
 
 --
 -- Filtros para la tabla `user_asignatura`
