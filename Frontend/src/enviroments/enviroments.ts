@@ -20,6 +20,7 @@ export const environment = {
     pac: {
         all: '/pacientes',
         addnew: '/pacientes',
-        delete: '/pacientes'
+        delete: '/pacientes',
+        update: '/pacientes/'
     }
 };

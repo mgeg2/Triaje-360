@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { PacientesService } from 'app/core/pacientes/pacientes.service';
+import { EjerciciosService } from 'app/core/ejercicios/ejercicios.service';
 
 @Component({
   selector: 'app-pacientes',
@@ -30,8 +31,13 @@ export class PacientesComponent implements OnInit {
 
   // Modal control
   showModal = false;
+  showDeleteModal = false;
   isEditMode = false;
   intentosLimitados = false;
+  idpaciente = null;
+  pacienteToDelete: any = null;
+  // Pacientes list
+  pacientes: any[] = [];
 
   // Acciones del paciente options
   accionesPacienteOptions = [
@@ -50,6 +56,9 @@ export class PacientesComponent implements OnInit {
     { value: 'negro', label: 'Negro', hex: '#000000' }
   ];
 
+  // Image options (static for now)
+  imagenes: any[];
+
   // Helper method to get hex color from color name
   getColorHex(colorName: string): string {
     const color = this.colorOptions.find(c => c.value === colorName);
@@ -62,12 +71,30 @@ export class PacientesComponent implements OnInit {
     descripcion: ['', Validators.required],
     color: ['', Validators.required],
     accionesPaciente: [[]],
-    tiempoEmpeoramiento: ['']
+    tiempoEmpeoramiento: [''],
+    imagenSeleccionada: [null]
   });
 
-  constructor(private _pacientesService: PacientesService) { }
+  constructor(private _pacientesService: PacientesService, private _ejerciciosService: EjerciciosService) { }
   ngOnInit(): void {
+    this.getimagenesPacientes();
     // Initialize component
+    this.loadPacientes();
+  }
+
+  /**
+   * Loads all patients from the service
+   */
+  loadPacientes(): void {
+    this._pacientesService.getPacientes().subscribe(
+      (response) => {
+        this.pacientes = response;
+        console.log('Pacientes cargados:', this.pacientes);
+      },
+      (error) => {
+        console.error('Error al cargar pacientes:', error);
+      }
+    );
   }
 
   /**
@@ -78,6 +105,7 @@ export class PacientesComponent implements OnInit {
     this.showModal = true;
     this.intentosLimitados = false;
     this.PacienteForm.reset();
+
   }
 
   /**
@@ -92,9 +120,11 @@ export class PacientesComponent implements OnInit {
       descripcion: paciente.descripcion,
       color: paciente.color,
       accionesPaciente: paciente.accionesPaciente || [],
-      tiempoEmpeoramiento: paciente.tiempoEmpeoramiento
+      tiempoEmpeoramiento: paciente.Tempeora,
+      imagenSeleccionada: paciente.imagen || null
     });
-    this.intentosLimitados = !!paciente.tiempoEmpeoramiento;
+    this.idpaciente = paciente.id;
+    this.intentosLimitados = paciente.Tempeora > 0;
   }
 
   /**
@@ -104,6 +134,32 @@ export class PacientesComponent implements OnInit {
     this.showModal = false;
     this.PacienteForm.reset();
     this.intentosLimitados = false;
+  }
+
+  openDeleteModal(paciente: any, event: Event): void {
+    event.stopPropagation(); // Prevent opening the edit modal
+    this.pacienteToDelete = paciente;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.pacienteToDelete = null;
+  }
+
+  confirmDelete(): void {
+    if (this.pacienteToDelete) {
+      this._pacientesService.deletePaciente(this.pacienteToDelete.id).subscribe(
+        () => {
+          console.log('Paciente eliminado');
+          this.loadPacientes();
+          this.closeDeleteModal();
+        },
+        (error) => {
+          console.error('Error al eliminar paciente:', error);
+        }
+      );
+    }
   }
 
   /**
@@ -125,7 +181,14 @@ export class PacientesComponent implements OnInit {
     if (this.isEditMode) {
       // TODO: Implement update logic
       console.log('Actualizando paciente:', formData);
-      // this._pacientesService.updatePaciente(formData).subscribe(...);
+      this._pacientesService.updatePaciente(this.idpaciente, formData).subscribe((response) => {
+        console.log('Paciente actualizado:', response);
+        this.loadPacientes(); // Actualiza la lista después de actualizar
+        this.closeNewEditModal();
+      },
+        (error) => {
+          console.error('Error al actualizar paciente:', error);
+        });
     } else {
       if (formData.tiempoEmpeoramiento) {
         formData.tiempoEmpeoramiento = formData.tiempoEmpeoramiento;
@@ -135,7 +198,8 @@ export class PacientesComponent implements OnInit {
       // TODO: Implement create logic
       console.log('Creando paciente:', formData);
       this._pacientesService.CreatePaciente(formData).subscribe((response) => {
-        console.log('Paciente agregado:', response);// Actualiza la lista después de agregar una nueva asignatura
+        console.log('Paciente agregado:', response);
+        this.loadPacientes(); // Actualiza la lista después de agregar
         this.closeNewEditModal();
       },
         (error) => {
@@ -146,7 +210,18 @@ export class PacientesComponent implements OnInit {
     // Close modal after successful submission
     this.closeNewEditModal();
   }
-
+  getimagenesPacientes() {
+    var tipo = "paciente"
+    this._ejerciciosService.getImagenes(tipo).subscribe(
+      (response) => {
+        this.imagenes = response;
+        console.log('Imagenes cargadas:', this.imagenes);
+      },
+      (error) => {
+        console.error('Error al cargar imagenes:', error);
+      }
+    );
+  }
   /**
    * Updates the validation for numeroIntentos based on checkbox state
    */
