@@ -113,10 +113,19 @@ const deletePaciente = async (id) => {
         });
     });
 };
+const getAccionesPaciente = async () => {
+    return new Promise((resolve, reject) => {
+        db.query('SELECT * FROM Acciones', (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+};
 
 module.exports = {
     getPacientes,
     createPaciente,
     updatePaciente,
-    deletePaciente
+    deletePaciente,
+    getAccionesPaciente
 };

@@ -9,5 +9,7 @@ router.get('/:idEjercicio', EjerciciosController.getOneEjercicios);
 router.put('/:idEjercicio', EjerciciosController.updateEjercicio);
 router.get('/asignaturas/:idAsignatura', EjerciciosController.getEjerciciosFromAsignatura);
 router.get('/imagenes/:tipo', EjerciciosController.getImagenes);
+router.post('/paciente', EjerciciosController.postPacienteToEjercicio);
+router.get('/:idEjercicio/pacientes', EjerciciosController.getPacientesEjercicio);
 
 module.exports = router;

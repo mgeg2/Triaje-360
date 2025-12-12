@@ -113,8 +113,8 @@
                             <mat-form-field appearance="outline" class="w-full">
                                 <mat-label>Selecciona las acciones necesarias</mat-label>
                                 <mat-select formControlName="accionesPaciente" multiple>
-                                    <mat-option *ngFor="let accion of accionesPacienteOptions" [value]="accion.value">
-                                        {{ accion.label }}
+                                    <mat-option *ngFor="let accion of accionesPacienteOptions" [value]="accion.id">
+                                        {{ accion.nombre_accion }}
                                     </mat-option>
                                 </mat-select>
                                 <mat-icon matPrefix class="text-primary-500">checklist</mat-icon>

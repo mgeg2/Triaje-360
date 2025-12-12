@@ -43,6 +43,7 @@
                     <!-- Content -->
                     <div class="px-8 py-4">
                         <mat-stepper #stepper linear="true" class="custom-stepper">
+                            <!-- Primer paso -->
                             <mat-step [stepControl]="firstFormGroup" [editable]="false" label="Datos Generales">
                                 <form [formGroup]="firstFormGroup" class="space-y-4 mt-4">
                                     <!-- Nombre y Descripción en columnas -->
@@ -132,17 +133,18 @@
                                     </button>
                                 </div>
                             </mat-step>
-
+                            <!-- Segundo paso -->
                             <mat-step [stepControl]="secondFormGroup" [editable]="false" label="Seleccionar Escenario">
                                 <form [formGroup]="secondFormGroup" class="space-y-4 mt-4">
                                     <div class="mb-4">
                                         <h3 class="text-lg font-medium text-gray-700 mb-2">Elige un escenario</h3>
                                         <div class="flex flex-wrap gap-4 justify-center">
-                                            <div *ngFor="let imagen of imagenes" (click)="selectEscenario(imagen)"
+                                            <div *ngFor="let imagen of imagenesEscenarios"
+                                                (click)="selectEscenario(imagen)"
                                                 class="cursor-pointer border-4 rounded-lg overflow-hidden transition-all duration-200 hover:scale-105"
                                                 [ngClass]="{'border-blue-500 shadow-lg scale-105': (secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id), 'border-transparent': !(secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id)}">
-                                                <img [src]="'assets/escenarios/' + imagen.nombre + '.JPG'"
-                                                    [alt]="imagen.nombre" class="h-32 w-auto object-cover">
+                                                <img [src]="'assets/escenarios/' + imagen.nombre_imagen + '.JPG'"
+                                                    [alt]="imagen.nombre_imagen" class="h-32 w-auto object-cover">
                                             </div>
                                         </div>
                                         <mat-error *ngIf="secondFormGroup.get('escenarios').hasError('required') &&
@@ -162,20 +164,218 @@
                                     </button>
                                 </div>
                             </mat-step>
-
-                            <mat-step [editable]="false" label="Completado">
-                                <div class="text-center py-10">
-                                    <div
-                                        class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-3">
-                                        <mat-icon class="text-green-600 text-4xl">check_circle</mat-icon>
+                            <!-- Tercer paso -->
+                            <mat-step [editable]="false" label="Seleccionar Pacientes">
+                                <div class="flex">
+                                    <!-- Primer div (columna) -->
+                                    <div class="w-[50px] h-[300px] overflow-auto">
+                                        <div *ngFor="let paciente of pacientes"
+                                            class="flex flex-col rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300"
+                                            (click)="seleccionarPaciente(paciente)">
+                                            <!-- Solo la imagen del paciente como tarjeta -->
+                                            <img [src]="'assets/pacientes/'+ paciente.nombre_imagen + '.png'"
+                                                [alt]="paciente.descripcion" class="w-full h-32 object-cover">
+                                        </div>
                                     </div>
-                                    <h3 class="text-xl font-semibold text-gray-800 mb-2">¡Ejercicio Creado!</h3>
-                                    <p class="text-gray-600">El ejercicio se ha guardado correctamente</p>
+
+                                    <!-- Segundo div (más ancho) -->
+                                    <div class="w-[800px] h-[300px] overflow-auto">
+                                        <form [formGroup]="ThirdFormGroup">
+                                            <!-- Información Básica Section -->
+                                            <div class="mb-6">
+                                                <h3
+                                                    class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                                    <mat-icon class="text-primary-600">info</mat-icon>
+                                                    Información Básica
+                                                </h3>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <mat-form-field appearance="outline" class="w-full">
+                                                        <mat-label>Nombre del Paciente</mat-label>
+                                                        <input matInput placeholder="Ej: Juan Pérez"
+                                                            formControlName="nombre" required>
+                                                        <mat-icon matPrefix class="text-primary-500">person</mat-icon>
+                                                        <mat-error
+                                                            *ngIf="ThirdFormGroup.get('nombre').hasError('required') && ThirdFormGroup.get('nombre').touched">El
+                                                            nombre es obligatorio</mat-error>
+                                                    </mat-form-field>
+
+                                                    <mat-form-field appearance="outline" class="w-full">
+                                                        <mat-label>Color de Identificación</mat-label>
+                                                        <mat-select formControlName="color" required>
+                                                            <mat-option *ngFor="let colorOption of colorOptions"
+                                                                [value]="colorOption.value">
+                                                                <div class="flex items-center gap-2">
+                                                                    <span
+                                                                        class="w-6 h-6 rounded-full border-2 border-gray-300"
+                                                                        [style.background-color]="colorOption.hex"></span>
+                                                                    {{ colorOption.label }}
+                                                                </div>
+                                                            </mat-option>
+                                                        </mat-select>
+                                                        <mat-icon matPrefix class="text-primary-500">palette</mat-icon>
+                                                        <mat-error
+                                                            *ngIf="ThirdFormGroup.get('color').hasError('required') && ThirdFormGroup.get('color').touched">El
+                                                            color es obligatorio</mat-error>
+                                                    </mat-form-field>
+                                                </div>
+
+                                                <mat-form-field appearance="outline" class="w-full">
+                                                    <mat-label>Descripción</mat-label>
+                                                    <textarea matInput placeholder="Describe el caso del paciente..."
+                                                        formControlName="descripcion" required rows="3"></textarea>
+                                                    <mat-icon matPrefix class="text-primary-500">description</mat-icon>
+                                                    <mat-error
+                                                        *ngIf="ThirdFormGroup.get('descripcion').hasError('required') && ThirdFormGroup.get('descripcion').touched">La
+                                                        descripción es obligatoria</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                            <!-- Selección de Escenario Section -->
+                                            <div class="mb-6">
+                                                <h3
+                                                    class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                                    <mat-icon class="text-primary-600">image</mat-icon>
+                                                    Selección de Escenario
+                                                </h3>
+                                                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                                    <div *ngFor="let img of imagenesPacientes"
+                                                        class="relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-200"
+                                                        [class.border-primary-500]="ThirdFormGroup.get('imagenSeleccionada').value === img.id"
+                                                        [class.border-transparent]="ThirdFormGroup.get('imagenSeleccionada').value !== img.id"
+                                                        [class.ring-2]="ThirdFormGroup.get('imagenSeleccionada').value === img.id"
+                                                        [class.ring-primary-500]="ThirdFormGroup.get('imagenSeleccionada').value === img.id"
+                                                        (click)="ThirdFormGroup.patchValue({imagenSeleccionada: img.id})">
+                                                        <img [src]="'assets/pacientes/'+ img.nombre_imagen + '.png'"
+                                                            [alt]="img.descripcion"
+                                                            class="w-full h-20 object-contain hover:scale-105 transition-transform duration-300 p-1">
+                                                        <div *ngIf="ThirdFormGroup.get('imagenSeleccionada').value === img.nombre_imagen"
+                                                            class="absolute inset-0 bg-primary-500 bg-opacity-20 flex items-center justify-center">
+                                                            <mat-icon class="text-white bg-primary-500 rounded-full p-1"
+                                                                style="width: 24px; height: 24px; font-size: 18px;">check</mat-icon>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Acciones del Paciente Section -->
+                                            <div class="mb-6">
+                                                <h3
+                                                    class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                                    <mat-icon class="text-primary-600">medical_services</mat-icon>
+                                                    Acciones Médicas
+                                                </h3>
+                                                <mat-form-field appearance="outline" class="w-full">
+                                                    <mat-label>Selecciona las acciones necesarias</mat-label>
+                                                    <mat-select formControlName="accionesPaciente" multiple>
+                                                        <mat-option *ngFor="let accion of accionesPaciente"
+                                                            [value]="accion.id">
+                                                            {{ accion.nombre_accion }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                    <mat-icon matPrefix class="text-primary-500">checklist</mat-icon>
+                                                    <mat-hint>Puedes seleccionar múltiples acciones
+                                                        (opcional)</mat-hint>
+                                                </mat-form-field>
+
+                                                <!-- Display selected actions in the modal -->
+                                                <div *ngIf="ThirdFormGroup.get('accionesPaciente').value?.length > 0"
+                                                    class="mt-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                                    <p class="text-sm font-medium text-blue-900 mb-2">Acciones
+                                                        seleccionadas:</p>
+                                                    <div class="flex flex-wrap gap-2">
+                                                        <span
+                                                            *ngFor="let accionId of ThirdFormGroup.get('accionesPaciente').value"
+                                                            class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium">
+                                                            <mat-icon class="text-white"
+                                                                style="font-size: 16px; width: 16px; height: 16px;">check_circle</mat-icon>
+                                                            {{ getAccionLabel(accionId) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Configuración Avanzada Section -->
+                                            <div class="mb-6">
+                                                <h3
+                                                    class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                                    <mat-icon class="text-primary-600">settings</mat-icon>
+                                                    Configuración Avanzada
+                                                </h3>
+
+                                                <!-- Checkbox -->
+                                                <div class="mb-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                                    <mat-checkbox [(ngModel)]="empeoramientoLimitado"
+                                                        (ngModelChange)="updateEmpeoramientoValidation()"
+                                                        [ngModelOptions]="{standalone: true}" color="primary"
+                                                        class="text-sm">
+                                                        <span class="font-semibold text-amber-900">El paciente puede
+                                                            empeorar</span>
+                                                    </mat-checkbox>
+                                                    <p class="text-xs text-amber-700 mt-2 ml-8">
+                                                        <mat-icon class="text-amber-600 align-middle"
+                                                            style="font-size: 14px; width: 14px; height: 14px;">info</mat-icon>
+                                                        Activa esta opción si deseas establecer un tiempo de
+                                                        empeoramiento
+                                                    </p>
+                                                </div>
+
+                                                <!-- Tiempo de Empeoramiento (condicional) -->
+                                                <div *ngIf="empeoramientoLimitado"
+                                                    class="transition-all duration-300 ease-in-out">
+                                                    <mat-form-field appearance="outline" class="w-full">
+                                                        <mat-label>Tiempo de empeoramiento (minutos)</mat-label>
+                                                        <input matInput type="number" placeholder="Ej: 5"
+                                                            formControlName="tiempoEmpeoramiento" required min="1">
+                                                        <mat-icon matPrefix class="text-primary-500">schedule</mat-icon>
+                                                        <mat-hint>Tiempo en minutos antes de que el paciente
+                                                            empeore</mat-hint>
+                                                        <mat-error
+                                                            *ngIf="ThirdFormGroup.get('tiempoEmpeoramiento').hasError('required') && ThirdFormGroup.get('tiempoEmpeoramiento').touched">El
+                                                            tiempo de empeoramiento es obligatorio</mat-error>
+                                                        <mat-error
+                                                            *ngIf="ThirdFormGroup.get('tiempoEmpeoramiento').hasError('min')">El
+                                                            tiempo
+                                                            debe ser mayor a 0</mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+
+                                            <!-- Action Buttons -->
+                                            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                                                <button mat-flat-button color="primary" type="button"
+                                                    (click)="addPacienteToExercise()" class="px-6">
+                                                    <mat-icon>save</mat-icon>
+                                                    Guardar
+                                                </button>
+                                                <button mat-raised-button color="primary" (click)="submitForm(3)" class="px-8"
+                                        >
+                                        Siguiente
+                                        <mat-icon class="ml-2">arrow_forward</mat-icon>
+                                    </button>
+
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <!-- Tercer div (columna) -->
+                                    <div class="w-[50px] h-[300px] overflow-auto">
+                                        <div *ngFor="let paciente of pacientesEjercicio"
+                                            class="flex flex-col rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300"
+                                            (click)="seleccionarPaciente(paciente)">
+                                            <!-- Solo la imagen del paciente como tarjeta -->
+                                            <img [src]="'assets/pacientes/'+ paciente.nombre_imagen + '.png'"
+                                                [alt]="paciente.descripcion" class="w-full h-32 object-cover">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex justify-center mt-4 pb-4">
-                                    <button mat-raised-button color="primary" (click)="closeNewEditModal()"
-                                        class="px-8">
-                                        Cerrar
+                            </mat-step>
+                            <mat-step>
+                                <p>Revisión y Confirmación</p>
+                                <div class="flex justify-between mt-6 pb-4">
+                                    <button mat-raised-button color="primary" (click)="closeNewEditModal()" class="px-8"
+                                        [disabled]="false">
+                                        Finalizar
+                                        <mat-icon class="ml-2">check_circle</mat-icon>
                                     </button>
                                 </div>
                             </mat-step>

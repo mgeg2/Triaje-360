@@ -41,9 +41,20 @@ const deletePaciente = async (req, res) => {
     }
 };
 
+const getAccionesPaciente = async (req, res) => {
+    try {
+        const accionesPaciente = await PacientesService.getAccionesPaciente();
+        res.json(accionesPaciente);
+    } catch (error) {
+        console.error('Error al obtener las acciones del paciente:', error);
+        res.status(500).json({ error: 'Error al obtener las acciones del paciente' });
+    }
+};
+
 module.exports = {
     getPacientes,
     createPaciente,
     updatePaciente,
-    deletePaciente
+    deletePaciente,
+    getAccionesPaciente
 };

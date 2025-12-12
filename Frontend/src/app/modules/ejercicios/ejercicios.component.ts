@@ -12,13 +12,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { EjerciciosService } from 'app/core/ejercicios/ejercicios.service';
-
+import { PacientesService } from 'app/core/pacientes/pacientes.service';
 @Component({
   selector: 'app-ejercicios',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatStepperModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatCheckboxModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatStepperModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatCheckboxModule, MatSelectModule],
   templateUrl: './ejercicios.component.html'
 })
 export class EjerciciosComponent implements OnInit {
@@ -30,7 +31,11 @@ export class EjerciciosComponent implements OnInit {
   intentosLimitados = false;
   selectedAsignaturaId: string = '';
   ejercicio: any
-  constructor(private _asignaturasService: AsignaturasService, private _userService: UserService, private _ejerciciosService: EjerciciosService) { }
+  pacientes: any[] = [];
+  pacientesEjercicio: any[] = [];
+  pacienteSeleccionado: any;
+  empeoramientoLimitado: any;
+  constructor(private _asignaturasService: AsignaturasService, private _userService: UserService, private _ejerciciosService: EjerciciosService, private _pacientesService: PacientesService) { }
   private _formBuilder = inject(FormBuilder);
 
   firstFormGroup = this._formBuilder.group({
@@ -46,7 +51,26 @@ export class EjerciciosComponent implements OnInit {
     escenarios: this._formBuilder.control<any[]>([], Validators.required),
     ejercicio: [''],
   });
-  imagenes: any[] = [];
+  ThirdFormGroup = this._formBuilder.group({
+    nombre: ['', Validators.required],
+    descripcion: ['', Validators.required],
+    color: ['', Validators.required],
+    accionesPaciente: [[]],
+    tiempoEmpeoramiento: [''],
+    imagenSeleccionada: [null],
+    ejercicio: [''],
+  });
+
+  imagenesEscenarios: any[] = [];
+  imagenesPacientes: any[] = [];
+  accionesPaciente: any[] = [];
+
+  colorOptions = [
+    { value: 'verde', label: 'Verde', hex: '#22c55e' },
+    { value: 'amarillo', label: 'Amarillo', hex: '#eab308' },
+    { value: 'rojo', label: 'Rojo', hex: '#ef4444' },
+    { value: 'negro', label: 'Negro', hex: '#000000' }
+  ];
 
   ngOnInit(): void {
     this._userService.user$
@@ -56,8 +80,13 @@ export class EjerciciosComponent implements OnInit {
         console.log(this.user);
       });
     this.getAsignaturasfromprofesor();
+    this.getAccionesPaciente();
+    console.log(this.accionesPaciente);
   }
-
+  getColorHex(colorName: string): string {
+    const color = this.colorOptions.find(c => c.value === colorName);
+    return color?.hex || '#000000';
+  }
   getAsignaturasfromprofesor(): void {
     console.log(this.user.id);
     this._asignaturasService.getallfromprofesor(this.user.id).subscribe((data: any) => {
@@ -108,9 +137,27 @@ export class EjerciciosComponent implements OnInit {
         console.log(data);
         if (data.status == 200) {
           this.stepper.next();
+          event++;
+          this.getimagenes(event, this.ejercicio);
+          this.getPacientes();
         }
       });
     }
+    if (event == 3) {
+      if (this.ThirdFormGroup.invalid) {
+        // Marcar todos los controles como touched para mostrar errores
+        this.ThirdFormGroup.markAllAsTouched();
+        return;
+      }
+      this._ejerciciosService.getPacientesEjercicio(this.ejercicio).subscribe((data: any) => {
+        console.log(data);
+        if(data.message=="No se encontraron pacientes para este ejercicio"){
+          alert("Debe agregar al menos un paciente al ejercicio");
+          return;
+        }
+        this.closeNewEditModal();
+      });
+    } 
   }
   getimagenes(event: any, ejercicio: any): void {
     var tipo;
@@ -118,11 +165,48 @@ export class EjerciciosComponent implements OnInit {
       tipo = "escenario"
       this._ejerciciosService.getImagenes(tipo).subscribe((data: any) => {
         console.log(data);
-        this.imagenes = data;
+        this.imagenesEscenarios = data;
+      });
+    }
+    if (event == 3) {
+      tipo = "paciente"
+      this._ejerciciosService.getImagenes(tipo).subscribe((data: any) => {
+        console.log(data);
+        this.imagenesPacientes = data;
       });
     }
   }
+  getPacientes(): void {
+    this._pacientesService.getPacientes().subscribe((data: any) => {
+      console.log(data);
+      this.pacientes = data;
+    });
+  }
+  getAccionesPaciente(): void {
+    this._pacientesService.getAccionesPaciente().subscribe((data: any) => {
+      console.log(data);
+      this.accionesPaciente = data;
+    });
+  }
 
+  seleccionarPaciente(paciente: any): void {
+    this.pacienteSeleccionado = paciente;
+    console.log(this.pacienteSeleccionado);
+     const imagenCorrespondiente = this.imagenesPacientes.find(
+    img => img.nombre_imagen === this.pacienteSeleccionado.nombre_imagen
+  );
+  
+  console.log('Imagen correspondiente:', imagenCorrespondiente);
+    this.ThirdFormGroup.patchValue({
+      nombre: this.pacienteSeleccionado.nombre,
+      descripcion: this.pacienteSeleccionado.descripcion,
+      color: this.pacienteSeleccionado.color,
+      imagenSeleccionada: imagenCorrespondiente.id || null,
+      accionesPaciente: this.pacienteSeleccionado.accionesPaciente || [],
+      tiempoEmpeoramiento: this.pacienteSeleccionado.Tempeora || null
+    });
+    this.empeoramientoLimitado = this.pacienteSeleccionado.Tempeora > 0;
+  }
   selectEscenario(imagen: any): void {
     const escenariosControl = this.secondFormGroup.get('escenarios');
     const currentEscenarios = escenariosControl?.value || [];
@@ -132,7 +216,7 @@ export class EjerciciosComponent implements OnInit {
       // Add if not present
       escenariosControl?.patchValue([...currentEscenarios, imagen.id]);
     } else {
-      // Remove if present
+      // Remove if presentgetAccionLabel
       const newEscenarios = currentEscenarios.filter((id: any) => id !== imagen.id);
       escenariosControl?.patchValue(newEscenarios);
     }
@@ -153,6 +237,17 @@ export class EjerciciosComponent implements OnInit {
     }
     numeroIntentosControl.updateValueAndValidity();
   }
+  updateEmpeoramientoValidation(): void {
+    const empeoramientoControl = this.ThirdFormGroup.get('tiempoEmpeoramiento');
+
+    console.log('Empeoramiento limitado:', this.empeoramientoLimitado);
+    if (this.empeoramientoLimitado) {
+      empeoramientoControl.setValidators([Validators.required, Validators.min(1)]);
+    } else {
+      empeoramientoControl.clearValidators();
+    }
+    empeoramientoControl.updateValueAndValidity();
+  }
 
   toggleAsignatura(index: number): void {
     this.asignaturas[index].expanded = !this.asignaturas[index].expanded;
@@ -168,5 +263,38 @@ export class EjerciciosComponent implements OnInit {
 
   closeNewEditModal(): void {
     this.showModal = false;
+  }
+
+  addPacienteToExercise(): void {
+    this.ThirdFormGroup.patchValue({ ejercicio: this.ejercicio });
+    const pacienteData = this.ThirdFormGroup.value;
+    if (pacienteData.tiempoEmpeoramiento) {
+        pacienteData.tiempoEmpeoramiento = pacienteData.tiempoEmpeoramiento;
+      } else {
+        pacienteData.tiempoEmpeoramiento = "0";
+      }
+
+    console.log('Paciente agregado al ejercicio:', pacienteData);
+    this._ejerciciosService.postPacienteToEjercicio(pacienteData).subscribe((data: any) => {
+      console.log(data);
+      if (data.status == 200) {
+        this.getPacientesEjercicio();
+      }
+    });
+  }
+  getPacientesEjercicio(): void {
+    this._ejerciciosService.getPacientesEjercicio(this.ejercicio).subscribe((data: any) => {
+      console.log(data);
+      this.pacientesEjercicio = data;
+    });
+  }
+
+  /**
+   * Gets the label for an action by its ID
+   * @param accionId - The ID of the action
+   * @returns The label of the action
+   */
+  getAccionLabel(accionId: number): string {
+    return this.accionesPaciente.find(a => a.id == accionId)?.nombre_accion || '';
   }
 }

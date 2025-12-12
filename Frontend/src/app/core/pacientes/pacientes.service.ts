@@ -37,4 +37,9 @@ export class PacientesService {
         const headers = new HttpHeaders().set('Authorization', `${token}`);
         return this._httpClient.delete(environment.apiUrl + environment.pac.delete + '/' + id, { headers });
     }
+    getAccionesPaciente(): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        return this._httpClient.get(environment.apiUrl + environment.pac.accionesPaciente, { headers });
+    }
 }

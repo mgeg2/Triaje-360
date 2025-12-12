@@ -40,13 +40,7 @@ export class PacientesComponent implements OnInit {
   pacientes: any[] = [];
 
   // Acciones del paciente options
-  accionesPacienteOptions = [
-    { value: 1, label: 'Drenaje torácico' },
-    { value: 2, label: 'Compresión' },
-    { value: 3, label: 'Collarín' },
-    { value: 4, label: 'Guedel' },
-    { value: 5, label: 'PLS' }
-  ];
+  accionesPacienteOptions: any[] = [];
 
   // Color options
   colorOptions = [
@@ -80,6 +74,7 @@ export class PacientesComponent implements OnInit {
     this.getimagenesPacientes();
     // Initialize component
     this.loadPacientes();
+    this.getAccionesPaciente();
   }
 
   /**
@@ -113,6 +108,7 @@ export class PacientesComponent implements OnInit {
    * @param paciente - The patient data to edit
    */
   openEditModal(paciente: any): void {
+    console.log(paciente.accionesPaciente);
     this.isEditMode = true;
     this.showModal = true;
     this.PacienteForm.patchValue({
@@ -236,6 +232,17 @@ export class PacientesComponent implements OnInit {
     }
     tiempoEmpeoramiento?.updateValueAndValidity();
   }
+  getAccionesPaciente() {
+    this._pacientesService.getAccionesPaciente().subscribe(
+      (response) => {
+        this.accionesPacienteOptions = response;
+        console.log('Acciones del paciente cargadas:', this.accionesPacienteOptions);
+      },
+      (error) => {
+        console.error('Error al cargar acciones del paciente:', error);
+      }
+    );
+  }
 
   /**
    * Gets the label for an action by its ID
@@ -243,6 +250,8 @@ export class PacientesComponent implements OnInit {
    * @returns The label of the action
    */
   getAccionLabel(accionId: number): string {
-    return this.accionesPacienteOptions.find(a => a.value === accionId)?.label || '';
+    console.log(accionId);
+    console.log(this.accionesPacienteOptions);
+    return this.accionesPacienteOptions.find(a => a.id == accionId)?.nombre_accion || '';
   }
 }

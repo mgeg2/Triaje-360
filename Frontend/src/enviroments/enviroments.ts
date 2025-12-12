@@ -15,12 +15,14 @@ export const environment = {
         all: '/ejercicios',
         addnew: '/ejercicios',
         delete: '/ejercicios',
-        imagenes: '/imagenes'
+        imagenes: '/imagenes',
+        addPaciente: '/ejercicios/paciente'
     },
     pac: {
         all: '/pacientes',
         addnew: '/pacientes',
         delete: '/pacientes',
-        update: '/pacientes/'
+        update: '/pacientes/',
+        accionesPaciente: '/pacientes/accionesPaciente'
     }
 };

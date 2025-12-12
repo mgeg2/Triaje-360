@@ -99,6 +99,32 @@ const getImagenes = async (req, res) => {
         }
     });
 };
+const postPacienteToEjercicio = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if ( req.role !== 'prof') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const result = await EjerciciosService.postPacienteToEjercicio(req.body);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+};
+const getPacientesEjercicio = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if ( req.role !== 'prof') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }   
+        try {
+            const pacientes = await EjerciciosService.getPacientesEjercicio(req.params.idEjercicio);
+            res.status(200).json(pacientes);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+};
 module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -106,5 +132,7 @@ module.exports = {
     getOneEjercicios,
     updateEjercicio,
     getEjerciciosFromAsignatura,
-    getImagenes
+    getImagenes,
+    postPacienteToEjercicio,
+    getPacientesEjercicio
 };
