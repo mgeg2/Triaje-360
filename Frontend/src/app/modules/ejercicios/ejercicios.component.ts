@@ -16,10 +16,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { EjerciciosService } from 'app/core/ejercicios/ejercicios.service';
 import { PacientesService } from 'app/core/pacientes/pacientes.service';
+import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'app-ejercicios',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatStepperModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatCheckboxModule, MatSelectModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatStepperModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatCheckboxModule, MatSelectModule, DragDropModule],
   templateUrl: './ejercicios.component.html'
 })
 export class EjerciciosComponent implements OnInit {
@@ -36,6 +37,7 @@ export class EjerciciosComponent implements OnInit {
   pacienteSeleccionado: any;
   empeoramientoLimitado: any;
   imagenSeleccionadaId: any = null;
+  pacientesColocados: { [key: string]: any } = {};
   constructor(private _asignaturasService: AsignaturasService, private _userService: UserService, private _ejerciciosService: EjerciciosService, private _pacientesService: PacientesService) { }
   private _formBuilder = inject(FormBuilder);
 
@@ -191,6 +193,7 @@ export class EjerciciosComponent implements OnInit {
       this._ejerciciosService.getImagenesFromEjercicio(ejercicio).subscribe((data: any) => {
         console.log(data);
         this.imagenesEscenarios = data;
+        this.imagenSeleccionadaId= data[0].nombre_imagen|| null;
       });
     }
   }
@@ -334,5 +337,53 @@ console.log(this.ThirdFormGroup.value);
       this.imagenSeleccionadaId = imagenId;
     }
     console.log('Imagen seleccionada:', this.imagenSeleccionadaId);
+  }
+
+  /**
+   * Maneja el drop de un paciente en una celda de la tabla
+   * @param event - Evento de drop del CDK
+   * @param row - La fila de la celda
+   * @param col - La columna de la celda
+   */
+  onDrop(event: CdkDragDrop<any>, row: number, col: number): void {
+    const paciente = event.item.data;
+    const key = `${row}-${col}`;
+    this.pacientesColocados[key] = paciente;
+    console.log(`Paciente ${paciente.nombre} colocado en celda ${row}-${col}`);
+  }
+
+  /**
+   * Maneja el click en una celda de la tabla del escenario para remover pacientes
+   * @param row - La fila de la celda
+   * @param col - La columna de la celda
+   */
+  onCellClick(row: number, col: number): void {
+    const key = `${row}-${col}`;
+    if (this.pacientesColocados[key]) {
+      delete this.pacientesColocados[key];
+      console.log(`Paciente removido de la celda ${row}-${col}`);
+    }
+  }
+
+  /**
+   * Obtiene el paciente colocado en una celda
+   * @param row - La fila de la celda
+   * @param col - La columna de la celda
+   * @returns El paciente o undefined
+   */
+  getPacienteEnCelda(row: number, col: number): any {
+    const key = `${row}-${col}`;
+    return this.pacientesColocados[key];
+  }
+
+  /**
+   * Obtiene el color de fondo de una celda
+   * @param row - La fila de la celda
+   * @param col - La columna de la celda
+   * @returns El color de fondo en formato CSS
+   */
+  getCellBackground(row: number, col: number): string {
+    const key = `${row}-${col}`;
+    return this.pacientesColocados[key] ? 'rgba(100, 200, 255, 0.2)' : 'transparent';
   }
 }
