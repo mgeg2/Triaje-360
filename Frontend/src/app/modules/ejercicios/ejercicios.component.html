@@ -374,17 +374,25 @@
                             <mat-step [editable]="false" label="ubicar pacientes">
                                 <div class="flex flex-col gap-6 py-6 h-full">
                                     <!-- Primer div: Pacientes (centrado) -->
-                                        
-                                        <div class="flex gap-2  items-center justify-center">
+                                    <div class="relative z-50 "cdkScrollable>
+                                        <div class="flex gap-2 items-center justify-center pb-4">
                                             <div *ngFor="let paciente of pacientesEjercicio"
                                                 cdkDrag
                                                 [cdkDragData]="paciente"
-                                                class="flex flex-col rounded-lg overflow-hidden cursor-move hover:scale-105 transition-transform duration-300 shadow-md">
+                                                class="flex flex-col rounded-lg overflow-hidden cursor-move shadow-md hover:shadow-lg transition-shadow flex-shrink-0">
+                                                <!-- Preview personalizado para drag suave -->
+                                                <ng-template *cdkDragPreview let-item="$implicit" matchSize="true">
+                                                    <div class="flex flex-col rounded-lg overflow-hidden shadow-xl">
+                                                        <img [src]="'assets/pacientes/'+ paciente.nombre_imagen + '.png'"
+                                                            [alt]="paciente.descripcion" class="w-12 h-12 object-cover">
+                                                    </div>
+                                                </ng-template>
                                                 <!-- Solo la imagen del paciente como tarjeta -->
                                                 <img [src]="'assets/pacientes/'+ paciente.nombre_imagen + '.png'"
-                                                    [alt]="paciente.descripcion" class="w-12 h-12 object-cover">
+                                                    [alt]="paciente.descripcion" class="w-12 h-12 object-cover hover:scale-105 transition-transform duration-200">
                                             </div>
                                         </div>
+                                    </div>
                                     <!-- Segundo div: Escenario (centrado horizontalmente con fondo blanco) -->
 
                                             <div class="flex justify-center relative">

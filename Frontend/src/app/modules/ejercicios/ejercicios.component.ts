@@ -366,6 +366,20 @@ console.log(this.ThirdFormGroup.value);
   }
 
   /**
+   * Remueve un paciente del escenario y lo devuelve a su posición original
+   * @param row - La fila de la celda
+   * @param col - La columna de la celda
+   */
+  removePacienteDelEscenario(row: number, col: number): void {
+    const key = `${row}-${col}`;
+    if (this.pacientesColocados[key]) {
+      const pacienteRemovido = this.pacientesColocados[key];
+      delete this.pacientesColocados[key];
+      console.log(`Paciente ${pacienteRemovido.nombre} removido de la celda ${row}-${col}`);
+    }
+  }
+
+  /**
    * Obtiene el paciente colocado en una celda
    * @param row - La fila de la celda
    * @param col - La columna de la celda
