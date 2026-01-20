@@ -16,11 +16,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { EjerciciosService } from 'app/core/ejercicios/ejercicios.service';
 import { PacientesService } from 'app/core/pacientes/pacientes.service';
-import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'app-ejercicios',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatStepperModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatCheckboxModule, MatSelectModule, DragDropModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatInputModule, MatFormFieldModule, MatStepperModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatCheckboxModule, MatSelectModule],
   templateUrl: './ejercicios.component.html'
 })
 export class EjerciciosComponent implements OnInit {
@@ -282,6 +281,7 @@ console.log(this.ThirdFormGroup.value);
     this.showModal = true;
     this.firstFormGroup.reset();
     this.secondFormGroup.reset();
+    this.ThirdFormGroup.reset();
     this.imagenSeleccionadaId = null;
   }
 
@@ -339,17 +339,68 @@ console.log(this.ThirdFormGroup.value);
     console.log('Imagen seleccionada:', this.imagenSeleccionadaId);
   }
 
+  private draggedPaciente: any = null;
+
   /**
-   * Maneja el drop de un paciente en una celda de la tabla
-   * @param event - Evento de drop del CDK
-   * @param row - La fila de la celda
-   * @param col - La columna de la celda
+   * Inicia el arrastre de un paciente
    */
-  onDrop(event: CdkDragDrop<any>, row: number, col: number): void {
-    const paciente = event.item.data;
+  onDragStart(event: DragEvent, paciente: any): void {
+    this.draggedPaciente = paciente;
+    console.log('onDragStart:', paciente.nombre);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'copy';
+    }
+  }
+
+  /**
+   * Finaliza el arrastre de un paciente
+   */
+  onDragEnd(event: DragEvent): void {
+    console.log('onDragEnd');
+  }
+
+  /**
+   * Maneja el drag over en una celda
+   */
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.dataTransfer!.dropEffect = 'copy';
+  }
+
+  /**
+   * Maneja el drag leave en una celda
+   */
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  /**
+   * Maneja el drop de un paciente en una celda del escenario
+   * @param event - Evento de drop del HTML
+   * @param row - La fila de la celda (1-indexed)
+   * @param col - La columna de la celda (1-indexed)
+   */
+  onDrop(event: DragEvent, row: number, col: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log('onDrop ejecutado en celda', row, col, 'paciente dragueado:', this.draggedPaciente);
+    
+    if (!this.draggedPaciente) {
+      console.error('No hay paciente dragueado');
+      return;
+    }
+
     const key = `${row}-${col}`;
-    this.pacientesColocados[key] = paciente;
-    console.log(`Paciente ${paciente.nombre} colocado en celda ${row}-${col}`);
+    this.pacientesColocados[key] = this.draggedPaciente;
+    
+    // Remover el paciente del array de pacientes disponibles
+    const index = this.pacientesEjercicio.indexOf(this.draggedPaciente);
+    if (index > -1) {
+      this.pacientesEjercicio.splice(index, 1);
+    }
+    
+    console.log(`Paciente ${this.draggedPaciente.nombre} colocado en celda ${row}-${col}`, this.pacientesColocados);
+    this.draggedPaciente = null;
   }
 
   /**
@@ -360,8 +411,11 @@ console.log(this.ThirdFormGroup.value);
   onCellClick(row: number, col: number): void {
     const key = `${row}-${col}`;
     if (this.pacientesColocados[key]) {
+      const paciente = this.pacientesColocados[key];
       delete this.pacientesColocados[key];
-      console.log(`Paciente removido de la celda ${row}-${col}`);
+      // Devolver el paciente al array de pacientes disponibles
+      this.pacientesEjercicio.push(paciente);
+      console.log(`Paciente ${paciente.nombre} removido de la celda ${row}-${col}`);
     }
   }
 
@@ -399,5 +453,26 @@ console.log(this.ThirdFormGroup.value);
   getCellBackground(row: number, col: number): string {
     const key = `${row}-${col}`;
     return this.pacientesColocados[key] ? 'rgba(100, 200, 255, 0.2)' : 'transparent';
+  }
+
+  /**
+   * Genera un array de índices de 0 a 63 (4 filas x 16 columnas)
+   */
+  getCellIndices(): number[] {
+    return Array.from({ length: 64 }, (_, i) => i);
+  }
+
+  /**
+   * Convierte un índice lineal a número de fila (1-indexed)
+   */
+  getRowFromIndex(index: number): number {
+    return Math.floor(index / 16) + 1;
+  }
+
+  /**
+   * Convierte un índice lineal a número de columna (1-indexed)
+   */
+  getColFromIndex(index: number): number {
+    return (index % 16) + 1;
   }
 }
