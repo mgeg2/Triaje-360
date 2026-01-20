@@ -47,9 +47,9 @@
                             <!-- Primer paso -->
                             <mat-step [stepControl]="firstFormGroup" [editable]="false" label="Datos Generales">
                                 <form [formGroup]="firstFormGroup" class="space-y-4 mt-4">
-                                    <!-- Nombre y Descripción en columnas -->
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <mat-form-field appearance="outline" class="w-full">
+                                    <!-- Nombre y Fechas en una fila -->
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <mat-form-field appearance="outline" class="w-full md:col-span-2">
                                             <mat-label>Nombre del Ejercicio</mat-label>
                                             <input matInput placeholder="Ej: Examen Final" formControlName="nombre"
                                                 required>
@@ -58,19 +58,6 @@
                                         firstFormGroup.get('nombre').touched">El nombre es obligatorio</mat-error>
                                         </mat-form-field>
 
-                                        <mat-form-field appearance="outline" class="w-full">
-                                            <mat-label>Descripción</mat-label>
-                                            <input matInput placeholder="Describe el ejercicio..."
-                                                formControlName="descripcion" required>
-                                            <mat-icon matPrefix class="text-gray-400">description</mat-icon>
-                                            <mat-error *ngIf="firstFormGroup.get('descripcion').hasError('required') &&
-                                        firstFormGroup.get('descripcion').touched">La descripción es
-                                                obligatoria</mat-error>
-                                        </mat-form-field>
-                                    </div>
-
-                                    <!-- Fechas en dos columnas -->
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <mat-form-field appearance="outline" class="w-full">
                                             <mat-label>Fecha de Inicio</mat-label>
                                             <input matInput [matDatepicker]="pickerInicio"
@@ -98,33 +85,46 @@
                                         </mat-form-field>
                                     </div>
 
-                                    <!-- Número de Intentos (condicional) -->
-                                    <div *ngIf="intentosLimitados" class="transition-all duration-300 ease-in-out">
-                                        <mat-form-field appearance="outline" class="w-full md:w-1/2">
-                                            <mat-label>Número de Intentos</mat-label>
-                                            <input matInput type="number" placeholder="Ej: 3"
-                                                formControlName="numeroIntentos" required min="1">
-                                            <mat-icon matPrefix class="text-gray-400">repeat</mat-icon>
-                                            <mat-error *ngIf="firstFormGroup.get('numeroIntentos').hasError('required') &&
-                                        firstFormGroup.get('numeroIntentos').touched">El número de intentos es
-                                                obligatorio</mat-error>
-                                            <mat-error *ngIf="firstFormGroup.get('numeroIntentos').hasError('min')">El
-                                                número debe ser mayor a 0</mat-error>
-                                        </mat-form-field>
+                                    <!-- Descripción como textarea -->
+                                    <mat-form-field appearance="outline" class="w-full">
+                                        <mat-label>Descripción</mat-label>
+                                        <textarea matInput placeholder="Describe el ejercicio..."
+                                            formControlName="descripcion" required rows="4"></textarea>
+                                        <mat-icon matPrefix class="text-gray-400">description</mat-icon>
+                                        <mat-error *ngIf="firstFormGroup.get('descripcion').hasError('required') &&
+                                    firstFormGroup.get('descripcion').touched">La descripción es
+                                            obligatoria</mat-error>
+                                    </mat-form-field>
+
+                                    <!-- Checkbox y Número de Intentos en fila -->
+                                    <div class="flex gap-4 items-start">
+                                        <!-- Checkbox (más estrecho) -->
+                                        <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex-shrink-0">
+                                            <mat-checkbox [(ngModel)]="intentosLimitados"
+                                                (ngModelChange)="updateNumeroIntentosValidation()"
+                                                [ngModelOptions]="{standalone: true}" color="primary"
+                                                class="text-sm">
+                                                <span class="font-medium">Limitar intentos</span>
+                                            </mat-checkbox>
+                                            <p class="text-xs text-gray-500 mt-1 ml-8">Activa si deseas limitar cuántas veces pueden realizar el ejercicio</p>
+                                        </div>
+
+                                        <!-- Número de Intentos (a la derecha cuando se activa) -->
+                                        <div *ngIf="intentosLimitados" class="transition-all duration-300 ease-in-out flex-1 pt-4">
+                                            <mat-form-field appearance="outline" class="w-full">
+                                                <mat-label>Número de Intentos</mat-label>
+                                                <input matInput type="number" placeholder="Ej: 3"
+                                                    formControlName="numeroIntentos" required min="1">
+                                                <mat-icon matPrefix class="text-gray-400">repeat</mat-icon>
+                                                <mat-error *ngIf="firstFormGroup.get('numeroIntentos').hasError('required') &&
+                                            firstFormGroup.get('numeroIntentos').touched">El número de intentos es
+                                                    obligatorio</mat-error>
+                                                <mat-error *ngIf="firstFormGroup.get('numeroIntentos').hasError('min')">El
+                                                    número debe ser mayor a 0</mat-error>
+                                            </mat-form-field>
+                                        </div>
                                     </div>
                                 </form>
-
-                                <!-- Checkbox fuera del formulario -->
-                                <div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                    <mat-checkbox [(ngModel)]="intentosLimitados"
-                                        (ngModelChange)="updateNumeroIntentosValidation()" color="primary"
-                                        class="text-sm">
-                                        <span class="font-medium">Limitar número de intentos</span>
-                                    </mat-checkbox>
-                                    <p class="text-xs text-gray-500 mt-1 ml-8">Activa esta opción si deseas limitar
-                                        cuántas
-                                        veces pueden realizar el ejercicio</p>
-                                </div>
 
                                 <!-- Botones -->
                                 <div class="flex justify-end mt-6 pb-4">
@@ -139,13 +139,21 @@
                                 <form [formGroup]="secondFormGroup" class="space-y-4 mt-4">
                                     <div class="mb-4">
                                         <h3 class="text-lg font-medium text-gray-700 mb-2">Elige un escenario</h3>
+                                        <p class="text-sm text-gray-500 mb-3">
+                                            Seleccionadas: <span class="font-semibold text-gray-700">{{ (secondFormGroup.get('escenarios')?.value ?? []).length }}</span>
+                                        </p>
                                         <div class="flex flex-wrap gap-4 justify-center">
                                             <div *ngFor="let imagen of imagenesEscenarios"
                                                 (click)="selectEscenario(imagen)"
-                                                class="cursor-pointer border-4 rounded-lg overflow-hidden transition-all duration-200 hover:scale-105"
+                                                class="relative cursor-pointer border-4 rounded-lg overflow-hidden transition-all duration-200 hover:scale-105"
                                                 [ngClass]="{'border-blue-500 shadow-lg scale-105': (secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id), 'border-transparent': !(secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id)}">
                                                 <img [src]="'assets/escenarios/' + imagen.nombre_imagen + '.JPG'"
                                                     [alt]="imagen.nombre_imagen" class="h-32 w-auto object-cover">
+                                                <!-- Número de orden cuando está seleccionado -->
+                                                <div *ngIf="(secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id)"
+                                                    class="absolute top-2 right-2 bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg shadow-lg">
+                                                    {{ getOrdenEscenario(imagen.id) }}
+                                                </div>
                                             </div>
                                         </div>
                                         <mat-error *ngIf="secondFormGroup.get('escenarios').hasError('required') &&
@@ -169,13 +177,39 @@
                             <mat-step [editable]="false" label="Seleccionar Pacientes">
                                 <div class="flex gap-4">
                                     <!-- Primer div (columna) -->
-                                    <div class="w-[80px] h-[500px] overflow-auto">
-                                        <div *ngFor="let paciente of pacientes"
-                                            class="flex flex-col rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300"
-                                            (click)="seleccionarPaciente(paciente)">
-                                            <!-- Solo la imagen del paciente como tarjeta -->
-                                            <img [src]="'assets/pacientes/'+ paciente.nombre_imagen + '.png'"
-                                                [alt]="paciente.descripcion" class="w-full h-32 object-cover">
+                                    <div class="flex flex-col w-[160px] h-[500px]">
+                                        <!-- Search input -->
+                                        <mat-form-field appearance="outline" class="w-full mb-2 flex-shrink-0">
+                                            <mat-label>Buscar paciente</mat-label>
+                                            <input matInput placeholder="Nombre o descripción..."
+                                                [value]="searchTermPacientes"
+                                                (input)="filterPacientes($event.target.value)">
+                                            <mat-icon matPrefix class="text-gray-400">search</mat-icon>
+                                            <button mat-icon-button matSuffix *ngIf="searchTermPacientes" 
+                                                (click)="filterPacientes('')"
+                                                class="text-gray-400 hover:text-gray-600">
+                                                <mat-icon>close</mat-icon>
+                                            </button>
+                                        </mat-form-field>
+                                        
+                                        <!-- Pacientes list -->
+                                        <div class="flex-1 overflow-auto">
+                                            <div *ngFor="let paciente of pacientesFiltrados"
+                                                class="relative flex flex-col rounded-2xl overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 m-2"
+                                                [style.border]="'3px solid ' + getColorHex(paciente.color)"
+                                                (click)="seleccionarPaciente(paciente)">
+                                                <!-- Solo la imagen del paciente como tarjeta -->
+                                                <img [src]="'assets/pacientes/'+ paciente.nombre_imagen + '.png'"
+                                                    [alt]="paciente.descripcion" class="w-full h-32 object-cover">
+                                                <!-- Descripción en hover -->
+                                                <div class="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-2xl p-3">
+                                                    <p class="text-white text-sm text-center leading-relaxed overflow-y-auto max-h-full font-medium">{{ paciente.descripcion }}</p>
+                                                </div>
+                                            </div>
+                                            <!-- No results message -->
+                                            <div *ngIf="pacientesFiltrados.length === 0" class="p-4 text-center text-gray-500 text-sm">
+                                                No se encontraron pacientes
+                                            </div>
                                         </div>
                                     </div>
 
@@ -231,29 +265,70 @@
                                                 </mat-form-field>
                                             </div>
 
-                                            <!-- Selección de Escenario Section -->
+                                            <!-- Selección de Imagen Section -->
                                             <div class="mb-6">
                                                 <h3
-                                                    class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                                    class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-3">
                                                     <mat-icon class="text-primary-600">image</mat-icon>
-                                                    Selección de Escenario
-                                                </h3>
-                                                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                                    <div *ngFor="let img of imagenesPacientes"
-                                                        class="relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-200"
-                                                        [class.border-primary-500]="ThirdFormGroup.get('imagenSeleccionada').value === img.id"
-                                                        [class.border-transparent]="ThirdFormGroup.get('imagenSeleccionada').value !== img.id"
-                                                        [class.ring-2]="ThirdFormGroup.get('imagenSeleccionada').value === img.id"
-                                                        [class.ring-primary-500]="ThirdFormGroup.get('imagenSeleccionada').value === img.id"
-                                                        (click)="ThirdFormGroup.patchValue({imagenSeleccionada: img.id})">
-                                                        <img [src]="'assets/pacientes/'+ img.nombre_imagen + '.png'"
-                                                            [alt]="img.descripcion"
-                                                            class="w-full h-20 object-contain hover:scale-105 transition-transform duration-300 p-1">
-                                                        <div *ngIf="ThirdFormGroup.get('imagenSeleccionada').value === img.nombre_imagen"
-                                                            class="absolute inset-0 bg-primary-500 bg-opacity-20 flex items-center justify-center">
-                                                            <mat-icon class="text-white bg-primary-500 rounded-full p-1"
-                                                                style="width: 24px; height: 24px; font-size: 18px;">check</mat-icon>
+                                                    Imagen de Paciente
+                                                    <!-- Selected Image Display -->
+                                                    <div *ngIf="ThirdFormGroup.get('imagenSeleccionada').value"
+                                                        class="flex items-center gap-2 ml-auto">
+                                                        <div class="w-10 h-10 rounded-lg border-2 border-blue-600 overflow-hidden bg-white flex-shrink-0">
+                                                            <img [src]="'assets/pacientes/' + getImagenSeleccionada()?.nombre_imagen + '.png'"
+                                                                class="w-full h-full object-contain p-0.5">
                                                         </div>
+                                                        <button type="button" (click)="openImagenModal()"
+                                                            class="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                                            title="Cambiar imagen">
+                                                            <mat-icon class="text-blue-600" style="font-size: 18px; width: 18px; height: 18px;">edit</mat-icon>
+                                                        </button>
+                                                    </div>
+                                                    <!-- Add Image Button -->
+                                                    <button *ngIf="!ThirdFormGroup.get('imagenSeleccionada').value" type="button" (click)="openImagenModal()"
+                                                        class="ml-auto p-1 hover:bg-gray-200 rounded-full transition-colors duration-200">
+                                                        <mat-icon class="text-blue-600">add</mat-icon>
+                                                    </button>
+                                                </h3>
+                                            </div>
+
+                                            <!-- Imagen Modal -->
+                                            <div *ngIf="showImagenModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                                                <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-96 flex flex-col">
+                                                    <!-- Modal Header -->
+                                                    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                                                        <h3 class="text-lg font-semibold text-gray-800">Seleccionar Imagen de Paciente</h3>
+                                                        <button type="button" (click)="closeImagenModal()"
+                                                            class="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                                                            <mat-icon class="text-gray-400">close</mat-icon>
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- Modal Content - Horizontal Layout -->
+                                                    <div class="overflow-x-auto flex-1 p-4">
+                                                        <div class="flex gap-4 pb-2">
+                                                            <button *ngFor="let img of imagenesPacientes"
+                                                                type="button"
+                                                                (click)="selectImagen(img.id)"
+                                                                class="flex-shrink-0 relative cursor-pointer rounded-lg overflow-hidden border-4 transition-all duration-200 hover:scale-105"
+                                                                [ngClass]="{'border-blue-500 shadow-lg': ThirdFormGroup.get('imagenSeleccionada').value === img.id, 'border-gray-300': ThirdFormGroup.get('imagenSeleccionada').value !== img.id}">
+                                                                <img [src]="'assets/pacientes/'+ img.nombre_imagen + '.png'"
+                                                                    [alt]="img.descripcion"
+                                                                    class="w-32 h-32 object-contain p-2">
+                                                                <div *ngIf="ThirdFormGroup.get('imagenSeleccionada').value === img.id"
+                                                                    class="absolute top-1 right-1 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                                                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Modal Footer -->
+                                                    <div class="p-4 border-t border-gray-200 flex justify-end">
+                                                        <button type="button" (click)="closeImagenModal()"
+                                                            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors">
+                                                            Cerrar
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -264,33 +339,63 @@
                                                     class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                                                     <mat-icon class="text-primary-600">medical_services</mat-icon>
                                                     Acciones Médicas
+                                                    <button type="button" (click)="openAccionesModal()"
+                                                        class="ml-auto p-1 hover:bg-gray-200 rounded-full transition-colors duration-200">
+                                                        <mat-icon class="text-blue-600">add</mat-icon>
+                                                    </button>
                                                 </h3>
-                                                <mat-form-field appearance="outline" class="w-full">
-                                                    <mat-label>Selecciona las acciones necesarias</mat-label>
-                                                    <mat-select formControlName="accionesPaciente" multiple>
-                                                        <mat-option *ngFor="let accion of accionesPaciente"
-                                                            [value]="accion.id">
-                                                            {{ accion.nombre_accion }}
-                                                        </mat-option>
-                                                    </mat-select>
-                                                    <mat-icon matPrefix class="text-primary-500">checklist</mat-icon>
-                                                    <mat-hint>Puedes seleccionar múltiples acciones
-                                                        (opcional)</mat-hint>
-                                                </mat-form-field>
 
-                                                <!-- Display selected actions in the modal -->
+                                                <!-- Display selected actions as badges -->
                                                 <div *ngIf="ThirdFormGroup.get('accionesPaciente').value?.length > 0"
-                                                    class="mt-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                                    <p class="text-sm font-medium text-blue-900 mb-2">Acciones
-                                                        seleccionadas:</p>
+                                                    class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                                    <p class="text-sm font-medium text-blue-900 mb-2">Acciones seleccionadas:</p>
                                                     <div class="flex flex-wrap gap-2">
                                                         <span
                                                             *ngFor="let accionId of ThirdFormGroup.get('accionesPaciente').value"
-                                                            class="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium">
-                                                            <mat-icon class="text-white"
-                                                                style="font-size: 16px; width: 16px; height: 16px;">check_circle</mat-icon>
+                                                            class="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-medium">
                                                             {{ getAccionLabel(accionId) }}
+                                                            <button type="button" (click)="removeAccion(accionId)"
+                                                                class="hover:bg-blue-700 rounded-full p-0.5 transition-colors">
+                                                                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">close</mat-icon>
+                                                            </button>
                                                         </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Acciones Modal -->
+                                            <div *ngIf="showAccionesModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                                                <div class="bg-white rounded-lg shadow-2xl max-w-md w-full max-h-96 flex flex-col">
+                                                    <!-- Modal Header -->
+                                                    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                                                        <h3 class="text-lg font-semibold text-gray-800">Seleccionar Acciones</h3>
+                                                        <button type="button" (click)="closeAccionesModal()"
+                                                            class="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                                                            <mat-icon class="text-gray-400">close</mat-icon>
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- Modal Content -->
+                                                    <div class="overflow-y-auto flex-1 p-4">
+                                                        <div class="space-y-2">
+                                                            <button *ngFor="let accion of getAccionesDisponibles()"
+                                                                type="button"
+                                                                (click)="addAccion(accion.id)"
+                                                                class="w-full text-left px-4 py-3 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200">
+                                                                <div class="flex items-center gap-2">
+                                                                    <mat-icon class="text-primary-600">check_circle_outline</mat-icon>
+                                                                    <span class="font-medium text-gray-700">{{ accion.nombre_accion }}</span>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Modal Footer -->
+                                                    <div class="p-4 border-t border-gray-200 flex justify-end">
+                                                        <button type="button" (click)="closeAccionesModal()"
+                                                            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors">
+                                                            Cerrar
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -303,41 +408,40 @@
                                                     Configuración Avanzada
                                                 </h3>
 
-                                                <!-- Checkbox -->
-                                                <div class="mb-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                                                    <mat-checkbox [(ngModel)]="empeoramientoLimitado"
-                                                        (ngModelChange)="updateEmpeoramientoValidation()"
-                                                        [ngModelOptions]="{standalone: true}" color="primary"
-                                                        class="text-sm">
-                                                        <span class="font-semibold text-amber-900">El paciente puede
-                                                            empeorar</span>
-                                                    </mat-checkbox>
-                                                    <p class="text-xs text-amber-700 mt-2 ml-8">
-                                                        <mat-icon class="text-amber-600 align-middle"
-                                                            style="font-size: 14px; width: 14px; height: 14px;">info</mat-icon>
-                                                        Activa esta opción si deseas establecer un tiempo de
-                                                        empeoramiento
-                                                    </p>
-                                                </div>
+                                                <!-- Checkbox y Tiempo de Empeoramiento en fila -->
+                                                <div class="flex gap-4 items-start">
+                                                    <!-- Checkbox (más estrecho) -->
+                                                    <div class="p-4 bg-amber-50 rounded-lg border border-amber-200 flex-shrink-0">
+                                                        <mat-checkbox [(ngModel)]="empeoramientoLimitado"
+                                                            (ngModelChange)="updateEmpeoramientoValidation()"
+                                                            [ngModelOptions]="{standalone: true}" color="primary"
+                                                            class="text-sm">
+                                                            <span class="font-semibold text-amber-900">El paciente puede empeorar</span>
+                                                        </mat-checkbox>
+                                                        <p class="text-xs text-amber-700 mt-2 ml-8">
+                                                            <mat-icon class="text-amber-600 align-middle"
+                                                                style="font-size: 14px; width: 14px; height: 14px;">info</mat-icon>
+                                                            Activa esta opción si deseas establecer un tiempo de empeoramiento
+                                                        </p>
+                                                    </div>
 
-                                                <!-- Tiempo de Empeoramiento (condicional) -->
-                                                <div *ngIf="empeoramientoLimitado"
-                                                    class="transition-all duration-300 ease-in-out">
-                                                    <mat-form-field appearance="outline" class="w-full">
-                                                        <mat-label>Tiempo de empeoramiento (minutos)</mat-label>
-                                                        <input matInput type="number" placeholder="Ej: 5"
-                                                            formControlName="tiempoEmpeoramiento" required min="1">
-                                                        <mat-icon matPrefix class="text-primary-500">schedule</mat-icon>
-                                                        <mat-hint>Tiempo en minutos antes de que el paciente
-                                                            empeore</mat-hint>
-                                                        <mat-error
-                                                            *ngIf="ThirdFormGroup.get('tiempoEmpeoramiento').hasError('required') && ThirdFormGroup.get('tiempoEmpeoramiento').touched">El
-                                                            tiempo de empeoramiento es obligatorio</mat-error>
-                                                        <mat-error
-                                                            *ngIf="ThirdFormGroup.get('tiempoEmpeoramiento').hasError('min')">El
-                                                            tiempo
-                                                            debe ser mayor a 0</mat-error>
-                                                    </mat-form-field>
+                                                    <!-- Tiempo de Empeoramiento (a la derecha cuando se activa) -->
+                                                    <div *ngIf="empeoramientoLimitado" class="transition-all duration-300 ease-in-out flex-1 pt-4">
+                                                        <mat-form-field appearance="outline" class="w-full">
+                                                            <mat-label>Tiempo de empeoramiento (minutos)</mat-label>
+                                                            <input matInput type="number" placeholder="Ej: 5"
+                                                                formControlName="tiempoEmpeoramiento" required min="1">
+                                                            <mat-icon matPrefix class="text-primary-500">schedule</mat-icon>
+                                                            <mat-hint>Tiempo en minutos antes de que el paciente
+                                                                empeore</mat-hint>
+                                                            <mat-error
+                                                                *ngIf="ThirdFormGroup.get('tiempoEmpeoramiento').hasError('required') && ThirdFormGroup.get('tiempoEmpeoramiento').touched">El
+                                                                tiempo de empeoramiento es obligatorio</mat-error>
+                                                            <mat-error
+                                                                *ngIf="ThirdFormGroup.get('tiempoEmpeoramiento').hasError('min')">El
+                                                                tiempo debe ser mayor a 0</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -359,13 +463,18 @@
                                     </div>
 
                                     <!-- Tercer div (columna) -->
-                                    <div class="w-[80px] h-[500px] overflow-auto">
+                                    <div class="w-[160px] h-[500px] overflow-auto">
                                         <div *ngFor="let paciente of pacientesEjercicio"
-                                            class="flex flex-col rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300"
+                                            class="relative flex flex-col rounded-2xl overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 m-2"
+                                            [style.border]="'3px solid ' + getColorHex(paciente.color)"
                                             (click)="seleccionarPaciente(paciente)">
                                             <!-- Solo la imagen del paciente como tarjeta -->
                                             <img [src]="'assets/pacientes/'+ paciente.nombre_imagen + '.png'"
                                                 [alt]="paciente.descripcion" class="w-full h-32 object-cover">
+                                            <!-- Descripción en hover -->
+                                            <div class="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-2xl p-3">
+                                                <p class="text-white text-sm text-center leading-relaxed overflow-y-auto max-h-full font-medium">{{ paciente.descripcion }}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -402,7 +511,8 @@
                                                     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-rows: repeat(4, 1fr); grid-template-columns: repeat(16, 1fr); gap: 0; border: 2px solid rgba(0, 0, 0, 0.8);">
                                                         <div *ngFor="let cellIdx of getCellIndices()"
                                                             (drop)="onDrop($event, getRowFromIndex(cellIdx), getColFromIndex(cellIdx))"
-                                                            (dragover)="onDragOver($event)"
+                                                            (dragover)="onDragOver($event, getRowFromIndex(cellIdx), getColFromIndex(cellIdx))"
+                                                            (dragenter)="onDragEnter($event, getRowFromIndex(cellIdx), getColFromIndex(cellIdx))"
                                                             (dragleave)="onDragLeave($event)"
                                                             style="border: 1px solid rgba(0, 0, 0, 0.4); cursor: pointer; position: relative; min-height: 67px; display: flex; align-items: center; justify-content: center;"
                                                             [style.background-color]="getCellBackground(getRowFromIndex(cellIdx), getColFromIndex(cellIdx))"
@@ -417,23 +527,20 @@
                                                 </div>
                                             </div>
 
-                                    <!-- Tercer div: Seleccionar Escenarios (centrado) -->
-
-                                        <div class="flex items-center justify-center flex-1">
-                                                
-                                                <div class="flex flex-wrap gap-2 items-center justify-center" style="max-width: 300px;">
-                                                    <div *ngFor="let imagen of imagenesEscenarios" 
-                                                        (click)="seleccionarImagenEscenario(imagen.nombre_imagen)"
-                                                        class="p-2 w-30 h-30 flex items-center justify-center transition-all cursor-pointer hover:scale-105 relative rounded-lg border-2"
-                                                        [ngClass]="{'border-blue-500 shadow-lg bg-blue-50': imagenSeleccionadaId == imagen.nombre_imagen, 'border-gray-300 bg-white': imagenSeleccionadaId != imagen.nombre_imagen }">
-                                                        <img [src]="'assets/escenarios/' + imagen.nombre_imagen + '.JPG'" [alt]="imagen.nombre_imagen" class="w-full h-full object-cover rounded">
-                                                        <div *ngIf="imagenSeleccionadaId == imagen.nombre_imagen" class="absolute top-0 right-0 bg-blue-500 text-white rounded-full p-0.5">
-                                                            <mat-icon style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
-                                                        </div>
-                                                    </div>
+                                    <!-- Tercer div: Seleccionar Escenarios (horizontal) -->
+                                    <div class="w-full overflow-x-auto border border-gray-300 rounded-lg bg-gray-50">
+                                        <div class="flex gap-2 items-center justify-center p-2">
+                                            <div *ngFor="let imagen of imagenesEscenarios" 
+                                                (click)="seleccionarImagenEscenario(imagen.nombre_imagen)"
+                                                class="p-2 w-20 h-20 flex items-center justify-center transition-all cursor-pointer hover:scale-105 relative rounded-lg border-2 flex-shrink-0"
+                                                [ngClass]="{'border-blue-500 shadow-lg bg-blue-50': imagenSeleccionadaId == imagen.nombre_imagen, 'border-gray-300 bg-white': imagenSeleccionadaId != imagen.nombre_imagen }">
+                                                <img [src]="'assets/escenarios/' + imagen.nombre_imagen + '.JPG'" [alt]="imagen.nombre_imagen" class="w-full h-full object-cover rounded">
+                                                <div *ngIf="imagenSeleccionadaId == imagen.nombre_imagen" class="absolute top-0 right-0 bg-blue-500 text-white rounded-full p-0.5">
+                                                    <mat-icon style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
                                                 </div>
-                                            
+                                            </div>
                                         </div>
+                                    </div>
 
                                     <!-- Botones de navegación -->
                                     <div class="flex justify-between pt-4 border-t border-gray-200">

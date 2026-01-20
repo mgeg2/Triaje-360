@@ -252,11 +252,28 @@ const getImagenesFromEjercicio = async (ejercicioId) => {
         });
     });
 }
+
+
+const locatePacienteInEjercicio = async (idEjercicio, body) => {
+    console.log(body);
+    return new Promise((resolve, reject) => {
+        if (!body || !body.pacienteId || body.fila === undefined || body.columna === undefined) {
+            return reject({ status: 400, message: 'Body, pacienteId, nuevaPosicionX y nuevaPosicionY son requeridos' });
+        }
+        db.query('INSERT INTO ubicacion_pacientes_ejercicio (paciente, ejercicio,imagen, fila, columna) VALUES (?, ?,?, ?, ?) ON DUPLICATE KEY UPDATE fila = ?, columna = ?',
+            [body.pacienteId, idEjercicio,body.imagenId, body.fila, body.columna, body.fila, body.columna], (err, results) => {
+                if (err) return reject(err);
+                resolve({ status: 200, message: "Ubicación del paciente actualizada correctamente", results });
+            });
+    });
+}
+
             module.exports = {
     getAllEjercicios,
     postEjercicio,
     getImagenes,
     postPacienteToEjercicio,
     getPacientesEjercicio,
-    getImagenesFromEjercicio
+    getImagenesFromEjercicio,
+    locatePacienteInEjercicio
 }

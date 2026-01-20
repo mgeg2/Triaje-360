@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AsignaturasService } from 'app/core/asignaturas/asignaturas.service';
 import { UserService } from 'app/core/user/user.service';
@@ -28,6 +28,8 @@ export class EjerciciosComponent implements OnInit {
   user!: User;
   private _unsubscribeAll: Subject<any> = new Subject<any>();
   showModal = false;
+  showAccionesModal = false;
+  showImagenModal = false;
   intentosLimitados = false;
   selectedAsignaturaId: string = '';
   ejercicio: any
@@ -37,7 +39,10 @@ export class EjerciciosComponent implements OnInit {
   empeoramientoLimitado: any;
   imagenSeleccionadaId: any = null;
   pacientesColocados: { [key: string]: any } = {};
-  constructor(private _asignaturasService: AsignaturasService, private _userService: UserService, private _ejerciciosService: EjerciciosService, private _pacientesService: PacientesService) { }
+  pacientesColocadosPorImagen: { [imagenId: string]: { [key: string]: any } } = {};
+  searchTermPacientes: string = '';
+  pacientesFiltrados: any[] = [];
+  constructor(private _asignaturasService: AsignaturasService, private _userService: UserService, private _ejerciciosService: EjerciciosService, private _pacientesService: PacientesService, private cdr: ChangeDetectorRef) { }
   private _formBuilder = inject(FormBuilder);
 
   firstFormGroup = this._formBuilder.group({
@@ -58,7 +63,7 @@ export class EjerciciosComponent implements OnInit {
     nombre: ['', Validators.required],
     descripcion: ['', Validators.required],
     color: ['', Validators.required],
-    accionesPaciente: [[]],
+    accionesPaciente: this._formBuilder.control<any[]>([]),
     tiempoEmpeoramiento: [''],
     imagenSeleccionada: [null],
     ejercicio: [''],
@@ -164,12 +169,61 @@ export class EjerciciosComponent implements OnInit {
           this.stepper.next();
           event++;
           this.getimagenes(event, this.ejercicio);
+          this.getPacientesEjercicio();
         }
         
         // this.closeNewEditModal();
       });
 
-    } 
+    }
+    if (event == 4) {
+      // Guardar las posiciones de los pacientes de todas las imágenes
+      let totalPacientesColocados = 0;
+      
+      // Guardar pacientes de la imagen actual si hay alguno seleccionado
+      if (this.imagenSeleccionadaId && Object.keys(this.pacientesColocados).length > 0) {
+        Object.entries(this.pacientesColocados).forEach(([key, paciente]) => {
+          const [fila, columna] = key.split('-').map(Number);
+          this._ejerciciosService.locatePacienteInEjercicio(this.ejercicio, {
+            pacienteId: paciente.id,
+            imagenId: this.imagenSeleccionadaId,
+            fila: fila,
+            columna: columna
+          }).subscribe((data: any) => {
+            console.log('Posición guardada:', data);
+          });
+          totalPacientesColocados++;
+        });
+      }
+      
+      // Guardar pacientes de imágenes anteriores guardadas
+      Object.entries(this.pacientesColocadosPorImagen).forEach(([imagenId, pacientesColocados]) => {
+        Object.entries(pacientesColocados).forEach(([key, paciente]) => {
+          const [fila, columna] = key.split('-').map(Number);
+          this._ejerciciosService.locatePacienteInEjercicio(this.ejercicio, {
+            pacienteId: paciente.id,
+            imagenId: imagenId,
+            fila: fila,
+            columna: columna
+          }).subscribe((data: any) => {
+            console.log('Posición guardada:', data);
+          });
+          totalPacientesColocados++;
+        });
+      });
+
+      if (totalPacientesColocados === 0) {
+        alert("Debe colocar al menos un paciente en algún escenario");
+        return;
+      }
+
+      alert("Ejercicio creado correctamente");
+      this.closeNewEditModal();
+      this.showModal = false;
+      this.pacientesColocados = {};
+      this.pacientesColocadosPorImagen = {};
+      this.getPacientesEjercicio();
+    }
   }
   getimagenes(event: any, ejercicio: any): void {
     var tipo;
@@ -200,6 +254,7 @@ export class EjerciciosComponent implements OnInit {
     this._pacientesService.getPacientes().subscribe((data: any) => {
       console.log(data);
       this.pacientes = data;
+      this.pacientesFiltrados = [...data];
     });
   }
   getAccionesPaciente(): void {
@@ -247,6 +302,13 @@ console.log(this.ThirdFormGroup.value);
       escenariosControl?.setErrors({ required: true });
     }
   }
+
+  // Método para obtener el orden de un escenario seleccionado
+  getOrdenEscenario(imagenId: any): number {
+    const escenariosControl = this.secondFormGroup.get('escenarios');
+    const currentEscenarios = escenariosControl?.value || [];
+    return currentEscenarios.indexOf(imagenId) + 1;
+  }
   // Método para actualizar validación cuando cambia el checkbox
   updateNumeroIntentosValidation(): void {
     const numeroIntentosControl = this.firstFormGroup.get('numeroIntentos');
@@ -269,6 +331,7 @@ console.log(this.ThirdFormGroup.value);
       empeoramientoControl.clearValidators();
     }
     empeoramientoControl.updateValueAndValidity();
+    this.cdr.detectChanges();
   }
 
   toggleAsignatura(index: number): void {
@@ -282,17 +345,33 @@ console.log(this.ThirdFormGroup.value);
     this.firstFormGroup.reset();
     this.secondFormGroup.reset();
     this.ThirdFormGroup.reset();
+    this.pacientesEjercicio = [];
+    this.pacientesColocados = {};
+    this.intentosLimitados = false;
+    this.empeoramientoLimitado = false;
     this.imagenSeleccionadaId = null;
   }
 
   closeNewEditModal(): void {
     this.showModal = false;
+    this.stepper.reset();
+    this.firstFormGroup.reset();
+    this.secondFormGroup.reset();
+    this.ThirdFormGroup.reset();
+    this.pacientesEjercicio = [];
+    this.pacientesColocados = {};
+    this.intentosLimitados = false;
+    this.empeoramientoLimitado = false;
+    this.imagenSeleccionadaId = null;
   }
 
   addPacienteToExercise(): void {
     
     this.ThirdFormGroup.patchValue({ ejercicio: this.ejercicio });
     const pacienteData = this.ThirdFormGroup.value;
+    if (!this.empeoramientoLimitado) {
+      pacienteData.tiempoEmpeoramiento = "0";
+    }
     if (pacienteData.tiempoEmpeoramiento) {
         pacienteData.tiempoEmpeoramiento = pacienteData.tiempoEmpeoramiento;
       } else {
@@ -326,17 +405,134 @@ console.log(this.ThirdFormGroup.value);
   }
 
   /**
+   * Abre el modal de selección de acciones
+   */
+  openAccionesModal(): void {
+    this.showAccionesModal = true;
+  }
+
+  /**
+   * Cierra el modal de selección de acciones
+   */
+  closeAccionesModal(): void {
+    this.showAccionesModal = false;
+  }
+
+  /**
+   * Abre el modal de selección de imagen de paciente
+   */
+  openImagenModal(): void {
+    this.showImagenModal = true;
+  }
+
+  /**
+   * Cierra el modal de selección de imagen de paciente
+   */
+  closeImagenModal(): void {
+    this.showImagenModal = false;
+  }
+
+  /**
+   * Obtiene las acciones disponibles (todas las acciones sin filtrar)
+   * @returns Array de todas las acciones
+   */
+  getAccionesDisponibles(): any[] {
+    return this.accionesPaciente;
+  }
+
+  /**
+   * Agrega una acción a la lista de acciones seleccionadas
+   * @param accionId - El ID de la acción a agregar
+   */
+  addAccion(accionId: number): void {
+    const accionesControl = this.ThirdFormGroup.get('accionesPaciente');
+    const currentAcciones = accionesControl?.value || [];
+    
+    accionesControl?.patchValue([...currentAcciones, accionId]);
+    this.closeAccionesModal();
+  }
+
+  /**
+   * Selecciona una imagen de paciente (una sola imagen permitida)
+   * @param imagenId - El ID de la imagen a seleccionar
+   */
+  selectImagen(imagenId: number): void {
+    this.ThirdFormGroup.patchValue({imagenSeleccionada: imagenId});
+    this.closeImagenModal();
+  }
+
+  /**
+   * Remueve una acción de la lista de acciones seleccionadas (solo una instancia)
+   * @param accionId - El ID de la acción a remover
+   */
+  removeAccion(accionId: number): void {
+    const accionesControl = this.ThirdFormGroup.get('accionesPaciente');
+    const currentAcciones = accionesControl?.value || [];
+    
+    const index = currentAcciones.indexOf(accionId);
+    if (index > -1) {
+      const newAcciones = currentAcciones.slice();
+      newAcciones.splice(index, 1);
+      accionesControl?.patchValue(newAcciones);
+    }
+  }
+
+  /**
+   * Obtiene la imagen de paciente seleccionada
+   * @returns El objeto imagen o undefined
+   */
+  getImagenSeleccionada(): any {
+    const imagenId = this.ThirdFormGroup.get('imagenSeleccionada')?.value;
+    return this.imagenesPacientes.find(img => img.id === imagenId);
+  }
+
+  /**
+   * Filtra los pacientes según el término de búsqueda (por nombre y descripción)
+   * @param searchTerm - El término a buscar
+   */
+  filterPacientes(searchTerm: string): void {
+    this.searchTermPacientes = searchTerm;
+    if (!searchTerm || searchTerm.trim() === '') {
+      this.pacientesFiltrados = [...this.pacientes];
+    } else {
+      const term = searchTerm.toLowerCase();
+      this.pacientesFiltrados = this.pacientes.filter(paciente =>
+        paciente.nombre?.toLowerCase().includes(term) ||
+        paciente.descripcion?.toLowerCase().includes(term)
+      );
+    }
+  }
+
+  /**
    * Selecciona una imagen del escenario y deselecciona la anterior
    * @param imagenId - El ID de la imagen a seleccionar
    */
   seleccionarImagenEscenario(imagenId: any): void {
+    // Guardar el estado actual de pacientes colocados si hay una imagen seleccionada
+    if (this.imagenSeleccionadaId && this.imagenSeleccionadaId !== imagenId) {
+      // Guardar los pacientes colocados de la imagen anterior
+      this.pacientesColocadosPorImagen[this.imagenSeleccionadaId] = { ...this.pacientesColocados };
+      
+      // Limpiar para que desaparezcan
+      this.pacientesColocados = {};
+      
+      // Cargar los pacientes de la nueva imagen si existen
+      if (this.pacientesColocadosPorImagen[imagenId]) {
+        this.pacientesColocados = { ...this.pacientesColocadosPorImagen[imagenId] };
+      }
+    }
+    
     // Si es la misma imagen, deselecciona. Si es diferente, selecciona solo esa
     if (this.imagenSeleccionadaId === imagenId) {
       this.imagenSeleccionadaId = null;
+      // Guardar antes de deseleccionar
+      this.pacientesColocadosPorImagen[imagenId] = { ...this.pacientesColocados };
+      this.pacientesColocados = {};
     } else {
       this.imagenSeleccionadaId = imagenId;
     }
     console.log('Imagen seleccionada:', this.imagenSeleccionadaId);
+    console.log('Pacientes colocados por imagen:', this.pacientesColocadosPorImagen);
   }
 
   private draggedPaciente: any = null;
@@ -360,11 +556,30 @@ console.log(this.ThirdFormGroup.value);
   }
 
   /**
+   * Maneja el drag enter en una celda
+   */
+  onDragEnter(event: DragEvent, row: number, col: number): void {
+    const key = `${row}-${col}`;
+    // Si la celda está ocupada, mostrar cursor prohibido
+    if (this.pacientesColocados[key]) {
+      event.dataTransfer!.dropEffect = 'none';
+    } else {
+      event.dataTransfer!.dropEffect = 'copy';
+    }
+  }
+
+  /**
    * Maneja el drag over en una celda
    */
-  onDragOver(event: DragEvent): void {
+  onDragOver(event: DragEvent, row: number, col: number): void {
     event.preventDefault();
-    event.dataTransfer!.dropEffect = 'copy';
+    const key = `${row}-${col}`;
+    // Si la celda está ocupada, mostrar cursor prohibido
+    if (this.pacientesColocados[key]) {
+      event.dataTransfer!.dropEffect = 'none';
+    } else {
+      event.dataTransfer!.dropEffect = 'copy';
+    }
   }
 
   /**
@@ -391,6 +606,14 @@ console.log(this.ThirdFormGroup.value);
     }
 
     const key = `${row}-${col}`;
+    
+    // Verificar si ya hay un paciente en la celda
+    if (this.pacientesColocados[key]) {
+      console.warn(`La celda ${row}-${col} ya contiene un paciente`);
+      this.draggedPaciente = null;
+      return;
+    }
+
     this.pacientesColocados[key] = this.draggedPaciente;
     
     // Remover el paciente del array de pacientes disponibles
