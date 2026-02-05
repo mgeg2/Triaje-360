@@ -1,15 +1,18 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EjerciciosService } from 'app/core/ejercicios/ejercicios.service';
-import * as Marzipano from 'marzipano';  // Importar Marzipano
+import { PacientesService } from 'app/core/pacientes/pacientes.service';
+import * as Marzipano from 'marzipano';
+import Swal from 'sweetalert2';
+import { DOCUMENT } from '@angular/common';
 @Component({
   selector: 'app-marzipano360',
   imports: [CommonModule],
   templateUrl: './marzipano360.component.html',
-  styles: ``
+  styles: []
 })
-export class Marzipano360Component implements OnInit {
+export class Marzipano360Component implements OnInit, OnDestroy {
   
   @ViewChild('pano', { static: true }) panoElement: ElementRef | undefined;
   ejercicioId: string = '';
@@ -17,10 +20,41 @@ export class Marzipano360Component implements OnInit {
   pacientesUbicados: any[] = [];
   imagenesEjercicio: any[] = [];
   pacienteSeleccionado: any = null;
+  acciones: any[] = [];
+  accionesSeleccionadas: any[] = [];
+  colorSeleccionado: string = '';
+  tiempoRestante: number = 180; // 180 segundos (3 minutos)
+  intervalId: any;
+  intervalVerificacionColores: any;
+  
+  // Mapeo de pacientes a sus elementos de imagen en el marzipano
+  pacienteImagenesMap: Map<string, HTMLImageElement> = new Map();
+  
+  // Orden de colores de mejor a peor
+  coloresOrdenados: string[] = ['verde', 'amarillo', 'rojo', 'negro'];
+  
+  // Mapeo de acciones con sus tiempos en segundos
+  tiemposAcciones: { [key: string]: number } = {
+    'pls': 30,
+    'guedel': 10,
+    'collarin cervical': 60,
+    'compresion sangrado': 60,
+    'Drenaje torácico': 60
+  };
+  
+  // Mapeo de colores a clases de borde
+  colorBordeMap: { [key: string]: string } = {
+    'negro': 'border-black',
+    'rojo': 'border-red-600',
+    'amarillo': 'border-yellow-400',
+    'verde': 'border-green-600'
+  };
 
   constructor(
     private route: ActivatedRoute,
-    private ejerciciosService: EjerciciosService
+    private router: Router,
+    private ejerciciosService: EjerciciosService,
+    private pacientesService: PacientesService
   ) {}
 
   ngOnInit(): void {
@@ -28,13 +62,45 @@ export class Marzipano360Component implements OnInit {
       this.ejercicioId = params['id'];
       console.log('Ejercicio ID:', this.ejercicioId);
       
+      // Obtener acciones disponibles
+      this.obtenerAcciones();
+      
       // Obtener pacientes del ejercicio (sin color)
       this.obtenerPacientesEjercicio();
       
       // Obtener imágenes del ejercicio en orden
       this.obtenerImagenesEjercicio();
+      
+      // Iniciar el temporizador
+      this.iniciarTemporizador();
+      
+      // Iniciar verificación de empeoramiento de pacientes
+      this.iniciarVerificacionColoresPacientes();
     });
-    
+  }
+
+  ngOnDestroy(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+    if (this.intervalVerificacionColores) {
+      clearInterval(this.intervalVerificacionColores);
+    }
+  }
+
+  /**
+   * Obtiene las acciones disponibles de la base de datos
+   */
+  obtenerAcciones(): void {
+    this.pacientesService.getAccionesPaciente().subscribe({
+      next: (acciones) => {
+        this.acciones = acciones;
+        console.log('Acciones obtenidas:', this.acciones);
+      },
+      error: (error) => {
+        console.error('Error al obtener acciones:', error);
+      }
+    });
   }
 
   /**
@@ -150,15 +216,7 @@ else{
 
       // Crear elemento de imagen del paciente (sin fondo)
       const hotspotElement = document.createElement('div');
-      hotspotElement.className = 'paciente-hotspot';
-      hotspotElement.style.cssText = `
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: auto;
-        width: 60px;
-        height: 60px;
-      `;
+      hotspotElement.className = 'flex items-center justify-center pointer-events-auto w-15 h-15 relative z-10';
       
       const imgElement = document.createElement('img');
       const ruta = 'assets/pacientes/';
@@ -166,34 +224,30 @@ else{
       imgElement.src = imagenSrc;
       imgElement.alt = paciente.nombre;
       console.log(`Cargando imagen para ${paciente.nombre}: ${imagenSrc}`);
-      imgElement.style.cssText = `
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        object-fit: contain;
-        cursor: pointer;
-        border: 3px solid #007bff;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        flex-shrink: 0;
-        background-color: white;
-        display: block;
-      `;
+      
+      // Crear clase de borde solo si hay color asignado
+      const borderColor = paciente.color ? this.colorBordeMap[paciente.color] : '';
+      imgElement.className = `w-15 h-15 rounded-full object-contain cursor-pointer border-4 border-transparent ${borderColor} transition-all duration-300 shadow-md flex-shrink-0 block`;
+      
+      // Guardar referencia al elemento de imagen para actualizar color después
+      paciente.imgElement = imgElement;
+      this.pacienteImagenesMap.set(paciente.id, imgElement);
       
       // Manejar errores de carga de imagen
       imgElement.addEventListener('error', () => {
         console.warn(`Error cargando imagen: ${imagenSrc}`);
         imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"%3E%3Crect fill="%23ddd" width="60" height="60"/%3E%3Ctext x="30" y="30" text-anchor="middle" dy=".3em" fill="%23999" font-size="12"%3E?%3C/text%3E%3C/svg%3E';
+        imgElement.classList.add('bg-gray-200');
       });
 
       // Añadir efecto hover
       imgElement.addEventListener('mouseenter', () => {
-        imgElement.style.transform = 'scale(1.15)';
-        imgElement.style.boxShadow = '0 4px 20px rgba(0, 123, 255, 0.5)';
+        imgElement.classList.add('scale-125', 'shadow-lg');
+        imgElement.classList.remove('shadow-md');
       });
       imgElement.addEventListener('mouseleave', () => {
-        imgElement.style.transform = 'scale(1)';
-        imgElement.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+        imgElement.classList.remove('scale-125', 'shadow-lg');
+        imgElement.classList.add('shadow-md');
       });
 
       // Click para mostrar descripción
@@ -218,6 +272,8 @@ else{
    */
   mostrarDescripcion(paciente: any): void {
     this.pacienteSeleccionado = paciente;
+    this.accionesSeleccionadas = paciente.acciones || [];
+    this.colorSeleccionado = paciente.color || '';
   }
 
   /**
@@ -225,6 +281,240 @@ else{
    */
   cerrarModal(): void {
     this.pacienteSeleccionado = null;
+    this.accionesSeleccionadas = [];
+    this.colorSeleccionado = '';
+  }
+
+  /**
+   * Alterna la selección de una acción
+   */
+  alternarAccion(accion: any): void {
+    const index = this.accionesSeleccionadas.findIndex(a => a.id === accion.id);
+    const nombreAccion = (accion.nombre_accion || accion.nombre || accion.name || '').toLowerCase().trim();
+    // Usar el tiempo del objeto o buscar en el mapeo
+    const tiempoARestar = accion.tiempo || this.tiemposAcciones[nombreAccion] || 0;
+    
+    console.log('=== DEBUG alternarAccion ===');
+    console.log('Acción objeto:', accion);
+    console.log('Nombre acción (lowercase):', nombreAccion);
+    console.log('Tiempo a restar:', tiempoARestar);
+    console.log('Mapeo de tiempos:', this.tiemposAcciones);
+    console.log('============================');
+    
+    if (index > -1) {
+      // Deseleccionar: devolver el tiempo
+      this.accionesSeleccionadas.splice(index, 1);
+      this.tiempoRestante += tiempoARestar;
+      console.log(`Acción deseleccionada: ${nombreAccion}, tiempo devuelto: ${tiempoARestar}s, tiempo restante: ${this.tiempoRestante}s`);
+    } else {
+      // Seleccionar: restar el tiempo
+      this.accionesSeleccionadas.push(accion);
+      this.tiempoRestante -= tiempoARestar;
+      console.log(`Acción seleccionada: ${nombreAccion}, tiempo restado: ${tiempoARestar}s, tiempo restante: ${this.tiempoRestante}s`);
+    }
+  }
+
+  /**
+   * Selecciona un color para el paciente
+   */
+  seleccionarColor(color: string): void {
+    this.colorSeleccionado = color;
+    
+    // Actualizar el borde del paciente en el marzipano
+    if (this.pacienteSeleccionado && this.pacienteSeleccionado.id) {
+      const imgElement = this.pacienteImagenesMap.get(this.pacienteSeleccionado.id);
+      if (imgElement) {
+        // Remover todas las clases de borde
+        imgElement.className = imgElement.className.replace(/border-(black|red-600|yellow-400|green-600|blue-500)/g, '');
+        
+        // Agregar la nueva clase de borde
+        const borderColor = this.colorBordeMap[color] || 'border-blue-500';
+        imgElement.classList.add(borderColor);
+        
+        console.log(`Color actualizado para paciente ${this.pacienteSeleccionado.nombre}: ${color}`);
+      }
+    }
+  }
+
+  /**
+   * Verifica si una acción está seleccionada
+   */
+  esAccionSeleccionada(accion: any): boolean {
+    return this.accionesSeleccionadas.some(a => a.id === accion.id);
+  }
+
+  /**
+   * Guarda las acciones seleccionadas para el paciente
+   */
+  guardarAcciones(): void {
+    if (this.pacienteSeleccionado) {
+      this.pacienteSeleccionado.acciones = this.accionesSeleccionadas;
+      this.pacienteSeleccionado.color = this.colorSeleccionado;
+      console.log('Acciones y color guardados para paciente:', this.pacienteSeleccionado.nombre, {
+        acciones: this.accionesSeleccionadas,
+        color: this.colorSeleccionado
+      });
+      this.cerrarModal();
+    }
+  }
+
+  /**
+   * Inicia el temporizador de un minuto
+   */
+  iniciarTemporizador(): void {
+    this.intervalId = setInterval(() => {
+      this.tiempoRestante--;
+      if (this.tiempoRestante <= 0) {
+        clearInterval(this.intervalId);
+        this.mostrarAlertaTiempoTerminado();
+      }
+    }, 1000);
+  }
+
+  /**
+   * Muestra el alert cuando el tiempo termina
+   */
+  mostrarAlertaTiempoTerminado(): void {
+    Swal.fire({
+      title: 'Tiempo terminado',
+      text: 'El tiempo del ejercicio ha finalizado.',
+      icon: 'info',
+      showConfirmButton: true,
+      confirmButtonColor: '#3b82f6',
+      confirmButtonText: 'Volver a ejercicios',
+      didOpen: () => {
+        const popup = document.querySelector('.swal2-popup') as HTMLElement;
+        const backdrop = document.querySelector('.swal2-backdrop-show') as HTMLElement;
+        if (popup) {
+          popup.style.zIndex = '999999';
+        }
+        if (backdrop) {
+          backdrop.style.zIndex = '999998';
+        }
+      }
+    }).then(() => {
+      this.volverAEjercicios();
+    });
+  }
+
+  /**
+   * Obtiene el formato MM:SS del temporizador
+   */
+  obtenerFormatoTiempo(): string {
+    const minutos = Math.floor(this.tiempoRestante / 60);
+    const segundos = this.tiempoRestante % 60;
+    return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+  }
+
+  /**
+   * Inicia la verificación periódica del empeoramiento de pacientes
+   */
+  iniciarVerificacionColoresPacientes(): void {
+    this.intervalVerificacionColores = setInterval(() => {
+      this.verificarYActualizarColoresPacientes();
+    }, 5000); // Verificar cada 5 segundos
+  }
+
+  /**
+   * Verifica y actualiza los colores de los pacientes según el tiempo de empeoramiento
+   */
+  verificarYActualizarColoresPacientes(): void {
+    this.pacientesUbicados.forEach((paciente: any) => {
+      // No actualizar si el paciente ya es negro (peor estado)
+      if (paciente.color === 'negro') {
+        return;
+      }
+
+      // Obtener el tiempo de empeoramiento del paciente (en minutos)
+      const tiempoEmpeoramiento = paciente.Tempeora || 0;
+      
+      // Si no hay tiempo de empeoramiento definido, no hacer nada
+      if (tiempoEmpeoramiento <= 0) {
+        return;
+      }
+
+      // Convertir minutos a segundos
+      const tiempoEmpeoraminutoEnSegundos = tiempoEmpeoramiento * 60;
+
+      // Si el tiempo restante es menor o igual al tiempo de empeoramiento,
+      // cambiar el color al siguiente en la escala
+      if (this.tiempoRestante <= tiempoEmpeoraminutoEnSegundos) {
+        const colorActual = paciente.color || 'verde';
+        const indiceActual = this.coloresOrdenados.indexOf(colorActual);
+        
+        // Cambiar al siguiente color (peor) si no es el último (negro)
+        if (indiceActual < this.coloresOrdenados.length - 1) {
+          const nuevoColor = this.coloresOrdenados[indiceActual + 1];
+          
+          if (nuevoColor !== colorActual) {
+            paciente.color = nuevoColor;
+            // Solo guardar en BD, sin actualizar la UI (para que el usuario no se entere)
+            this.guardarColorPacienteEnBD(paciente);
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Actualiza visualmente el color del paciente en la UI
+   */
+  private actualizarColorPacienteEnUI(paciente: any): void {
+    const imgElement = this.pacienteImagenesMap.get(paciente.id);
+    if (imgElement) {
+      // Remover todas las clases de borde de color
+      imgElement.classList.remove('border-black', 'border-red-600', 'border-yellow-400', 'border-green-600', 'border-transparent');
+      
+      // Agregar la nueva clase de borde
+      const borderColor = this.colorBordeMap[paciente.color] || 'border-transparent';
+      imgElement.classList.add(borderColor);
+      
+      console.log(`Color actualizado automáticamente para paciente ${paciente.nombre}: ${paciente.color}`);
+    }
+  }
+
+  /**
+   * Guarda el color actualizado del paciente en la BD
+   */
+  private guardarColorPacienteEnBD(paciente: any): void {
+    // Aquí iría la llamada HTTP para actualizar el color en la BD
+    // Por ejemplo:
+    // this.pacientesService.actualizarColorPaciente(paciente.id, paciente.color).subscribe(...);
+    // Por ahora solo registramos en consola
+    console.log(`Guardando color actualizado en BD para paciente ${paciente.nombre}: ${paciente.color}`);
+  }
+  terminarEjercicio(): void {
+    Swal.fire({
+      title: '¿Terminar ejercicio?',
+      text: '¿Estás seguro de que deseas terminar el ejercicio?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, terminar',
+      cancelButtonText: 'Cancelar',
+      didOpen: () => {
+        const popup = document.querySelector('.swal2-popup') as HTMLElement;
+        const backdrop = document.querySelector('.swal2-backdrop-show') as HTMLElement;
+        if (popup) {
+          popup.style.zIndex = '999999';
+        }
+        if (backdrop) {
+          backdrop.style.zIndex = '999998';
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.volverAEjercicios();
+      }
+    });
+  }
+
+  /**
+   * Vuelve a la página de ejercicios
+   */
+  volverAEjercicios(): void {
+    this.router.navigate(['/ejercicios']);
   }
 
 }

@@ -1,43 +1,79 @@
-<div style="position: relative; width: 100%; height: 600px;">
-  <div #pano style="width: 100%; height: 100%;"></div>
+<div class="fixed inset-0 w-screen h-screen overflow-hidden z-[9999]">
+  <div #pano class="w-full h-full"></div>
+  
+  <!-- Temporizador -->
+  <div class="fixed top-4 right-4 bg-black text-white text-4xl font-bold z-[10000] px-6 py-3 border-4 border-white">
+    {{ obtenerFormatoTiempo() }}
+  </div>
+  
+  <button (click)="terminarEjercicio()" class="absolute bottom-4 right-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 z-[10000]">
+    Terminar Ejercicio
+  </button>
 </div>
 
 <!-- Modal para mostrar descripción del paciente -->
-<div *ngIf="pacienteSeleccionado" id="paciente-modal" style="
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  max-width: 400px;
-  z-index: 1000;
-">
-  <button (click)="cerrarModal()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+<div *ngIf="pacienteSeleccionado" id="paciente-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-5 rounded-lg shadow-lg max-w-2xl max-h-96 overflow-y-auto z-[99999]">
+  <button (click)="cerrarModal()" class="absolute top-2.5 right-2.5 bg-none border-none text-2xl cursor-pointer">×</button>
   
-  <h2>{{ pacienteSeleccionado.nombre }}</h2>
+  <h2 class="text-2xl font-bold mb-3">{{ pacienteSeleccionado.nombre }}</h2>
   <p><strong>Descripción:</strong></p>
-  <p>{{ pacienteSeleccionado.descripcion || 'Sin descripción disponible' }}</p>
+  <p class="mb-4">{{ pacienteSeleccionado.descripcion || 'Sin descripción disponible' }}</p>
   
-  <button (click)="cerrarModal()" style="
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-  ">Cerrar</button>
+  <div class="mb-4">
+    <p><strong>Selecciona el color (de peor a mejor):</strong></p>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <button 
+        (click)="seleccionarColor('negro')"
+        [class.ring-4]="colorSeleccionado === 'negro'"
+        [class.ring-offset-2]="colorSeleccionado === 'negro'"
+        class="w-12 h-12 bg-black rounded-full border-4 border-gray-300 cursor-pointer transition-all hover:border-gray-500"
+        title="Negro"
+      ></button>
+      <button 
+        (click)="seleccionarColor('rojo')"
+        [class.ring-4]="colorSeleccionado === 'rojo'"
+        [class.ring-offset-2]="colorSeleccionado === 'rojo'"
+        class="w-12 h-12 bg-red-600 rounded-full border-4 border-gray-300 cursor-pointer transition-all hover:border-gray-500"
+        title="Rojo"
+      ></button>
+      <button 
+        (click)="seleccionarColor('amarillo')"
+        [class.ring-4]="colorSeleccionado === 'amarillo'"
+        [class.ring-offset-2]="colorSeleccionado === 'amarillo'"
+        class="w-12 h-12 bg-yellow-400 rounded-full border-4 border-gray-300 cursor-pointer transition-all hover:border-gray-500"
+        title="Amarillo"
+      ></button>
+      <button 
+        (click)="seleccionarColor('verde')"
+        [class.ring-4]="colorSeleccionado === 'verde'"
+        [class.ring-offset-2]="colorSeleccionado === 'verde'"
+        class="w-12 h-12 bg-green-600 rounded-full border-4 border-gray-300 cursor-pointer transition-all hover:border-gray-500"
+        title="Verde"
+      ></button>
+    </div>
+  </div>
+  
+  <div class="mb-4">
+    <p><strong>Selecciona las acciones realizadas:</strong></p>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <button 
+        *ngFor="let accion of acciones"
+        (click)="alternarAccion(accion)"
+        [class.bg-blue-600]="esAccionSeleccionada(accion)"
+        [class.bg-gray-300]="!esAccionSeleccionada(accion)"
+        [class.text-white]="esAccionSeleccionada(accion)"
+        class="px-3 py-1 rounded border-2 border-gray-400 cursor-pointer transition-all"
+      >
+        {{ accion.nombre_accion || accion.name }}
+      </button>
+    </div>
+  </div>
+  
+  <div class="flex gap-2">
+    <button (click)="guardarAcciones()" class="bg-green-600 text-white border-none px-5 py-2.5 rounded cursor-pointer hover:bg-green-700">Guardar</button>
+    <button (click)="cerrarModal()" class="bg-blue-600 text-white border-none px-5 py-2.5 rounded cursor-pointer hover:bg-blue-700">Cerrar</button>
+  </div>
 </div>
 
 <!-- Overlay para cerrar modal -->
-<div *ngIf="pacienteSeleccionado" (click)="cerrarModal()" style="
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-"></div>
+<div *ngIf="pacienteSeleccionado" (click)="cerrarModal()" class="fixed inset-0 bg-black/50 z-[99998]"></div>
