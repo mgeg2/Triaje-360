@@ -35,9 +35,12 @@ export class EjerciciosComponent implements OnInit {
   ejercicioAEliminar: any = null;
   intentosLimitados = false;
   selectedAsignaturaId: string = '';
+  esEdicion: boolean = false;
   ejercicio: any
+  ejercicioCompleto: boolean = false;
   pacientes: any[] = [];
   pacientesEjercicio: any[] = [];
+  pacientesEjercicioOriginal: any[] = []; // Almacenaremos la lista original sin modificaciones
   pacienteSeleccionado: any;
   empeoramientoLimitado: any;
   imagenSeleccionadaId: any = null;
@@ -51,8 +54,8 @@ export class EjerciciosComponent implements OnInit {
 
   firstFormGroup = this._formBuilder.group({
     nombre: ['', Validators.required],
-    fechaInicio: ['', Validators.required],
-    fechaFin: ['', Validators.required],
+    fechaInicio: [null as any, Validators.required],
+    fechaFin: [null as any, Validators.required],
     descripcion: ['', Validators.required],
     numeroIntentos: [''],
     asignatura: [''],
@@ -99,6 +102,24 @@ export class EjerciciosComponent implements OnInit {
     const color = this.colorOptions.find(c => c.value === colorName);
     return color?.hex || '#000000';
   }
+
+  /**
+   * Getter para obtener los pacientes disponibles (sin los que ya están colocados)
+   */
+  get pacientesDisponibles(): any[] {
+    const pacientesColocadosIds = new Set<string>();
+    
+    // Recolectar todos los IDs de pacientes colocados en cualquier imagen
+    Object.values(this.pacientesColocadosPorImagen).forEach((imagenPacientes: any) => {
+      Object.values(imagenPacientes).forEach((paciente: any) => {
+        pacientesColocadosIds.add(paciente.id);
+      });
+    });
+    
+    // Filtrar pacient​esEjercicio original para no mostrar los colocados
+    return this.pacientesEjercicioOriginal.filter(p => !pacientesColocadosIds.has(p.id));
+  }
+
   getAsignaturasfromprofesor(): void {
     console.log(this.user.id);
     this._asignaturasService.getallfromprofesor(this.user.id).subscribe((data: any) => {
@@ -126,16 +147,42 @@ export class EjerciciosComponent implements OnInit {
         this.firstFormGroup.markAllAsTouched();
         return;
       }
-      this._ejerciciosService.postEjercicio(this.firstFormGroup.value, event).subscribe((data: any) => {
-        console.log(data);
-        if (data.status == 200) {
-          this.stepper.next();
-          event++;
-          this.ejercicio = data.ejercicio.id;
-          this.getimagenes(event, this.ejercicio);
-          console.log(event);
-        }
-      });
+      
+      // Preparar los datos para enviar (convertir fechas a string ISO)
+      const formData = {
+        ...this.firstFormGroup.value,
+        fechaInicio: this.firstFormGroup.value.fechaInicio instanceof Date ? 
+          this.firstFormGroup.value.fechaInicio.toISOString().split('T')[0] : 
+          this.firstFormGroup.value.fechaInicio,
+        fechaFin: this.firstFormGroup.value.fechaFin instanceof Date ? 
+          this.firstFormGroup.value.fechaFin.toISOString().split('T')[0] : 
+          this.firstFormGroup.value.fechaFin
+      };
+      
+      if (this.esEdicion) {
+        // Edición
+        this._ejerciciosService.updateEjercicio(this.ejercicio, formData).subscribe((data: any) => {
+          console.log(data);
+          if (data.status == 200) {
+            this.stepper.next();
+            event++;
+            this.getimagenes(event, this.ejercicio);
+            console.log(event);
+          }
+        });
+      } else {
+        // Creación
+        this._ejerciciosService.postEjercicio(formData, event).subscribe((data: any) => {
+          console.log(data);
+          if (data.status == 200) {
+            this.stepper.next();
+            event++;
+            this.ejercicio = data.ejercicio.id;
+            this.getimagenes(event, this.ejercicio);
+            console.log(event);
+          }
+        });
+      }
     }
     if (event == 2) {
       if (this.secondFormGroup.invalid) {
@@ -156,29 +203,33 @@ export class EjerciciosComponent implements OnInit {
       });
     }
     if (event == 3) {
-      if (this.ThirdFormGroup.invalid) {
-        // Marcar todos los controles como touched para mostrar errores
+      // Verificar si el usuario ha tocado algún campo del formulario
+      const formularioTieneDatos = this.ThirdFormGroup.get('nombre')?.value || 
+                                    this.ThirdFormGroup.get('descripcion')?.value ||
+                                    this.ThirdFormGroup.get('color')?.value ||
+                                    (this.ThirdFormGroup.get('accionesPaciente')?.value?.length > 0);
+      
+      // Si el usuario ha comenzado a completar el formulario, debe ser válido
+      if (formularioTieneDatos && this.ThirdFormGroup.invalid) {
         this.ThirdFormGroup.markAllAsTouched();
+        alert("Por favor completa la información del paciente");
         return;
       }
+      
+      // Verificar que el ejercicio tiene al menos un paciente
       this._ejerciciosService.getPacientesEjercicio(this.ejercicio).subscribe((data: any) => {
         console.log(data);
         if(data.length == 0){
           alert("Debe agregar al menos un paciente al ejercicio");
           return;
-          
         }
         if (data.length > 0) {
-          //alert("Ejercicio creado correctamente");
           this.stepper.next();
           event++;
           this.getimagenes(event, this.ejercicio);
           this.getPacientesEjercicio();
         }
-        
-        // this.closeNewEditModal();
       });
-
     }
     if (event == 4) {
       // Guardar las posiciones de los pacientes de todas las imágenes
@@ -221,12 +272,23 @@ export class EjerciciosComponent implements OnInit {
         return;
       }
 
-      alert("Ejercicio creado correctamente");
+      const mensaje = this.esEdicion ? "Ejercicio actualizado correctamente" : "Ejercicio creado correctamente";
+      alert(mensaje);
+      
+      // Solo marcar como completo si es creación (nueva)
+      if (!this.esEdicion) {
+        this.ejercicioCompleto = true;
+      }
+      
       this.closeNewEditModal();
       this.showModal = false;
       this.pacientesColocados = {};
       this.pacientesColocadosPorImagen = {};
-      this.getPacientesEjercicio();
+      
+      // Recargar ejercicios
+      if (this.selectedAsignaturaId) {
+        this.getEjerciciosByAsignatura(this.selectedAsignaturaId);
+      }
     }
   }
   getimagenes(event: any, ejercicio: any): void {
@@ -355,7 +417,129 @@ console.log(this.ThirdFormGroup.value);
     });
   }
 
+  editarEjercicio(ejercicio: any): void {
+    console.log('\n🔄 INICIANDO editarEjercicio con:', ejercicio);
+    this.esEdicion = true;
+    this.ejercicio = ejercicio.id;
+    this.selectedAsignaturaId = ejercicio.asignatura;
+    this.showModal = true;
+
+    // Resetear formularios
+    this.firstFormGroup.reset();
+    this.secondFormGroup.reset();
+    this.ThirdFormGroup.reset();
+    this.pacientesEjercicio = [];
+    this.pacientesEjercicioOriginal = [];
+    this.pacientesColocados = {};
+    this.pacientesColocadosPorImagen = {};
+    this.intentosLimitados = ejercicio.numerointentos > 0;
+    this.empeoramientoLimitado = false;
+    this.ejercicioCompleto = false;
+    this.imagenSeleccionadaId = null;
+
+    // Convertir fechas al formato correcto
+    const fechaInicio = new Date(ejercicio.fechaInicio);
+    const fechaFin = new Date(ejercicio.fechaFin);
+
+    // Cargar datos del ejercicio en el paso 1
+    this.firstFormGroup.patchValue({
+      nombre: ejercicio.nombre,
+      fechaInicio: fechaInicio,
+      fechaFin: fechaFin,
+      descripcion: ejercicio.descripcion,
+      numeroIntentos: ejercicio.numerointentos > 0 ? ejercicio.numerointentos : '',
+      asignatura: ejercicio.asignatura
+    });
+
+    // Cargar imágenes de pacientes (en paralelo, no es muy crítico)
+    this._ejerciciosService.getImagenes('paciente').subscribe((data: any) => {
+      this.imagenesPacientes = data;
+    });
+
+    // Cargar imágenes de escenarios
+    this._ejerciciosService.getImagenes('escenario').subscribe((data: any) => {
+      this.imagenesEscenarios = data;
+      
+      // Cargar escenarios del ejercicio
+      this._ejerciciosService.getImagenesFromEjercicio(ejercicio.id).subscribe((escenarios: any) => {
+        const escenarioIds = escenarios.map((esc: any) => esc.imagen);
+        this.secondFormGroup.patchValue({
+          escenarios: escenarioIds,
+          ejercicio: ejercicio.id
+        });
+        
+        console.log('Escenarios cargados:', escenarioIds);
+        console.log('Escenarios completos:', escenarios);
+
+        // Cargar pacientes del ejercicio
+        this._ejerciciosService.getPacientesEjercicio(ejercicio.id).subscribe((pacientes: any) => {
+          this.pacientesEjercicio = pacientes;
+          this.pacientesEjercicioOriginal = [...pacientes]; // Guardar copia sin modificaciones
+          console.log('Pacientes del ejercicio cargados:', pacientes);
+
+          // Cargar ubicaciones de los pacientes
+          this._ejerciciosService.getPacientesLocationInEjercicio(ejercicio.id).subscribe((locations: any) => {
+            console.log('Ubicaciones cargadas desde BD:', locations);
+            console.log('pacientes disponibles:', pacientes);
+            
+            // Poblar pacientesColocados y pacientesColocadosPorImagen
+            const imagenesConUbicaciones = new Set<string>();
+            
+            locations.forEach((location: any) => {
+              const key = `${location.fila}-${location.columna}`;
+              const pacienteCompleto = pacientes.find(p => p.id === location.paciente);
+              
+              console.log(`📍 Ubicación BD: paciente_id=${location.paciente}, imagen="${location.imagen}", fila=${location.fila}, columna=${location.columna} → KEY="${key}"`);
+              
+              if (pacienteCompleto) {
+                console.log(`   ✓ Paciente encontrado: "${pacienteCompleto.nombre}"`);
+                
+                // Siempre agregar a pacientesColocadosPorImagen
+                if (!this.pacientesColocadosPorImagen[location.imagen]) {
+                  this.pacientesColocadosPorImagen[location.imagen] = {};
+                }
+                this.pacientesColocadosPorImagen[location.imagen][key] = pacienteCompleto;
+                console.log(`   → Agregado a pacientesColocadosPorImagen["${location.imagen}"]["${key}"]`);
+                
+                imagenesConUbicaciones.add(location.imagen);
+              } else {
+                console.log(`   ✗ Paciente NO encontrado con id: ${location.paciente}`);
+                console.log(`   IDs disponibles:`, pacientes.map(p => p.id));
+              }
+            });
+            
+            console.log('🎬 Imágenes con ubicaciones guardadas:', Array.from(imagenesConUbicaciones));
+            
+            // Si hay ubicaciones guardadas, establecer imagenSeleccionadaId a la primera imagen con ubicaciones
+            if (imagenesConUbicaciones.size > 0) {
+              const primerImagenConUbicacion = Array.from(imagenesConUbicaciones)[0];
+              this.imagenSeleccionadaId = primerImagenConUbicacion;
+              console.log('🖼️ Estableciendo imagenSeleccionadaId a:', this.imagenSeleccionadaId);
+              
+              // Ahora poblar pacientesColocados con la imagen seleccionada
+              if (this.pacientesColocadosPorImagen[this.imagenSeleccionadaId]) {
+                this.pacientesColocados = { ...this.pacientesColocadosPorImagen[this.imagenSeleccionadaId] };
+                console.log('✅ pacientesColocados población:');
+                Object.entries(this.pacientesColocados).forEach(([k, v]: [string, any]) => {
+                  console.log(`   [${k}] = ${v.nombre}`);
+                });
+              }
+            } else {
+              console.log('⚠️ No hay ubicaciones guardadas');
+            }
+            
+            console.log('=== ESTADO FINAL DE CARGA ===');
+            console.log('imagenSeleccionadaId:', this.imagenSeleccionadaId);
+            console.log('Claves en pacientesColocados:', Object.keys(this.pacientesColocados));
+            console.log('pacientesColocados:', this.pacientesColocados);
+          });
+        });
+      });
+    });
+  }
+
   openCreateEjercicioModal(asig: any): void {
+    this.esEdicion = false;
     this.selectedAsignaturaId = asig.id;
     console.log('Asignatura seleccionada:', asig.id);
     this.showModal = true;
@@ -364,12 +548,26 @@ console.log(this.ThirdFormGroup.value);
     this.ThirdFormGroup.reset();
     this.pacientesEjercicio = [];
     this.pacientesColocados = {};
+    this.pacientesColocadosPorImagen = {};
     this.intentosLimitados = false;
     this.empeoramientoLimitado = false;
+    this.ejercicioCompleto = false;
     this.imagenSeleccionadaId = null;
   }
 
   closeNewEditModal(): void {
+    // Si el ejercicio no fue completado y no estamos editando, eliminarlo
+    if (!this.ejercicioCompleto && !this.esEdicion && this.ejercicio) {
+      this._ejerciciosService.deleteEjercicio(this.ejercicio).subscribe(
+        (data: any) => {
+          console.log('Ejercicio incompleto eliminado:', data);
+        },
+        (error: any) => {
+          console.error('Error al eliminar ejercicio incompleto:', error);
+        }
+      );
+    }
+
     this.showModal = false;
     this.stepper.reset();
     this.firstFormGroup.reset();
@@ -377,9 +575,13 @@ console.log(this.ThirdFormGroup.value);
     this.ThirdFormGroup.reset();
     this.pacientesEjercicio = [];
     this.pacientesColocados = {};
+    this.pacientesColocadosPorImagen = {};
     this.intentosLimitados = false;
     this.empeoramientoLimitado = false;
     this.imagenSeleccionadaId = null;
+    this.ejercicio = null;
+    this.ejercicioCompleto = false;
+    this.esEdicion = false;
   }
 
   addPacienteToExercise(): void {
@@ -550,8 +752,10 @@ console.log(this.ThirdFormGroup.value);
     } else {
       this.imagenSeleccionadaId = imagenId;
     }
+    
     console.log('Imagen seleccionada:', this.imagenSeleccionadaId);
     console.log('Pacientes colocados por imagen:', this.pacientesColocadosPorImagen);
+    console.log('Pacientes disponibles:', this.pacientesDisponibles.map((p: any) => p.nombre));
   }
 
   private draggedPaciente: any = null;
@@ -635,13 +839,14 @@ console.log(this.ThirdFormGroup.value);
 
     this.pacientesColocados[key] = this.draggedPaciente;
     
-    // Remover el paciente del array de pacientes disponibles
-    const index = this.pacientesEjercicio.indexOf(this.draggedPaciente);
-    if (index > -1) {
-      this.pacientesEjercicio.splice(index, 1);
+    // Guardar en pacientesColocadosPorImagen
+    if (!this.pacientesColocadosPorImagen[this.imagenSeleccionadaId]) {
+      this.pacientesColocadosPorImagen[this.imagenSeleccionadaId] = {};
     }
+    this.pacientesColocadosPorImagen[this.imagenSeleccionadaId][key] = this.draggedPaciente;
     
     console.log(`Paciente ${this.draggedPaciente.nombre} colocado en celda ${row}-${col}`, this.pacientesColocados);
+    console.log('Pacientes disponibles después del drop:', this.pacientesDisponibles.map((p: any) => p.nombre));
     this.draggedPaciente = null;
   }
 
@@ -655,9 +860,14 @@ console.log(this.ThirdFormGroup.value);
     if (this.pacientesColocados[key]) {
       const paciente = this.pacientesColocados[key];
       delete this.pacientesColocados[key];
-      // Devolver el paciente al array de pacientes disponibles
-      this.pacientesEjercicio.push(paciente);
+      
+      // Remover también de pacientesColocadosPorImagen
+      if (this.pacientesColocadosPorImagen[this.imagenSeleccionadaId]) {
+        delete this.pacientesColocadosPorImagen[this.imagenSeleccionadaId][key];
+      }
+      
       console.log(`Paciente ${paciente.nombre} removido de la celda ${row}-${col}`);
+      console.log('Pacientes disponibles después de remover:', this.pacientesDisponibles.map((p: any) => p.nombre));
     }
   }
 
@@ -671,6 +881,12 @@ console.log(this.ThirdFormGroup.value);
     if (this.pacientesColocados[key]) {
       const pacienteRemovido = this.pacientesColocados[key];
       delete this.pacientesColocados[key];
+      
+      // Remover también de pacientesColocadosPorImagen
+      if (this.pacientesColocadosPorImagen[this.imagenSeleccionadaId]) {
+        delete this.pacientesColocadosPorImagen[this.imagenSeleccionadaId][key];
+      }
+      
       console.log(`Paciente ${pacienteRemovido.nombre} removido de la celda ${row}-${col}`);
     }
   }
@@ -683,7 +899,11 @@ console.log(this.ThirdFormGroup.value);
    */
   getPacienteEnCelda(row: number, col: number): any {
     const key = `${row}-${col}`;
-    return this.pacientesColocados[key];
+    const paciente = this.pacientesColocados[key];
+    if (paciente) {
+      console.log(`✓ Encontrado paciente en celda [${row}-${col}]:`, paciente.nombre);
+    }
+    return paciente;
   }
 
   /**
@@ -739,6 +959,48 @@ console.log(this.ThirdFormGroup.value);
   closeDeleteConfirmModal(): void {
     this.showDeleteConfirmModal = false;
     this.ejercicioAEliminar = null;
+  }
+
+  /**
+   * Elimina un paciente del ejercicio
+   * @param pacienteId - El ID del paciente a eliminar
+   */
+  removePacienteFromExercise(pacienteId: any): void {
+    // Buscar el paciente en el array de pacientes del ejercicio
+    const pacienteAEliminar = this.pacientesEjercicio.find(p => p.id === pacienteId);
+    
+    if (!pacienteAEliminar) {
+      console.error('Paciente no encontrado en el ejercicio');
+      return;
+    }
+
+    // Limpiar todas las ubicaciones del paciente en pacientesColocados (escenario actual)
+    Object.keys(this.pacientesColocados).forEach(key => {
+      if (this.pacientesColocados[key]?.id === pacienteId) {
+        delete this.pacientesColocados[key];
+      }
+    });
+
+    // Limpiar todas las ubicaciones del paciente en pacientesColocadosPorImagen (todos los escenarios)
+    Object.keys(this.pacientesColocadosPorImagen).forEach(imagenId => {
+      Object.keys(this.pacientesColocadosPorImagen[imagenId]).forEach(key => {
+        if (this.pacientesColocadosPorImagen[imagenId][key]?.id === pacienteId) {
+          delete this.pacientesColocadosPorImagen[imagenId][key];
+        }
+      });
+    });
+
+    // Llamar al servicio para eliminar del backend
+    this._ejerciciosService.removePacienteFromEjercicio(this.ejercicio, pacienteId).subscribe(
+      (data: any) => {
+        console.log('Paciente eliminado del ejercicio:', data);
+        this.getPacientesEjercicio();
+      },
+      (error: any) => {
+        console.error('Error al eliminar paciente:', error);
+        alert('Error al eliminar el paciente del ejercicio');
+      }
+    );
   }
 
   /**

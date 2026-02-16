@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../enviroments/enviroments';
 import { AuthService } from '../auth/auth.service';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class EjerciciosService {
@@ -64,5 +64,28 @@ export class EjerciciosService {
         const token = this._authService.accessToken;
         const headers = new HttpHeaders().set('Authorization', `${token}`);
         return this._httpClient.delete(`${environment.apiUrl}${environment.ejer.all}/${ejercicioId}`, { headers });
+    }
+
+    removePacienteFromEjercicio(ejercicioId: string, pacienteId: string): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        return this._httpClient.delete(`${environment.apiUrl}${environment.ejer.all}/${ejercicioId}/paciente/${pacienteId}`, { headers });
+    }
+
+    updateEjercicio(ejercicioId: string, ejercicio: any): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        return this._httpClient.put(`${environment.apiUrl}${environment.ejer.all}/${ejercicioId}`, ejercicio, { headers });
+    }
+
+    getPacientesLocationInEjercicio(ejercicioId: string): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        console.log(`📡 Llamando a getPacientesLocationInEjercicio para ejercicio: ${ejercicioId}`);
+        return this._httpClient.get(`${environment.apiUrl}${environment.ejer.all}/${ejercicioId}/pacientesLocations`, { headers }).pipe(
+            tap((data: any) => {
+                console.log(`📥 Respuesta recibida de getPacientesLocationInEjercicio:`, data);
+            })
+        );
     }
 }

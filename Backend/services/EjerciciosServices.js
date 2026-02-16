@@ -47,6 +47,18 @@ const postEjercicio = async (body, phaseId) => {
                 console.log("es el caso 2");
                 console.log(body.escenarios);
 
+                // Eliminar escenarios existentes si es edición
+                try {
+                    await new Promise((resolve, reject) => {
+                        db.query('DELETE FROM imagenes_ejercicio WHERE ejercicio = ?', [body.ejercicio], (err, results) => {
+                            if (err) return reject(err);
+                            resolve(results);
+                        });
+                    });
+                } catch (err) {
+                    console.error("Error al eliminar escenarios antiguos:", err);
+                }
+
                 var orden = 1;
                 // Verificamos si body.escenarios es un array
                 if (Array.isArray(body.escenarios)) {
@@ -280,6 +292,87 @@ const locatePacienteInEjercicio = async (idEjercicio, body) => {
         });
 }
 
+const updateEjercicio = async (ejercicioId, body) => {
+    return new Promise((resolve, reject) => {
+        if (!ejercicioId || !body) {
+            return reject({ status: 400, message: 'ID del ejercicio y datos son requeridos' });
+        }
+        
+        db.query('UPDATE ejercicios SET nombre = ?, descripcion = ?, fechaInicio = ?, fechaFin = ?, numerointentos = ? WHERE id = ?', 
+            [body.nombre, body.descripcion, body.fechaInicio, body.fechaFin, body.numeroIntentos || 0, ejercicioId], 
+            (err, results) => {
+                if (err) return reject(err);
+                resolve({ status: 200, message: "Ejercicio actualizado correctamente", results });
+            });
+    });
+};
+
+const removePacienteFromEjercicio = async (idEjercicio, idPaciente) => {
+    return new Promise(async (resolve, reject) => {
+        if (!idEjercicio || !idPaciente) {
+            return reject({ status: 400, message: 'El ID del ejercicio y del paciente son requeridos' });
+        }
+
+        try {
+            // Deshabilitar restricciones de clave foránea temporalmente
+            await new Promise((resolveDisable, rejectDisable) => {
+                db.query('SET FOREIGN_KEY_CHECKS=0', (errDisable) => {
+                    if (errDisable) return rejectDisable(errDisable);
+                    resolveDisable();
+                });
+            });
+
+            try {
+                // 1. Eliminar las acciones del paciente en el ejercicio
+                await new Promise((resolveAcciones, rejectAcciones) => {
+                    db.query('DELETE FROM acciones_paciente_ejercicio WHERE paciente_id = ? AND ejercicio_id = ?', [idPaciente, idEjercicio], (errAcciones) => {
+                        if (errAcciones) return rejectAcciones(errAcciones);
+                        resolveAcciones();
+                    });
+                });
+
+                // 2. Eliminar la ubicación del paciente en el ejercicio
+                await new Promise((resolveUbicacion, rejectUbicacion) => {
+                    db.query('DELETE FROM ubicacion_pacientes_ejercicio WHERE paciente = ? AND ejercicio = ?', [idPaciente, idEjercicio], (errUbicacion) => {
+                        if (errUbicacion) return rejectUbicacion(errUbicacion);
+                        resolveUbicacion();
+                    });
+                });
+
+                // 3. Eliminar el paciente del ejercicio
+                await new Promise((resolvePaciente, rejectPaciente) => {
+                    db.query('DELETE FROM pacientes_ejercicio WHERE id = ? AND ejercicio = ?', [idPaciente, idEjercicio], (errPaciente) => {
+                        if (errPaciente) return rejectPaciente(errPaciente);
+                        resolvePaciente();
+                    });
+                });
+
+                // Habilitar restricciones de clave foránea nuevamente
+                await new Promise((resolveEnable, rejectEnable) => {
+                    db.query('SET FOREIGN_KEY_CHECKS=1', (errEnable) => {
+                        if (errEnable) return rejectEnable(errEnable);
+                        resolveEnable();
+                    });
+                });
+
+                resolve({ status: 200, message: "Paciente eliminado del ejercicio correctamente" });
+            } catch (errorTransaction) {
+                // Volver a habilitar restricciones en caso de error
+                await new Promise((resolveEnable, rejectEnable) => {
+                    db.query('SET FOREIGN_KEY_CHECKS=1', (errEnable) => {
+                        if (errEnable) rejectEnable(errEnable);
+                        else resolveEnable();
+                    });
+                });
+                return reject(errorTransaction);
+            }
+        } catch (err) {
+            console.error("Error al eliminar paciente del ejercicio:", err);
+            return reject({ status: 500, message: "Error al eliminar paciente del ejercicio", error: err.message });
+        }
+    });
+};
+
 const deleteEjercicio = async (ejercicioId) => {
     return new Promise(async (resolve, reject) => {
         if (!ejercicioId) {
@@ -361,6 +454,35 @@ const deleteEjercicio = async (ejercicioId) => {
     });
 };
 
+const getPacientesLocationInEjercicio = async (idEjercicio) => {
+    return new Promise((resolve, reject) => {
+        if (!idEjercicio) {
+            return reject({ status: 400, message: 'El ID del ejercicio es requerido' });
+        }
+
+        try {
+            const query = `
+                SELECT upe.paciente, upe.ejercicio, upe.imagen, upe.fila, upe.columna
+                FROM ubicacion_pacientes_ejercicio upe
+                WHERE upe.ejercicio = ?
+            `;
+            console.log('SQL Query:', query, 'Params:', [idEjercicio]);
+            
+            db.query(query, [idEjercicio], (err, result) => {
+                if (err) {
+                    console.error('Error en getPacientesLocationInEjercicio:', err);
+                    return reject({ status: 500,error: err });
+                }
+                console.log('Resultado de getPacientesLocationInEjercicio:', JSON.stringify(result, null, 2));
+                resolve(result);
+            });
+        } catch (error) {
+            console.log(error);
+            reject({ status: 500,error: error });
+        }
+    });
+};
+
             module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -370,6 +492,9 @@ const deleteEjercicio = async (ejercicioId) => {
     getImagenesFromEjercicio,
     locatePacienteInEjercicio,
     getEjerciciosFromAsignatura,
-    deleteEjercicio
+    deleteEjercicio,
+    removePacienteFromEjercicio,
+    updateEjercicio,
+    getPacientesLocationInEjercicio
 
 }

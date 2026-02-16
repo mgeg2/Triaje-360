@@ -64,7 +64,7 @@ const updateEjercicio = async (req, res) => {
             return res.status(403).json({ message: 'Acceso denegado' });
         }
         try {
-            const ejercicio = await EjerciciosService.updateEjercicio(req.params.id, req.body);
+            const ejercicio = await EjerciciosService.updateEjercicio(req.params.idEjercicio, req.body);
             res.status(200).json(ejercicio);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -156,6 +156,34 @@ const locatePacienteInEjercicio = async (req, res) => {
     });
 };
 
+const removePacienteFromEjercicio = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if ( req.role !== 'prof') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const result = await EjerciciosService.removePacienteFromEjercicio(req.params.idEjercicio, req.params.idPaciente);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+};
+
+const getPacientesLocationInEjercicio = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'prof' && req.role !== 'alu') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const locations = await EjerciciosService.getPacientesLocationInEjercicio(req.params.idEjercicio);
+            res.status(200).json(locations);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    });
+};
+
 module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -167,5 +195,7 @@ module.exports = {
     postPacienteToEjercicio,
     getPacientesEjercicio,
     getImagenesFromEjercicio,
-    locatePacienteInEjercicio
+    locatePacienteInEjercicio,
+    removePacienteFromEjercicio,
+    getPacientesLocationInEjercicio
 };

@@ -143,14 +143,14 @@ CREATE TABLE `imagenes` (
 --
 
 INSERT INTO `imagenes` (`id`, `nombre_original`, `nombre_archivo`, `tipo`, `fecha_subida`, `descripcion`) VALUES
-('1', 'paciente1.png', 'paciente1.png', 'paciente', NOW(), 'paciente con corte en la clavicula'),
-('2', 'paciente2.png', 'paciente2.png', 'paciente', NOW(), 'paciente sangrante con corte profundo en la clavicula'),
-('3', 'paciente3.png', 'paciente3.png', 'paciente', NOW(), 'paciente con hematoma en la cabeza'),
-('4', 'paciente4.png', 'paciente4.png', 'paciente', NOW(), 'paciente manchado de sangre'),
-('5', 'escenario1.JPG', 'escenario1.JPG', 'escenario', NOW(), 'escenario1'),
-('6', 'escenario2.JPG', 'escenario2.JPG', 'escenario', NOW(), 'escenario2'),
-('7', 'escenario3.JPG', 'escenario3.JPG', 'escenario', NOW(), 'escenario3'),
-('8', 'escenario4.JPG', 'escenario4.JPG', 'escenario', NOW(), 'escenario4');
+('1', 'paciente1.png', 'paciente1', 'paciente', NOW(), 'paciente con corte en la clavicula'),
+('2', 'paciente2.png', 'paciente2', 'paciente', NOW(), 'paciente sangrante con corte profundo en la clavicula'),
+('3', 'paciente3.png', 'paciente3', 'paciente', NOW(), 'paciente con hematoma en la cabeza'),
+('4', 'paciente4.png', 'paciente4', 'paciente', NOW(), 'paciente manchado de sangre'),
+('5', 'escenario1.JPG', 'escenario1', 'escenario', NOW(), 'escenario1'),
+('6', 'escenario2.JPG', 'escenario2', 'escenario', NOW(), 'escenario2'),
+('7', 'escenario3.JPG', 'escenario3', 'escenario', NOW(), 'escenario3'),
+('8', 'escenario4.JPG', 'escenario4', 'escenario', NOW(), 'escenario4');
 
 -- --------------------------------------------------------
 

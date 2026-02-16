@@ -38,13 +38,21 @@
                                     title="Realizar ejercicio">
                                     <mat-icon class="text-white">play_arrow</mat-icon>
                                 </button>
-                                <!-- Icono de X para eliminar (profesores) -->
-                                <button *ngIf="user?.role == 'prof'" 
-                                    (click)="openDeleteConfirmModal(ejercicio); $event.stopPropagation()"
-                                    class="absolute top-4 right-4 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors opacity-0 group-hover:opacity-100 transition-opacity"
-                                    title="Eliminar ejercicio">
-                                    <mat-icon class="text-white">close</mat-icon>
-                                </button>
+                                <!-- Iconos para profesores -->
+                                <div *ngIf="user?.role == 'prof'" class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <!-- Icono de editar -->
+                                    <button (click)="editarEjercicio(ejercicio); $event.stopPropagation()"
+                                        class="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                                        title="Editar ejercicio">
+                                        <mat-icon class="text-white">edit</mat-icon>
+                                    </button>
+                                    <!-- Icono de X para eliminar -->
+                                    <button (click)="openDeleteConfirmModal(ejercicio); $event.stopPropagation()"
+                                        class="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                                        title="Eliminar ejercicio">
+                                        <mat-icon class="text-white">close</mat-icon>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -65,16 +73,16 @@
                             <mat-icon class="text-gray-400 hover:text-gray-600"
                                 [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
                         </button>
-                        <h2 class="text-2xl font-bold text-gray-800">Agregar Ejercicio</h2>
-                        <p class="text-sm text-gray-500 mt-1">Complete los datos del nuevo ejercicio</p>
+                        <h2 class="text-2xl font-bold text-gray-800">{{ esEdicion ? 'Editar Ejercicio' : 'Agregar Ejercicio' }}</h2>
+                        <p class="text-sm text-gray-500 mt-1">{{ esEdicion ? 'Modifique los datos del ejercicio' : 'Complete los datos del nuevo ejercicio' }}</p>
                     </div>
 
 
                     <!-- Content -->
                     <div class="px-8 py-4 flex-1 overflow-y-auto">
-                        <mat-stepper #stepper linear="true" class="custom-stepper">
+                        <mat-stepper #stepper [linear]="!esEdicion" class="custom-stepper">
                             <!-- Primer paso -->
-                            <mat-step [stepControl]="firstFormGroup" [editable]="false" label="Datos Generales">
+                            <mat-step [stepControl]="firstFormGroup" [editable]="esEdicion" label="Datos Generales">
                                 <form [formGroup]="firstFormGroup" class="space-y-4 mt-4">
                                     <!-- Nombre y Fechas en una fila -->
                                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -164,7 +172,7 @@
                                 </div>
                             </mat-step>
                             <!-- Segundo paso -->
-                            <mat-step [stepControl]="secondFormGroup" [editable]="false" label="Seleccionar Escenario">
+                            <mat-step [stepControl]="secondFormGroup" [editable]="esEdicion" label="Seleccionar Escenario">
                                 <form [formGroup]="secondFormGroup" class="space-y-4 mt-4">
                                     <div class="mb-4">
                                         <h3 class="text-lg font-medium text-gray-700 mb-2">Elige un escenario</h3>
@@ -174,14 +182,16 @@
                                         <div class="flex flex-wrap gap-4 justify-center">
                                             <div *ngFor="let imagen of imagenesEscenarios"
                                                 (click)="selectEscenario(imagen)"
-                                                class="relative cursor-pointer border-4 rounded-lg overflow-hidden transition-all duration-200 hover:scale-105"
-                                                [ngClass]="{'border-blue-500 shadow-lg scale-105': (secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id), 'border-transparent': !(secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id)}">
+                                                class="relative cursor-pointer rounded-lg overflow-hidden transition-all duration-200 hover:scale-105"
+                                                [ngClass]="{'border-4 border-blue-600 shadow-2xl scale-110': (secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id), 'border-4 border-gray-300': !(secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id)}">
                                                 <img [src]="'assets/escenarios/' + imagen.nombre_archivo + '.JPG'"
                                                     [alt]="imagen.descripcion" class="h-32 w-auto object-cover">
                                                 <!-- Número de orden cuando está seleccionado -->
                                                 <div *ngIf="(secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id)"
-                                                    class="absolute top-2 right-2 bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg shadow-lg">
-                                                    {{ getOrdenEscenario(imagen.id) }}
+                                                    class="absolute inset-0 bg-blue-600 bg-opacity-20 flex items-center justify-center">
+                                                    <div class="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl shadow-lg">
+                                                        {{ getOrdenEscenario(imagen.id) }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -203,7 +213,7 @@
                                 </div>
                             </mat-step>
                             <!-- Tercer paso -->
-                            <mat-step [editable]="false" label="Seleccionar Pacientes">
+                            <mat-step [editable]="esEdicion" label="Seleccionar Pacientes">
                                 <div class="flex gap-2" style="height: 400px;">
                                     <!-- Primer div (columna) -->
                                     <div class="flex flex-col w-[140px]">
@@ -494,14 +504,21 @@
                                     <!-- Tercer div (columna) -->
                                     <div class="w-[140px] overflow-auto">
                                         <div *ngFor="let paciente of pacientesEjercicio"
-                                            class="relative flex flex-col rounded-2xl overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 m-2"
-                                            [style.border]="'3px solid ' + getColorHex(paciente.color)"
-                                            (click)="seleccionarPaciente(paciente)">
+                                            class="relative flex flex-col rounded-2xl overflow-visible cursor-pointer group transition-transform duration-300 m-2 hover:scale-105"
+                                            [style.border]="'3px solid ' + getColorHex(paciente.color)">
                                             <!-- Solo la imagen del paciente como tarjeta -->
                                             <img [src]="'assets/pacientes/'+ paciente.nombre_archivo+'.png' "
-                                                [alt]="paciente.descripcion" class="w-full h-32 object-cover">
+                                                [alt]="paciente.descripcion" class="w-full h-32 object-cover rounded-2xl"
+                                                (click)="seleccionarPaciente(paciente)">
+                                            <!-- Botón de eliminación -->
+                                            <button type="button"
+                                                (click)="removePacienteFromExercise(paciente.id); $event.stopPropagation()"
+                                                class="absolute top-1 right-1 p-0.5 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg z-20"
+                                                title="Eliminar paciente">
+                                                <mat-icon class="text-white" style="font-size: 18px; width: 18px; height: 18px;">close</mat-icon>
+                                            </button>
                                             <!-- Descripción en hover -->
-                                            <div class="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-2xl p-3">
+                                            <div class="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl p-3">
                                                 <p class="text-white text-sm text-center leading-relaxed overflow-y-auto max-h-full font-medium">{{ paciente.descripcion }}</p>
                                             </div>
                                         </div>
@@ -509,12 +526,12 @@
                                 </div>
                             </mat-step>
                             <!-- Cuarto paso -->
-                            <mat-step [editable]="false" label="ubicar pacientes">
+                            <mat-step [editable]="esEdicion" label="ubicar pacientes">
                                 <div class="flex flex-col gap-6  h-full">
                                     <!-- Primer div: Pacientes (scroll horizontal) -->
                                     <div class="relative z-50 w-full overflow-x-auto border border-gray-300 rounded-lg  bg-gray-50">
                                         <div class="flex gap-2 items-center p-2">
-                                            <div *ngFor="let paciente of pacientesEjercicio"
+                                            <div *ngFor="let paciente of pacientesDisponibles"
                                                 draggable="true"
                                                 (dragstart)="onDragStart($event, paciente)"
                                                 (dragend)="onDragEnd($event)"
@@ -578,8 +595,8 @@
                                             Atrás
                                         </button>
                                         <button mat-raised-button color="primary" (click)="submitForm(4)" class="px-8">
-                                            Guardar Ejercicio
-                                            <mat-icon class="ml-2">check_circle</mat-icon>
+                                            {{ esEdicion ? 'Guardar Cambios' : 'Guardar Ejercicio' }}
+                                            <mat-icon class="ml-2">{{ esEdicion ? 'save' : 'check_circle' }}</mat-icon>
                                         </button>
                                     </div>
                                 </div>
