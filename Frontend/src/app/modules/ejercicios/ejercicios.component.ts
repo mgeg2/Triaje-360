@@ -1025,4 +1025,11 @@ console.log(this.ThirdFormGroup.value);
       }
     );
   }
+
+  /**
+   * Navega al componente de resultados
+   */
+  navegarAResultados(): void {
+    this._router.navigate(['/resultados']);
+  }
 }

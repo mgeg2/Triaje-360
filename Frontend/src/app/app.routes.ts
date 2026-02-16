@@ -90,10 +90,12 @@ export const appRoutes: Route[] = [
         children: [
             { path: 'asignaturas', loadChildren: () => import('app/modules/asignaturas/asignaturas.routes') },
             { path: 'ejercicios', loadChildren: () => import('app/modules/ejercicios/ejercicios.routes') },
+            //{ path: 'resultados', loadChildren: () => import('app/modules/resultados/resultados.routes') },
             { path: 'pacientes', loadChildren: () => import('app/modules/pacientes/pacientes.routes') },
             { path: 'marzipano360/:id', loadChildren: () => import('app/modules/marzipano360/marzipano360.routes') },
             {path: 'image-manager', loadChildren: () => import('app/modules/image-manager/image-manager.routes') },
             {path: 'audio-manager', loadChildren: () => import('app/modules/audio-manager/audio-manager.routes') },
+            {path: 'resultados', loadChildren: () => import('app/modules/resultados/resultados.routes') }
         ]
     }
 ];

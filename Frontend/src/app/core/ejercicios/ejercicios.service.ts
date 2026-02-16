@@ -88,4 +88,23 @@ export class EjerciciosService {
             })
         );
     }
+
+    obtenerResultadosUsuario(): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        return this._httpClient.get(`${environment.apiUrl}${environment.ejer.all}/resultados/usuario`, { headers });
+    }
+
+    obtenerDetallesResultado(intentoId: string): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        return this._httpClient.get(`${environment.apiUrl}${environment.ejer.all}/resultados/${intentoId}`, { headers });
+    }
+
+    guardarAccionesIntento(intentoId: string, pacientesAcciones: any[]): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        const data = { pacientesAcciones };
+        return this._httpClient.post(`${environment.apiUrl}${environment.ejer.all}/resultados/${intentoId}/acciones`, data, { headers });
+    }
 }

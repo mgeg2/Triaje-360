@@ -1,14 +1,15 @@
-<div class="w-full min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
-  <!-- Encabezado -->
-  <div class="sticky top-0 z-10 bg-white bg-opacity-95 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-slate-200 shadow-sm">
-    <div class="px-6 py-4">
-      <h1 class="text-3xl font-bold text-slate-900">Gestor de Sonidos</h1>
-      <p class="text-slate-600 mt-1">Administra y organiza tus audios (WAV, MP3, MP4)</p>
+<div class="bg-card flex min-w-0 flex-auto flex-col dark:bg-transparent sm:absolute sm:inset-0 sm:overflow-hidden">
+  <!-- Header -->
+  <div class="relative flex flex-0 flex-col border-b px-6 py-8 sm:flex-row sm:items-center sm:justify-between md:px-8">
+    <!-- Title -->
+    <div>
+      <h1 class="text-4xl font-extrabold tracking-tight">Gestor de Sonidos</h1>
+      <p class="text-gray-600 mt-2">Administra y organiza tus audios (WAV, MP3, MP4)</p>
     </div>
   </div>
 
-  <!-- Contenido Principal -->
-  <div class="flex-1 p-6 max-w-7xl mx-auto w-full pb-12">
+  <!-- Content -->
+  <div class="flex flex-col flex-auto overflow-y-auto p-6 md:p-8">
     <!-- Sección Audios -->
     <div>
       <div (click)="expandido = !expandido" class="flex items-center justify-between cursor-pointer p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-slate-200">

@@ -19,7 +19,27 @@ const upload = multer({
     }
 });
 
+// Configurar multer para recibir múltiples archivos (cubemap)
+const uploadMultiple = multer({
+    storage: multer.memoryStorage(),
+    fileFilter: (req, file, cb) => {
+        const allowedMimes = ['image/png', 'image/jpeg'];
+        if (allowedMimes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Solo se permiten archivos PNG o JPG'));
+        }
+    },
+    limits: {
+        fileSize: 50 * 1024 * 1024 // Máximo 50MB para tiles
+    }
+});
+
 router.post('/upload', upload.single('image'), ImageController.uploadImage);
+router.post('/upload/cubemap', uploadMultiple.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'tiles', maxCount: 6 }
+]), ImageController.uploadCubemapTiles);
 router.delete('/delete/:imageId', ImageController.deleteImage);
 router.get('/lista/:type', ImageController.listImages);
 router.get('/bbdd/:type', ImageController.getImagesByType);

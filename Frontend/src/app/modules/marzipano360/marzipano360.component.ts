@@ -436,12 +436,26 @@ export class Marzipano360Component implements OnInit, OnDestroy {
    */
   guardarAcciones(): void {
     if (this.pacienteSeleccionado) {
+      // Guardar directamente en el objeto paciente seleccionado
       this.pacienteSeleccionado.acciones = this.accionesSeleccionadas;
       this.pacienteSeleccionado.color = this.colorSeleccionado;
+      
+      // Asegurar que también se actualice en pacientesUbicados
+      const pacienteEnLista = this.pacientesUbicados.find(p => p.id === this.pacienteSeleccionado.id);
+      if (pacienteEnLista) {
+        pacienteEnLista.acciones = this.accionesSeleccionadas;
+        pacienteEnLista.color = this.colorSeleccionado;
+      }
+
       console.log('Acciones y color guardados para paciente:', this.pacienteSeleccionado.nombre, {
         acciones: this.accionesSeleccionadas,
         color: this.colorSeleccionado
       });
+      console.log('Pacientes actualizados:', this.pacientesUbicados);
+      
+      // Actualizar visualmente en el marzipano
+      this.actualizarColorPacienteEnUI(this.pacienteSeleccionado);
+      
       this.cerrarModal();
     }
   }
@@ -596,6 +610,33 @@ export class Marzipano360Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Recolecta todas las acciones de todos los pacientes para guardarlas
+   */
+  private recolectarAccionesPacientes(): any[] {
+    const pacientesConAcciones: any[] = [];
+
+    this.pacientesUbicados.forEach((paciente: any) => {
+      if (paciente.acciones && paciente.acciones.length > 0) {
+        pacientesConAcciones.push({
+          pacienteId: paciente.id,
+          acciones: paciente.acciones,
+          color: paciente.color || 'verde'
+        });
+      } else if (paciente.color) {
+        // Aunque no tenga acciones, guardar el color
+        pacientesConAcciones.push({
+          pacienteId: paciente.id,
+          acciones: [],
+          color: paciente.color
+        });
+      }
+    });
+
+    console.log('Acciones recolectadas:', pacientesConAcciones);
+    return pacientesConAcciones;
+  }
+
+  /**
    * Guarda el tiempo transcurrido del ejercicio en la base de datos
    */
   guardarTiempoEjercicio(): void {
@@ -609,7 +650,27 @@ export class Marzipano360Component implements OnInit, OnDestroy {
     this.ejerciciosService.guardarTiempoEjercicio(this.ejercicioId, this.tiempoRestante).subscribe({
       next: (response) => {
         console.log('Tiempo guardado correctamente:', response);
-        this.volverAEjercicios();
+        const intentoId = response.intento_id;
+
+        // Ahora guardar las acciones de los pacientes
+        const pacientesAcciones = this.recolectarAccionesPacientes();
+
+        if (pacientesAcciones.length > 0) {
+          this.ejerciciosService.guardarAccionesIntento(intentoId, pacientesAcciones).subscribe({
+            next: (accioResponse) => {
+              console.log('Acciones guardadas correctamente:', accioResponse);
+              this.volverAEjercicios();
+            },
+            error: (error) => {
+              console.error('Error al guardar acciones:', error);
+              // Aún así volver a ejercicios
+              this.volverAEjercicios();
+            }
+          });
+        } else {
+          console.log('No hay acciones para guardar');
+          this.volverAEjercicios();
+        }
       },
       error: (error) => {
         console.error('Error al guardar el tiempo del ejercicio:', error);

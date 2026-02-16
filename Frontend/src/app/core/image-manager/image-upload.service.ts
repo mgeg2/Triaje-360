@@ -24,6 +24,27 @@ export class ImageUploadService {
     return this.http.post<any>(this.uploadUrl, formData, { headers });
   }
 
+  uploadCubemapTiles(originalFile: File, faceBlobs: { [key: string]: Blob }): Observable<any> {
+    const formData = new FormData();
+    
+    // Agregar el archivo original
+    formData.append('image', originalFile);
+    
+    // Agregar cada cara del cubo con su respectivo nombre (f, b, l, r, u, p)
+    Object.entries(faceBlobs).forEach(([faceName, blob]) => {
+      formData.append('tiles', blob, `${faceName}.png`);
+    });
+    
+    formData.append('imageType', 'escenario');
+
+    const token = localStorage.getItem('token');
+    const headers = token 
+      ? new HttpHeaders({ 'Authorization': `${token}` })
+      : new HttpHeaders();
+
+    return this.http.post<any>(`${this.uploadUrl}/cubemap`, formData, { headers });
+  }
+
   getImagesByType(imageType: 'paciente' | 'escenario'): Observable<any> {
     return this.http.get<any>(`${this.getImagesUrl}/${imageType}`);
   }
@@ -35,7 +56,18 @@ export class ImageUploadService {
 
   getImagePath(fileName: string, imageType: 'paciente' | 'escenario'): string {
     console.log(`Obteniendo ruta para imagen: ${fileName} de tipo: ${imageType}`);
-    return `/assets/${imageType}s/${fileName}`;
+    
+    // Detectar si es un cubemap (contiene "Tiles/")
+    if (fileName.includes('Tiles/')) {
+      // Para cubemaps, devolver la ruta al tile frontal (f.png)
+      return `/assets/${imageType}s/${fileName}/f.png`;
+    }
+    
+    // Para imágenes normales de pacientes
+    const extension = imageType === 'paciente' ? '.png' : '.JPG';
+    const hasExtension = /\.(png|jpg|jpeg|JPG|PNG)$/i.test(fileName);
+    const fileNameWithExtension = hasExtension ? fileName : `${fileName}${extension}`;
+    return `/assets/${imageType}s/${fileNameWithExtension}`;
   }
 
   deleteImage(imageId: string): Observable<any> {

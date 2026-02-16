@@ -16,7 +16,8 @@ const comprobartoken = (req,res,next)=>{
     }
 
     try {
-        const{email,role,nickname}=jwt.verify(token, config.JWT_SECRET);
+        const{id,email,role,nickname}=jwt.verify(token, config.JWT_SECRET);
+        req.id=id;
         req.role=role;
         req.email=email;
         req.nickname=nickname;

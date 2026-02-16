@@ -184,6 +184,71 @@ const getPacientesLocationInEjercicio = async (req, res) => {
     });
 };
 
+const guardarTiempoEjercicio = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'alu') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const { tiempoTranscurrido } = req.body;
+            const ejercicioId = req.params.ejercicioId;
+            const usuarioId = req.id;
+            
+            const result = await EjerciciosService.guardarTiempoEjercicio(ejercicioId, usuarioId, tiempoTranscurrido);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ message: error.message || error });
+        }
+    });
+};
+
+const obtenerResultadosUsuario = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'alu') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const usuarioId = req.id;
+            const resultados = await EjerciciosService.obtenerResultadosUsuario(usuarioId);
+            res.status(200).json(resultados);
+        } catch (error) {
+            res.status(500).json({ message: error.message || error });
+        }
+    });
+};
+
+const obtenerDetallesResultado = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'alu') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const intentoId = req.params.intentoId;
+            const detalles = await EjerciciosService.obtenerDetallesResultado(intentoId);
+            res.status(200).json(detalles);
+        } catch (error) {
+            res.status(500).json({ message: error.message || error });
+        }
+    });
+};
+
+const guardarAccionesIntento = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'alu') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const intentoId = req.params.intentoId;
+            const { pacientesAcciones } = req.body;
+            
+            const result = await EjerciciosService.guardarAccionesIntento(intentoId, pacientesAcciones);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ message: error.message || error });
+        }
+    });
+};
+
 module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -197,5 +262,9 @@ module.exports = {
     getImagenesFromEjercicio,
     locatePacienteInEjercicio,
     removePacienteFromEjercicio,
-    getPacientesLocationInEjercicio
+    getPacientesLocationInEjercicio,
+    guardarTiempoEjercicio,
+    obtenerResultadosUsuario,
+    obtenerDetallesResultado,
+    guardarAccionesIntento
 };

@@ -112,10 +112,49 @@ const deleteImage = async (req, res) => {
     });
 };
 
+const uploadCubemapTiles = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'admin' && req.role !== 'prof') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            if (!req.files || !req.files.image || !req.files.tiles || req.files.tiles.length !== 6) {
+                return res.status(400).json({ 
+                    success: false,
+                    error: 'Se requiere la imagen original y exactamente 6 tiles' 
+                });
+            }
+
+            const originalFile = req.files.image[0];
+            const tileFiles = req.files.tiles;
+
+            const result = await ImageService.uploadCubemapTiles(originalFile, tileFiles);
+
+            res.status(result.status).json({
+                success: true,
+                message: result.message,
+                data: {
+                    id: result.id,
+                    nombre_original: result.originalName,
+                    nombre_archivo: result.fileName,
+                    imageType: 'escenario',
+                    path: result.path
+                }
+            });
+        } catch (error) {
+            res.status(error.status || 500).json({ 
+                success: false,
+                error: error.message 
+            });
+        }
+    });
+};
+
 module.exports = {
     uploadImage,
     listImages,
     getImage,
     getImagesByType,
-    deleteImage
+    deleteImage,
+    uploadCubemapTiles
 };

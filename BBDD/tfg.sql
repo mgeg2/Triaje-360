@@ -483,6 +483,78 @@ CREATE TABLE `sonidos` (
 ALTER TABLE `user_asignatura`
   ADD CONSTRAINT `alumno` FOREIGN KEY (`usuario`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `asignatura` FOREIGN KEY (`asignatura`) REFERENCES `asignatura` (`id`);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `intentos_ejercicio`
+--
+
+CREATE TABLE `intentos_ejercicio` (
+  `id` varchar(250) NOT NULL,
+  `usuario_id` varchar(250) NOT NULL,
+  `ejercicio_id` varchar(250) NOT NULL,
+  `tiempo_realizado` int(11) NOT NULL COMMENT 'Tiempo en segundos',
+  `fecha_inicio` datetime NOT NULL,
+  `fecha_finalizacion` datetime NOT NULL,
+  `numero_intento` int(11) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Índices para la tabla `intentos_ejercicio`
+--
+ALTER TABLE `intentos_ejercicio`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`),
+  ADD KEY `ejercicio_id` (`ejercicio_id`),
+  ADD KEY `idx_usuario_ejercicio` (`usuario_id`, `ejercicio_id`);
+
+--
+-- Restricciones para la tabla `intentos_ejercicio`
+--
+ALTER TABLE `intentos_ejercicio`
+  ADD CONSTRAINT `fk_usuario_intentos` FOREIGN KEY (`usuario_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_ejercicio_intentos` FOREIGN KEY (`ejercicio_id`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `acciones_intento`
+--
+
+CREATE TABLE `acciones_intento` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `intento_id` varchar(250) NOT NULL,
+  `paciente_id` varchar(250) NOT NULL,
+  `accion_id` varchar(250),
+  `color_asignado` varchar(250),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `intento_id` (`intento_id`),
+  KEY `paciente_id` (`paciente_id`),
+  KEY `accion_id` (`accion_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Índices para la tabla `acciones_intento`
+--
+-- Los índices ya están definidos en CREATE TABLE arriba
+
+--
+-- AUTO_INCREMENT para la tabla `acciones_intento`
+--
+ALTER TABLE `acciones_intento`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para la tabla `acciones_intento`
+--
+ALTER TABLE `acciones_intento`
+  ADD CONSTRAINT `fk_intento_acciones` FOREIGN KEY (`intento_id`) REFERENCES `intentos_ejercicio` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_paciente_acciones` FOREIGN KEY (`paciente_id`) REFERENCES `pacientes_ejercicio` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_accion_acciones` FOREIGN KEY (`accion_id`) REFERENCES `acciones` (`id`) ON DELETE SET NULL;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

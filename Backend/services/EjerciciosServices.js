@@ -483,6 +483,174 @@ const getPacientesLocationInEjercicio = async (idEjercicio) => {
     });
 };
 
+const guardarTiempoEjercicio = async (ejercicioId, usuarioId, tiempoTranscurrido) => {
+    return new Promise((resolve, reject) => {
+        if (!ejercicioId || !usuarioId || tiempoTranscurrido === undefined) {
+            return reject({ status: 400, message: 'ejercicioId, usuarioId y tiempoTranscurrido son requeridos' });
+        }
+
+        try {
+            const id = Date.now().toString(30) + Math.random().toString(30).substring(2);
+            const ahora = new Date();
+            const fechaInicio = new Date(ahora.getTime() - tiempoTranscurrido * 1000);
+
+            // Primero, contar los intentos existentes
+            db.query(
+                'SELECT COUNT(*) as numero_intento FROM intentos_ejercicio WHERE usuario_id = ? AND ejercicio_id = ?',
+                [usuarioId, ejercicioId],
+                (errCount, resultsCount) => {
+                    if (errCount) {
+                        console.error('Error al contar intentos:', errCount);
+                        return reject({ status: 500, error: errCount });
+                    }
+
+                    const numeroIntento = (resultsCount[0]?.numero_intento || 0) + 1;
+
+                    // Ahora insertar con el número de intento calculado
+                    db.query(
+                        'INSERT INTO intentos_ejercicio (id, usuario_id, ejercicio_id, tiempo_realizado, fecha_inicio, fecha_finalizacion, numero_intento) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                        [id, usuarioId, ejercicioId, tiempoTranscurrido, fechaInicio, ahora, numeroIntento],
+                        (err, results) => {
+                            if (err) {
+                                console.error('Error en guardarTiempoEjercicio:', err);
+                                return reject({ status: 500, error: err });
+                            }
+                            resolve({ status: 200, message: 'Tiempo del ejercicio guardado correctamente', intento_id: id });
+                        }
+                    );
+                }
+            );
+        } catch (error) {
+            console.error('Error en guardarTiempoEjercicio:', error);
+            reject({ status: 500, error: error });
+        }
+    });
+};
+
+const obtenerResultadosUsuario = async (usuarioId) => {
+    return new Promise((resolve, reject) => {
+        if (!usuarioId) {
+            return reject({ status: 400, message: 'usuarioId es requerido' });
+        }
+
+        try {
+            const query = `
+                SELECT 
+                    ie.id,
+                    ie.usuario_id,
+                    ie.ejercicio_id,
+                    ie.tiempo_realizado,
+                    ie.fecha_inicio,
+                    ie.fecha_finalizacion,
+                    ie.numero_intento,
+                    ie.created_at,
+                    e.nombre as ejercicio_nombre,
+                    e.descripcion as ejercicio_descripcion,
+                    a.nombre as asignatura_nombre,
+                    COUNT(ai.id) as total_acciones
+                FROM intentos_ejercicio ie
+                LEFT JOIN ejercicios e ON ie.ejercicio_id = e.id
+                LEFT JOIN asignatura a ON e.asignatura = a.id
+                LEFT JOIN acciones_intento ai ON ie.id = ai.intento_id
+                WHERE ie.usuario_id = ?
+                GROUP BY ie.id
+                ORDER BY ie.created_at DESC
+            `;
+
+            db.query(query, [usuarioId], (err, results) => {
+                if (err) return reject({ status: 500, message: 'Error al obtener los resultados', error: err });
+                resolve(results);
+            });
+        } catch (error) {
+            console.error('Error en obtenerResultadosUsuario:', error);
+            reject({ status: 500, message: 'Error al obtener los resultados', error: error });
+        }
+    });
+};
+
+const obtenerDetallesResultado = async (intentoId) => {
+    return new Promise((resolve, reject) => {
+        if (!intentoId) {
+            return reject({ status: 400, message: 'intentoId es requerido' });
+        }
+
+        try {
+            const query = `
+                SELECT 
+                    ai.id,
+                    ai.intento_id,
+                    ai.paciente_id,
+                    ai.accion_id,
+                    ai.color_asignado,
+                    ai.created_at,
+                    pe.nombre as paciente_nombre,
+                    ac.nombre_accion as nombre_accion
+                FROM acciones_intento ai
+                LEFT JOIN pacientes_ejercicio pe ON ai.paciente_id = pe.id
+                LEFT JOIN acciones ac ON ai.accion_id = ac.id
+                WHERE ai.intento_id = ?
+                ORDER BY ai.created_at ASC
+            `;
+
+            db.query(query, [intentoId], (err, results) => {
+                if (err) return reject({ status: 500, message: 'Error al obtener detalles del resultado', error: err });
+                resolve(results);
+            });
+        } catch (error) {
+            console.error('Error en obtenerDetallesResultado:', error);
+            reject({ status: 500, message: 'Error al obtener detalles del resultado', error: error });
+        }
+    });
+};
+
+const guardarAccionesIntento = async (intentoId, pacientesAcciones) => {
+    return new Promise(async (resolve, reject) => {
+        if (!intentoId || !Array.isArray(pacientesAcciones)) {
+            return reject({ status: 400, message: 'intentoId y pacientesAcciones son requeridos' });
+        }
+
+        try {
+            // Procesar cada paciente con sus acciones
+            for (let pacienteData of pacientesAcciones) {
+                const { pacienteId, acciones, color } = pacienteData;
+
+                // Insertar entrada de color para el paciente
+                await new Promise((resolveAccion, rejectAccion) => {
+                    db.query(
+                        'INSERT INTO acciones_intento (intento_id, paciente_id, color_asignado) VALUES (?, ?, ?)',
+                        [intentoId, pacienteId, color],
+                        (err, results) => {
+                            if (err) return rejectAccion(err);
+                            resolveAccion(results);
+                        }
+                    );
+                });
+
+                // Insertar cada acción del paciente
+                if (Array.isArray(acciones) && acciones.length > 0) {
+                    for (let accion of acciones) {
+                        await new Promise((resolveAccionItem, rejectAccionItem) => {
+                            db.query(
+                                'INSERT INTO acciones_intento (intento_id, paciente_id, accion_id) VALUES (?, ?, ?)',
+                                [intentoId, pacienteId, accion.id],
+                                (err, results) => {
+                                    if (err) return rejectAccionItem(err);
+                                    resolveAccionItem(results);
+                                }
+                            );
+                        });
+                    }
+                }
+            }
+
+            resolve({ status: 200, message: 'Acciones del intento guardadas correctamente' });
+        } catch (error) {
+            console.error('Error en guardarAccionesIntento:', error);
+            reject({ status: 500, message: 'Error al guardar acciones del intento', error: error });
+        }
+    });
+};
+
             module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -495,6 +663,10 @@ const getPacientesLocationInEjercicio = async (idEjercicio) => {
     deleteEjercicio,
     removePacienteFromEjercicio,
     updateEjercicio,
-    getPacientesLocationInEjercicio
+    getPacientesLocationInEjercicio,
+    guardarTiempoEjercicio,
+    obtenerResultadosUsuario,
+    obtenerDetallesResultado,
+    guardarAccionesIntento
 
 }

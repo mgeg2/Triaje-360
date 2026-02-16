@@ -181,7 +181,15 @@ const deleteImage = async (imageId) => {
 
                     // Eliminar del sistema de archivos
                     if (fs.existsSync(filePath)) {
-                        fs.unlinkSync(filePath);
+                        const stats = fs.statSync(filePath);
+                        
+                        if (stats.isDirectory()) {
+                            // Si es un directorio (cubemap), eliminar recursivamente
+                            fs.rmSync(filePath, { recursive: true, force: true });
+                        } else {
+                            // Si es un archivo, eliminar directamente
+                            fs.unlinkSync(filePath);
+                        }
                     }
 
                     // Eliminar de la base de datos
@@ -207,10 +215,92 @@ const deleteImage = async (imageId) => {
     });
 };
 
+const uploadCubemapTiles = async (originalFile, tileFiles) => {
+    return new Promise((resolve, reject) => {
+        try {
+            if (!originalFile || !tileFiles || tileFiles.length !== 6) {
+                return reject({ status: 400, message: 'Se requiere la imagen original y 6 tiles' });
+            }
+
+            // Crear carpetas en Frontend/src/assets si no existen
+            const baseDir = path.join(__dirname, '../../Frontend/src/assets');
+            const escenariosDir = path.join(baseDir, 'escenarios');
+            const tilesDir = path.join(escenariosDir, 'Tiles');
+
+            if (!fs.existsSync(baseDir)) {
+                fs.mkdirSync(baseDir, { recursive: true });
+            }
+            if (!fs.existsSync(escenariosDir)) {
+                fs.mkdirSync(escenariosDir, { recursive: true });
+            }
+            if (!fs.existsSync(tilesDir)) {
+                fs.mkdirSync(tilesDir, { recursive: true });
+            }
+
+            // Generar nombre único para la imagen original
+            const timestamp = Date.now().toString(30);
+            const random = Math.random().toString(30).substring(2);
+            const ext = path.extname(originalFile.originalname);
+            const uniqueName = `${timestamp}${random}${ext}`;
+            const uniqueNameWithoutExt = `${timestamp}${random}`;
+            
+            // Guardar imagen original en escenarios/
+            const originalPath = path.join(escenariosDir, uniqueName);
+            fs.writeFileSync(originalPath, originalFile.buffer);
+
+            // Crear carpeta para los tiles dentro de Tiles/
+            const folderPath = path.join(tilesDir, uniqueNameWithoutExt);
+            if (!fs.existsSync(folderPath)) {
+                fs.mkdirSync(folderPath, { recursive: true });
+            }
+
+            // Guardar los 6 tiles usando el nombre que viene del cliente
+            let savedCount = 0;
+
+            tileFiles.forEach((file) => {
+                const tileFilePath = path.join(folderPath, file.originalname);
+                fs.writeFileSync(tileFilePath, file.buffer);
+                savedCount++;
+            });
+
+            if (savedCount !== 6) {
+                return reject({ status: 500, message: 'Error al guardar los tiles' });
+            }
+
+            // Guardar en BBDD
+            const imagenId = timestamp + Math.random().toString(30).substring(2);
+            const fechaSubida = new Date();
+
+            db.query(
+                'INSERT INTO imagenes (id, nombre_original, nombre_archivo, tipo, fecha_subida) VALUES (?, ?, ?, ?, ?)',
+                [imagenId, originalFile.originalname, uniqueNameWithoutExt, 'escenario', fechaSubida],
+                (err, results) => {
+                    if (err) {
+                        return reject({ status: 500, message: 'Error al guardar en la base de datos: ' + err.message });
+                    }
+
+                    resolve({
+                        status: 200,
+                        message: `Cubemap '${originalFile.originalname}' guardado correctamente`,
+                        fileName: uniqueNameWithoutExt,
+                        originalName: originalFile.originalname,
+                        imageType: 'escenario',
+                        path: `/assets/escenarios/${uniqueName}`,
+                        id: imagenId
+                    });
+                }
+            );
+        } catch (error) {
+            reject({ status: 500, message: error.message || 'Error al guardar el cubemap' });
+        }
+    });
+};
+
 module.exports = {
     uploadImage,
     listImages,
     getImage,
     getImagesByType,
-    deleteImage
+    deleteImage,
+    uploadCubemapTiles
 };

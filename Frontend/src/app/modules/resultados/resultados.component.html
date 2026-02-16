@@ -1,0 +1,171 @@
+<div class="bg-card flex min-w-0 flex-auto flex-col dark:bg-transparent sm:absolute sm:inset-0 sm:overflow-hidden">
+  <!-- Header -->
+  <div class="relative flex flex-0 flex-col border-b px-6 py-8 sm:flex-row sm:items-center sm:justify-between md:px-8">
+    <!-- Title -->
+    <div>
+      <h1 class="text-4xl font-extrabold tracking-tight">Mis Resultados</h1>
+      <p class="text-gray-600 mt-2">Visualiza el historial de tus ejercicios realizados</p>
+    </div>
+    <!-- Actions -->
+    <button
+      (click)="volverAEjercicios()"
+      class="mt-6 sm:mt-0 flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+    >
+      <mat-icon class="text-white">arrow_back</mat-icon>
+      Volver a Ejercicios
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="flex flex-col flex-auto overflow-y-auto p-6 md:p-8">
+
+    <!-- Cargando -->
+    <div *ngIf="cargando" class="flex items-center justify-center py-12">
+      <div class="animate-spin">
+        <mat-icon class="text-blue-600" style="font-size: 48px; width: 48px; height: 48px">
+          refresh
+        </mat-icon>
+      </div>
+    </div>
+
+    <!-- Sin resultados -->
+    <div
+      *ngIf="!cargando && resultados.length === 0"
+      class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded"
+    >
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <mat-icon class="text-blue-600">info</mat-icon>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-lg font-medium text-blue-900">Sin resultados</h3>
+          <p class="text-blue-700 mt-2">
+            Aún no has completado ningún ejercicio. ¡Realiza tu primer ejercicio ahora!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de resultados -->
+    <div *ngIf="!cargando && resultados.length > 0" class="space-y-4">
+      <div
+        *ngFor="let intento of resultados"
+        class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+      >
+        <!-- Header del intento -->
+        <div
+          (click)="toggleResultado(intento.id)"
+          class="cursor-pointer p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+        >
+          <div class="flex-1">
+            <div class="flex items-center gap-3">
+              <h3 class="text-lg font-semibold text-gray-800">
+                {{ intento.ejercicio_nombre }}
+              </h3>
+              <span
+                *ngIf="intento.asignatura_nombre"
+                class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full"
+              >
+                {{ intento.asignatura_nombre }}
+              </span>
+              <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                Intento #{{ intento.numero_intento }}
+              </span>
+            </div>
+            <p class="text-gray-600 text-sm mt-2">{{ intento.ejercicio_descripcion }}</p>
+
+            <!-- Detalles del intento -->
+            <div class="grid grid-cols-3 gap-4 mt-4">
+              <div class="bg-gray-50 p-3 rounded">
+                <p class="text-gray-500 text-xs uppercase tracking-wide">Tiempo realizado</p>
+                <p class="text-2xl font-bold text-blue-600 mt-1">
+                  {{ formatearTiempo(intento.tiempo_realizado) }}
+                </p>
+              </div>
+              <div class="bg-gray-50 p-3 rounded">
+                <p class="text-gray-500 text-xs uppercase tracking-wide">Total de acciones</p>
+                <p class="text-2xl font-bold text-purple-600 mt-1">{{ intento.total_acciones }}</p>
+              </div>
+              <div class="bg-gray-50 p-3 rounded">
+                <p class="text-gray-500 text-xs uppercase tracking-wide">Fecha</p>
+                <p class="text-sm text-gray-800 mt-1">{{ formatearFecha(intento.created_at) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Icono de expandir -->
+          <div class="ml-4">
+            <mat-icon
+              class="text-gray-400 transition-transform duration-300"
+              [class.rotate-180]="expandedResultados[intento.id]"
+            >
+              expand_more
+            </mat-icon>
+          </div>
+        </div>
+
+        <!-- Detalles expandibles -->
+        <div
+          class="overflow-hidden transition-all duration-300 ease-in-out"
+          [class.max-h-0]="!expandedResultados[intento.id]"
+          [class.max-h-screen]="expandedResultados[intento.id]"
+        >
+          <div class="px-6 pb-6 border-t border-gray-200 bg-gray-50 max-h-96 overflow-y-auto">
+            <!-- Cargando detalles -->
+            <div *ngIf="!detallesResultado[intento.id]" class="flex justify-center py-4">
+              <div class="animate-spin">
+                <mat-icon class="text-blue-600">refresh</mat-icon>
+              </div>
+            </div>
+
+            <!-- Sin acciones registradas -->
+            <div
+              *ngIf="detallesResultado[intento.id] && detallesResultado[intento.id].length === 0"
+              class="text-center py-4 text-gray-500"
+            >
+              <p>No hay acciones registradas en este intento</p>
+            </div>
+
+            <!-- Listado de acciones -->
+            <div *ngIf="detallesResultado[intento.id] && detallesResultado[intento.id].length > 0">
+              <h4 class="font-semibold text-gray-800 mb-3">Acciones y Pacientes:</h4>
+              <div class="space-y-2">
+                <div
+                  *ngFor="let accion of detallesResultado[intento.id]"
+                  class="bg-white p-3 rounded border border-gray-200 flex items-start justify-between"
+                >
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-800">
+                      {{ accion.paciente_nombre }}
+                    </p>
+                    <div class="flex items-center gap-2 mt-1 flex-wrap">
+                      <span
+                        *ngIf="accion.nombre_accion"
+                        class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                      >
+                        {{ accion.nombre_accion }}
+                      </span>
+                      <span
+                        *ngIf="accion.color_asignado"
+                        [class]="
+                          'px-2 py-1 text-white text-xs rounded ' +
+                          getColorBadge(accion.color_asignado)
+                        "
+                      >
+                        {{ accion.color_asignado
+                        | uppercase }}
+                      </span>
+                    </div>
+                  </div>
+                  <span class="text-gray-400 text-xs ml-2">
+                    {{ formatearFecha(accion.created_at) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

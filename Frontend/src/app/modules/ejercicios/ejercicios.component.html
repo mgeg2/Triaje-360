@@ -1,8 +1,21 @@
-<div class="flex min-w-0 flex-auto flex-col">
-    <!-- Main -->
-    <div class="flex-auto p-6 sm:p-10">
-        <!-- CONTENT GOES HERE -->
-        <div class="text-4xl font-extrabold tracking-tight">Ejercicios</div>
+<div class="bg-card flex min-w-0 flex-auto flex-col dark:bg-transparent sm:absolute sm:inset-0 sm:overflow-hidden">
+    <!-- Header -->
+    <div class="relative flex flex-0 flex-col border-b px-6 py-8 sm:flex-row sm:items-center sm:justify-between md:px-8">
+        <!-- Title -->
+        <div>
+            <h1 class="text-4xl font-extrabold tracking-tight">Ejercicios</h1>
+        </div>
+        <!-- Actions -->
+        <button *ngIf="user?.role === 'alu'" 
+            (click)="navegarAResultados()"
+            class="mt-6 sm:mt-0 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            <mat-icon>bar_chart</mat-icon>
+            Ver mis resultados
+        </button>
+    </div>
+
+    <!-- Content -->
+    <div class="flex flex-col flex-auto overflow-y-auto p-6 md:p-8">
         <div *ngFor="let asig of asignaturas; let i = index" class="border-b-2 border-gray-300">
             <div (click)="toggleAsignatura(i)"
                 class="cursor-pointer bg-gray-100 px-4 py-2 flex items-center justify-between">
