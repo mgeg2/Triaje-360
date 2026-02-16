@@ -183,5 +183,21 @@ export class ImageManagerComponent implements OnInit {
   getImagePath(image: any): string {
     return this.imageUploadService.getImagePath(image.nombre_archivo, image.tipo);
   }
+
+  deleteImage(imageId: string, imageName: string): void {
+    if (confirm(`¿Estás seguro de que deseas eliminar la imagen "${imageName}"?`)) {
+      this.imageUploadService.deleteImage(imageId).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.loadImages();
+          }
+        },
+        error: (error) => {
+          console.error('Error al eliminar imagen:', error);
+          alert('Error al eliminar la imagen');
+        }
+      });
+    }
+  }
 }
 

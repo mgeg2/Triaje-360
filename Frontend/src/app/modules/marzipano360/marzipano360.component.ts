@@ -136,6 +136,7 @@ export class Marzipano360Component implements OnInit, OnDestroy {
   obtenerPacientesEjercicio(): void {
     this.ejerciciosService.getPacientesEjercicio(this.ejercicioId).subscribe({
       next: (pacientes) => {
+        console.log('Pacientes obtenidos del ejercicio:', pacientes);
         // Remover el campo 'color' de cada paciente
         this.pacientesUbicados = pacientes.map((paciente: any) => {
           const { color, ...pacienteSinColor } = paciente;
@@ -143,6 +144,7 @@ export class Marzipano360Component implements OnInit, OnDestroy {
         });
         console.log('=== PACIENTES UBICADOS CARGADOS ===');
         console.log('Total pacientes:', this.pacientesUbicados.length);
+        console.log('Pacientes ubicados:', this.pacientesUbicados);
         this.pacientesUbicados.forEach((p: any, idx: number) => {
           console.log(`Paciente ${idx}: ${p.nombre}`);
           console.log(`  - posicion:`, p.posicion);
@@ -181,7 +183,7 @@ export class Marzipano360Component implements OnInit, OnDestroy {
 
       // Configurar con 6 imágenes de cubo (0.png, 1.png, 2.png, 3.png, 4.png, 5.png)
       const source = Marzipano.ImageUrlSource.fromString(
-        `assets/escenarios/Tiles/${imagenesEjercicio[0].nombre_imagen}/{f}.png`
+        `assets/escenarios/Tiles/${imagenesEjercicio[0].nombre_archivo}/{f}.png`
       );
 
       const geometry = new Marzipano.CubeGeometry(
@@ -304,7 +306,7 @@ export class Marzipano360Component implements OnInit, OnDestroy {
       
       const imgElement = document.createElement('img');
       const ruta = 'assets/pacientes/';
-      const imagenSrc = paciente.nombre_imagen ? `${ruta}${paciente.nombre_imagen}.png` : 'assets/avatars/default.png';
+      const imagenSrc = paciente.nombre_archivo ? `${ruta}${paciente.nombre_archivo}.png` : 'assets/avatars/default.png';
       imgElement.src = imagenSrc;
       imgElement.alt = paciente.nombre;
       console.log(`Cargando imagen para ${paciente.nombre}: ${imagenSrc}`);

@@ -93,6 +93,7 @@ export const appRoutes: Route[] = [
             { path: 'pacientes', loadChildren: () => import('app/modules/pacientes/pacientes.routes') },
             { path: 'marzipano360/:id', loadChildren: () => import('app/modules/marzipano360/marzipano360.routes') },
             {path: 'image-manager', loadChildren: () => import('app/modules/image-manager/image-manager.routes') },
+            {path: 'audio-manager', loadChildren: () => import('app/modules/audio-manager/audio-manager.routes') },
         ]
     }
 ];

@@ -143,14 +143,14 @@ CREATE TABLE `imagenes` (
 --
 
 INSERT INTO `imagenes` (`id`, `nombre_original`, `nombre_archivo`, `tipo`, `fecha_subida`, `descripcion`) VALUES
-('1', 'paciente1.jpg', 'paciente1.jpg', 'paciente', NOW(), 'paciente con corte en la clavicula'),
-('2', 'paciente2.jpg', 'paciente2.jpg', 'paciente', NOW(), 'paciente sangrante con corte profundo en la clavicula'),
-('3', 'paciente3.jpg', 'paciente3.jpg', 'paciente', NOW(), 'paciente con hematoma en la cabeza'),
-('4', 'paciente4.jpg', 'paciente4.jpg', 'paciente', NOW(), 'paciente manchado de sangre'),
-('5', 'escenario1.jpg', 'escenario1.jpg', 'escenario', NOW(), 'escenario1'),
-('6', 'escenario2.jpg', 'escenario2.jpg', 'escenario', NOW(), 'escenario2'),
-('7', 'escenario3.jpg', 'escenario3.jpg', 'escenario', NOW(), 'escenario3'),
-('8', 'escenario4.jpg', 'escenario4.jpg', 'escenario', NOW(), 'escenario4');
+('1', 'paciente1.png', 'paciente1.png', 'paciente', NOW(), 'paciente con corte en la clavicula'),
+('2', 'paciente2.png', 'paciente2.png', 'paciente', NOW(), 'paciente sangrante con corte profundo en la clavicula'),
+('3', 'paciente3.png', 'paciente3.png', 'paciente', NOW(), 'paciente con hematoma en la cabeza'),
+('4', 'paciente4.png', 'paciente4.png', 'paciente', NOW(), 'paciente manchado de sangre'),
+('5', 'escenario1.JPG', 'escenario1.JPG', 'escenario', NOW(), 'escenario1'),
+('6', 'escenario2.JPG', 'escenario2.JPG', 'escenario', NOW(), 'escenario2'),
+('7', 'escenario3.JPG', 'escenario3.JPG', 'escenario', NOW(), 'escenario3'),
+('8', 'escenario4.JPG', 'escenario4.JPG', 'escenario', NOW(), 'escenario4');
 
 -- --------------------------------------------------------
 
@@ -459,6 +459,23 @@ ALTER TABLE `pacientes`
 ALTER TABLE `pacientes_ejercicio`
   ADD CONSTRAINT `esta en el ejercicio` FOREIGN KEY (`ejercicio`) REFERENCES `ejercicios` (`id`),
   ADD CONSTRAINT `imagenes_paciente` FOREIGN KEY (`imagen`) REFERENCES `imagenes` (`id`);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `sonidos`
+--
+
+CREATE TABLE `sonidos` (
+  `id` varchar(250) NOT NULL,
+  `nombre_original` varchar(255) NOT NULL,
+  `nombre_archivo` varchar(255) NOT NULL UNIQUE,
+  `fecha_subida` datetime NOT NULL,
+  `descripcion` varchar(255),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_fecha` (`fecha_subida`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Filtros para la tabla `user_asignatura`

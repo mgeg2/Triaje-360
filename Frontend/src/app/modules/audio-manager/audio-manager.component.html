@@ -1,0 +1,186 @@
+<div class="w-full min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
+  <!-- Encabezado -->
+  <div class="sticky top-0 z-10 bg-white bg-opacity-95 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-slate-200 shadow-sm">
+    <div class="px-6 py-4">
+      <h1 class="text-3xl font-bold text-slate-900">Gestor de Sonidos</h1>
+      <p class="text-slate-600 mt-1">Administra y organiza tus audios (WAV, MP3, MP4)</p>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="flex-1 p-6 max-w-7xl mx-auto w-full pb-12">
+    <!-- Sección Audios -->
+    <div>
+      <div (click)="expandido = !expandido" class="flex items-center justify-between cursor-pointer p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-slate-200">
+        <div class="flex-1">
+          <h2 class="text-2xl font-bold text-slate-900">Audios</h2>
+          <p class="text-slate-600 text-sm mt-1">{{ audios.length }} audio(s)</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            (click)="openModal(); $event.stopPropagation()"
+            class="inline-flex items-center justify-center px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium shadow-md text-sm"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          </button>
+          <svg [style.transform]="expandido ? 'rotate(0deg)' : 'rotate(-180deg)'" class="w-5 h-5 text-slate-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Lista de audios -->
+      <div *ngIf="expandido" class="space-y-2 mb-6 mt-4 animate-in fade-in duration-300">
+        <div
+          *ngFor="let audio of audiosPaginadas"
+          class="group relative bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition p-4 flex items-center gap-4"
+        >
+          <!-- Icono de audio -->
+          <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+            </svg>
+          </div>
+
+          <!-- Información del audio -->
+          <div class="flex-1">
+            <h3 class="font-semibold text-slate-900 text-sm line-clamp-1">{{ audio.nombre_original }}</h3>
+            <p class="text-xs text-slate-400 mt-1">
+              {{ audio.fecha_subida | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+          </div>
+
+          <!-- Reproductor de audio -->
+          <div class="flex-shrink-0">
+            <audio
+              controls
+              class="h-8 w-32 rounded"
+            >
+              <source [src]="getAudioPath(audio)" [type]="getAudioMimeType(audio)">
+              Tu navegador no soporta el elemento de audio.
+            </audio>
+          </div>
+
+          <!-- Botón eliminar -->
+          <button
+            (click)="deleteAudio(audio.id, audio.nombre_original)"
+            class="flex-shrink-0 px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition text-xs font-medium"
+            title="Eliminar audio"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div *ngIf="expandido && paginasTotales > 1" class="flex items-center justify-center gap-1 mt-4">
+        <button
+          (click)="paginaActual = paginaActual - 1"
+          [disabled]="paginaActual === 1"
+          class="px-2 py-1 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        >
+          ←
+        </button>
+
+        <div class="flex gap-0.5">
+          <button
+            *ngFor="let page of [1, 2, 3, 4, 5]"
+            [ngIf]="page <= paginasTotales"
+            (click)="paginaActual = page"
+            [class.bg-blue-600]="paginaActual === page"
+            [class.text-white]="paginaActual === page"
+            [class.bg-white]="paginaActual !== page"
+            [class.text-slate-700]="paginaActual !== page"
+            class="px-2 py-1 rounded text-xs font-medium border border-slate-300 hover:bg-slate-50 transition"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <button
+          (click)="paginaActual = paginaActual + 1"
+          [disabled]="paginaActual === paginasTotales"
+          class="px-2 py-1 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        >
+          →
+        </button>
+
+        <span class="text-xs text-slate-600">
+          {{ paginaActual }}/{{ paginasTotales }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Upload -->
+<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <!-- Header Modal -->
+    <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+      <h3 class="text-lg font-bold text-slate-900">
+        Subir Audio
+      </h3>
+      <button
+        (click)="closeModal()"
+        class="text-slate-400 hover:text-slate-600 transition"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Contenido Modal -->
+    <div class="p-6">
+      <!-- Input File -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Selecciona un audio</label>
+        <input
+          #fileInput
+          type="file"
+          accept=".wav,.mp3,.mp4"
+          (change)="onFileSelected($event)"
+          class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+        />
+        <p class="text-xs text-slate-500 mt-2">WAV, MP3 o MP4; máximo 50MB</p>
+      </div>
+
+      <!-- Nombre del archivo seleccionado -->
+      <div *ngIf="selectedFileName" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p class="text-xs text-blue-700 break-words">📁 {{ selectedFileName }}</p>
+      </div>
+
+      <!-- Mensajes -->
+      <div *ngIf="uploadError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-700">{{ uploadError }}</p>
+      </div>
+
+      <div *ngIf="uploadSuccess" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+        <p class="text-sm text-green-700">¡Audio subido correctamente!</p>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex gap-3">
+        <button
+          (click)="closeModal()"
+          class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="uploadAudio()"
+          [disabled]="!selectedFile || isLoading"
+          class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+        >
+          <span *ngIf="isLoading" class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          {{ isLoading ? 'Subiendo...' : 'Subir' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

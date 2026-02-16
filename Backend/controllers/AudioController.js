@@ -1,7 +1,7 @@
-const ImageService = require('../services/ImageServices');
+const AudioService = require('../services/AudioServices');
 var jwt = require('../middlewares/validar-jwt');
 
-const uploadImage = async (req, res) => {
+const uploadAudio = async (req, res) => {
     jwt.comprobartoken(req, res, async function () {
         if (req.role !== 'admin' && req.role !== 'prof') {
             return res.status(403).json({ message: 'Acceso denegado' });
@@ -14,8 +14,7 @@ const uploadImage = async (req, res) => {
                 });
             }
 
-            const imageType = req.body.imageType || 'paciente';
-            const result = await ImageService.uploadImage(req.file, imageType);
+            const result = await AudioService.uploadAudio(req.file);
 
             res.status(result.status).json({
                 success: true,
@@ -24,7 +23,6 @@ const uploadImage = async (req, res) => {
                     id: result.id,
                     nombre_original: result.originalName,
                     nombre_archivo: result.fileName,
-                    imageType: result.imageType,
                     path: result.path,
                     fullPath: result.fullPath
                 }
@@ -38,15 +36,13 @@ const uploadImage = async (req, res) => {
     });
 };
 
-const listImages = async (req, res) => {
+const listAudios = async (req, res) => {
     try {
-        const { type } = req.params;
-        const result = await ImageService.listImages(type);
+        const result = await AudioService.listAudios();
 
         res.status(result.status).json({
             success: true,
-            type: result.type,
-            images: result.images,
+            audios: result.audios,
             count: result.count
         });
     } catch (error) {
@@ -57,10 +53,10 @@ const listImages = async (req, res) => {
     }
 };
 
-const getImage = async (req, res) => {
+const getAudio = async (req, res) => {
     try {
-        const { type, fileName } = req.params;
-        const result = await ImageService.getImage(type, fileName);
+        const { fileName } = req.params;
+        const result = await AudioService.getAudio(fileName);
 
         res.sendFile(result.filePath);
     } catch (error) {
@@ -71,15 +67,13 @@ const getImage = async (req, res) => {
     }
 };
 
-const getImagesByType = async (req, res) => {
+const getAllAudios = async (req, res) => {
     try {
-        const { type } = req.params;
-        const result = await ImageService.getImagesByType(type);
+        const result = await AudioService.getAllAudios();
 
         res.status(result.status).json({
             success: true,
-            type: result.type,
-            data: result.images,
+            data: result.audios,
             count: result.count
         });
     } catch (error) {
@@ -90,14 +84,14 @@ const getImagesByType = async (req, res) => {
     }
 };
 
-const deleteImage = async (req, res) => {
+const deleteAudio = async (req, res) => {
     jwt.comprobartoken(req, res, async function () {
         if (req.role !== 'admin' && req.role !== 'prof') {
             return res.status(403).json({ message: 'Acceso denegado' });
         }
         try {
-            const { imageId } = req.params;
-            const result = await ImageService.deleteImage(imageId);
+            const { audioId } = req.params;
+            const result = await AudioService.deleteAudio(audioId);
 
             res.status(result.status).json({
                 success: true,
@@ -113,9 +107,9 @@ const deleteImage = async (req, res) => {
 };
 
 module.exports = {
-    uploadImage,
-    listImages,
-    getImage,
-    getImagesByType,
-    deleteImage
+    uploadAudio,
+    listAudios,
+    getAudio,
+    getAllAudios,
+    deleteAudio
 };

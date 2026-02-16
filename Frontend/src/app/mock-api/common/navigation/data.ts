@@ -23,11 +23,21 @@ export const adminNavigation: FuseNavigationItem[] = [
         icon: 'heroicons_outline:chart-pie',
         link: '/pacientes'
     },
-    {id:'image-manager',
-    title: 'Gestor de Imágenes',
-    type: 'basic',
-    icon: 'heroicons_outline:chart-pie',
-    link: '/image-manager'}
+    {
+        id:'image-manager',
+        title: 'Gestor de Imágenes',
+        type: 'basic',
+        icon: 'heroicons_outline:chart-pie',
+        link: '/image-manager'
+    },
+
+    {
+        id:'audio-manager',
+        title: 'Gestor de Audios',
+        type: 'basic',
+        icon: 'heroicons_outline:chart-pie',
+        link: '/audio-manager'
+    }
 ];
 export const profNavigation: FuseNavigationItem[] = [
     {

@@ -35,7 +35,7 @@ const uploadImage = async (file, imageType) => {
             // Generar nombre único
             const timestamp = Date.now().toString(30);
             const random = Math.random().toString(30).substring(2);
-            const ext = imageType === 'escenario' ? '.JPG' : '.png';
+            const ext = path.extname(file.originalname);
             const uniqueName = `${timestamp}${random}${ext}`;
             const uniqueNameWithoutExt = `${timestamp}${random}`;
             const filePath = path.join(typeDir, uniqueName);
@@ -158,9 +158,59 @@ const getImagesByType = async (imageType) => {
     });
 };
 
+const deleteImage = async (imageId) => {
+    return new Promise((resolve, reject) => {
+        try {
+            // Obtener información de la imagen para borrar el archivo
+            db.query(
+                'SELECT nombre_archivo, tipo FROM imagenes WHERE id = ?',
+                [imageId],
+                (err, results) => {
+                    if (err) {
+                        return reject({ status: 500, message: 'Error al obtener imagen' });
+                    }
+
+                    if (!results || results.length === 0) {
+                        return reject({ status: 404, message: 'Imagen no encontrada' });
+                    }
+
+                    const imageFile = results[0].nombre_archivo;
+                    const imageType = results[0].tipo;
+                    const imageDir = path.join(__dirname, '../../Frontend/src/assets', `${imageType}s`);
+                    const filePath = path.join(imageDir, imageFile);
+
+                    // Eliminar del sistema de archivos
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+
+                    // Eliminar de la base de datos
+                    db.query(
+                        'DELETE FROM imagenes WHERE id = ?',
+                        [imageId],
+                        (err) => {
+                            if (err) {
+                                return reject({ status: 500, message: 'Error al eliminar la imagen' });
+                            }
+
+                            resolve({
+                                status: 200,
+                                message: 'Imagen eliminada correctamente'
+                            });
+                        }
+                    );
+                }
+            );
+        } catch (error) {
+            reject({ status: 500, message: error.message || 'Error al eliminar imagen' });
+        }
+    });
+};
+
 module.exports = {
     uploadImage,
     listImages,
     getImage,
-    getImagesByType
+    getImagesByType,
+    deleteImage
 };

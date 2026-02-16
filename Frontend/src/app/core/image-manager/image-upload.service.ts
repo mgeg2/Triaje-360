@@ -35,7 +35,16 @@ export class ImageUploadService {
 
   getImagePath(fileName: string, imageType: 'paciente' | 'escenario'): string {
     console.log(`Obteniendo ruta para imagen: ${fileName} de tipo: ${imageType}`);
-    return `assets/${imageType}s/${fileName}`;
+    return `/assets/${imageType}s/${fileName}`;
+  }
+
+  deleteImage(imageId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = token 
+      ? new HttpHeaders({ 'Authorization': `${token}` })
+      : new HttpHeaders();
+
+    return this.http.delete<any>(`http://localhost:3000/api/imagenes/delete/${imageId}`, { headers });
   }
 }
 

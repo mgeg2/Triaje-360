@@ -20,6 +20,7 @@ const upload = multer({
 });
 
 router.post('/upload', upload.single('image'), ImageController.uploadImage);
+router.delete('/delete/:imageId', ImageController.deleteImage);
 router.get('/lista/:type', ImageController.listImages);
 router.get('/bbdd/:type', ImageController.getImagesByType);
 router.get('/:type/:fileName', ImageController.getImage);
