@@ -6,7 +6,10 @@ JWT_SECRET: 'your_jwt_secret_key'};
 
 const routes = {
   HOME: '/',
-  API: '/api'};
+  API: '/api',
+//ASSETS:'C:/xampp/htdocs/triaje-360/assets',
+ASSETS: 'C:/xampp/htdocs/TFG/frontend/src/assets'
+};
 
   const admin = {
   email: 'admin@gmail.com',

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const db = require('../db');
+const { routes } = require('../config');
 
 const generateUniqueName = (originalName) => {
     const timestamp = Date.now().toString(30);
@@ -22,7 +23,7 @@ const uploadImage = async (file, imageType) => {
             }
 
             // Crear carpetas en Frontend/src/assets si no existen
-            const baseDir = path.join(__dirname, '../../Frontend/src/assets');
+            const baseDir = path.join(routes.ASSETS);
             const typeDir = path.join(baseDir, `${imageType}s`);
 
             if (!fs.existsSync(baseDir)) {
@@ -50,7 +51,7 @@ const uploadImage = async (file, imageType) => {
 
             db.query(
                 'INSERT INTO imagenes (id, nombre_original, nombre_archivo, tipo, fecha_subida) VALUES (?, ?, ?, ?, ?)',
-                [imagenId, file.originalname, uniqueNameWithoutExt, imageType, fechaSubida],
+                [imagenId, file.originalname, uniqueName, imageType, fechaSubida],
                 (err, results) => {
                     if (err) {
                         return reject({ status: 500, message: 'Error al guardar en la base de datos: ' + err.message });
@@ -62,7 +63,7 @@ const uploadImage = async (file, imageType) => {
                         fileName: uniqueName,
                         originalName: file.originalname,
                         imageType: imageType,
-                        path: `/assets/${imageType}s/${uniqueName}`,
+                        path: routes.ASSETS + `/${imageType}s/${uniqueName}`,
                         fullPath: filePath,
                         id: imagenId
                     });
@@ -243,7 +244,7 @@ const uploadCubemapTiles = async (originalFile, tileFiles) => {
             }
 
             // Crear carpetas en Frontend/src/assets si no existen
-            const baseDir = path.join(__dirname, '../../Frontend/src/assets');
+            const baseDir = path.join(routes.ASSETS);
             const escenariosDir = path.join(baseDir, 'escenarios');
             const tilesDir = path.join(escenariosDir, 'Tiles');
 
@@ -293,7 +294,7 @@ const uploadCubemapTiles = async (originalFile, tileFiles) => {
 
             db.query(
                 'INSERT INTO imagenes (id, nombre_original, nombre_archivo, tipo, fecha_subida) VALUES (?, ?, ?, ?, ?)',
-                [imagenId, originalFile.originalname, uniqueNameWithoutExt, 'escenario', fechaSubida],
+                [imagenId, originalFile.originalname, uniqueName, 'escenario', fechaSubida],
                 (err, results) => {
                     if (err) {
                         return reject({ status: 500, message: 'Error al guardar en la base de datos: ' + err.message });
@@ -305,7 +306,7 @@ const uploadCubemapTiles = async (originalFile, tileFiles) => {
                         fileName: uniqueNameWithoutExt,
                         originalName: originalFile.originalname,
                         imageType: 'escenario',
-                        path: `/assets/escenarios/${uniqueName}`,
+                        path: routes.ASSETS + `/escenarios/${uniqueName}`,
                         id: imagenId
                     });
                 }

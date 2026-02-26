@@ -278,6 +278,22 @@ const getSonidosFromEjercicio = async (req, res) => {
     });
 };
 
+const removeSonidoFromEjercicio = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'admin' && req.role !== 'prof') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const ejercicioId = req.params.ejercicioId;
+            const sonidoId = req.params.sonidoId;
+            const result = await EjerciciosService.removeSonidoFromEjercicio(ejercicioId, sonidoId);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ message: error.message || error });
+        }
+    });
+};
+
 module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -297,5 +313,6 @@ module.exports = {
     obtenerDetallesResultado,
     guardarAccionesIntento,
     postSonidosToEjercicio,
-    getSonidosFromEjercicio
+    getSonidosFromEjercicio,
+    removeSonidoFromEjercicio
 };

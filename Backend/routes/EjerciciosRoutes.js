@@ -17,6 +17,7 @@ router.post('/resultados/:intentoId/acciones', EjerciciosController.guardarAccio
 // Rutas de sonidos (antes de las dinámicas)
 router.post('/sonidos', EjerciciosController.postSonidosToEjercicio);
 router.get('/:ejercicioId/sonidos', EjerciciosController.getSonidosFromEjercicio);
+router.delete('/:ejercicioId/sonido/:sonidoId', EjerciciosController.removeSonidoFromEjercicio);
 
 // Rutas dinámicas con parámetros (van después)
 router.get('/:idEjercicio', EjerciciosController.getOneEjercicios);

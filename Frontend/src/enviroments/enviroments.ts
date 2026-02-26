@@ -24,5 +24,9 @@ export const environment = {
         delete: '/pacientes',
         update: '/pacientes/',
         accionesPaciente: '/pacientes/accionesPaciente'
+    },
+    assets: {
+        assets:'c:/xampp/htdocs/TFG/Frontend/src/assets',
+        //assets:'assets'
     }
 };

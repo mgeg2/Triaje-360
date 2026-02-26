@@ -246,8 +246,8 @@
                                                         <p class="text-xs text-gray-400 mt-1">{{ sonido.fecha_subida | date: 'dd/MM/yyyy HH:mm' }}</p>
                                                     </div>
                                                 </div>
-                                                <div *ngIf="isSonidoSelected(sonido.id)" class="absolute top-2 right-2 bg-blue-600 text-white rounded-full p-1">
-                                                    <mat-icon style="font-size: 18px; width: 18px; height: 18px;">check</mat-icon>
+                                                <div *ngIf="isSonidoSelected(sonido.id)" class="absolute top-10 right-2 bg-blue-600 text-white rounded-full p-1">
+                                                    <mat-icon class="text-white" style="font-size: 18px; width: 18px; height: 18px;">check</mat-icon>
                                                 </div>
                                             </div>
                                         </div>
@@ -562,13 +562,13 @@
 
                                     <!-- Tercer div (columna) -->
                                     <div class="w-[140px] overflow-auto">
-                                        <div *ngFor="let paciente of pacientesEjercicio"
+                                        <div *ngFor="let paciente of pacientesEjercicio" (click)="seleccionarPaciente(paciente)"
                                             class="relative flex flex-col rounded-2xl overflow-visible cursor-pointer group transition-transform duration-300 m-2 hover:scale-105"
                                             [style.border]="'3px solid ' + getColorHex(paciente.color)">
                                             <!-- Solo la imagen del paciente como tarjeta -->
                                             <img [src]="'assets/pacientes/'+ paciente.nombre_archivo+'.png' "
                                                 [alt]="paciente.descripcion" class="w-full h-32 object-cover rounded-2xl"
-                                                (click)="seleccionarPaciente(paciente)">
+                                                >
                                             <!-- Botón de eliminación -->
                                             <button type="button"
                                                 (click)="removePacienteFromExercise(paciente.id); $event.stopPropagation()"

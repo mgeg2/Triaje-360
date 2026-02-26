@@ -718,6 +718,25 @@ const getSonidosFromEjercicio = async (ejercicioId) => {
     });
 };
 
+const removeSonidoFromEjercicio = async (ejercicioId, sonidoId) => {
+    return new Promise((resolve, reject) => {
+        if (!ejercicioId || !sonidoId) {
+            return reject({ status: 400, message: 'ejercicioId y sonidoId son requeridos' });
+        }
+
+        db.query(
+            'DELETE FROM sonidos_ejercicio WHERE ejercicio_id = ? AND sonido_id = ?',
+            [ejercicioId, sonidoId],
+            (err, results) => {
+                if (err) {
+                    return reject({ status: 500, message: 'Error al eliminar sonido del ejercicio', error: err });
+                }
+                resolve({ status: 200, message: 'Sonido eliminado del ejercicio', results });
+            }
+        );
+    });
+};
+
             module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -736,5 +755,6 @@ const getSonidosFromEjercicio = async (ejercicioId) => {
     obtenerDetallesResultado,
     guardarAccionesIntento,
     postSonidosToEjercicio,
-    getSonidosFromEjercicio
+    getSonidosFromEjercicio,
+    removeSonidoFromEjercicio
 }

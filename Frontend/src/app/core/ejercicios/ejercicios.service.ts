@@ -107,4 +107,10 @@ export class EjerciciosService {
         const data = { pacientesAcciones };
         return this._httpClient.post(`${environment.apiUrl}${environment.ejer.all}/resultados/${intentoId}/acciones`, data, { headers });
     }
+
+    removeSonidoFromEjercicio(ejercicioId: string, sonidoId: string): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        return this._httpClient.delete(`${environment.apiUrl}${environment.ejer.all}/${ejercicioId}/sonido/${sonidoId}`, { headers });
+    }
 }

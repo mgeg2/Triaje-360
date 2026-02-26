@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../enviroments/enviroments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageUploadService {
-  private uploadUrl = 'http://localhost:3000/api/imagenes/upload';
-  private getImagesUrl = 'http://localhost:3000/api/imagenes/bbdd';
+  private uploadUrl = `${environment.apiUrl}/imagenes/upload`;
+  private getImagesUrl = `${environment.apiUrl}/imagenes/bbdd`;
 
   constructor(private http: HttpClient) { }
 
@@ -60,14 +61,14 @@ export class ImageUploadService {
     // Detectar si es un cubemap (contiene "Tiles/")
     if (fileName.includes('Tiles/')) {
       // Para cubemaps, devolver la ruta al tile 'l' (left)
-      return `/assets/${imageType}s/${fileName}/l.png`;
+      return environment.assets.assets + `/${imageType}s/${fileName}/l.png`;
     }
     
     // Para imágenes normales de pacientes
-    const extension = imageType === 'paciente' ? '.png' : '.JPG';
-    const hasExtension = /\.(png|jpg|jpeg|JPG|PNG)$/i.test(fileName);
-    const fileNameWithExtension = hasExtension ? fileName : `${fileName}${extension}`;
-    return `/assets/${imageType}s/${fileNameWithExtension}`;
+
+    const hasExtension = /\.(png|jpg|jpeg|JPG|PNG|webp|WEBP)$/i.test(fileName);
+    const fileNameWithExtension = hasExtension ? fileName : `${fileName}.JPG`;
+    return environment.assets.assets + `/${imageType}s/${fileNameWithExtension}`;
   }
 
   deleteImage(imageId: string): Observable<any> {
@@ -76,7 +77,7 @@ export class ImageUploadService {
       ? new HttpHeaders({ 'Authorization': `${token}` })
       : new HttpHeaders();
 
-    return this.http.delete<any>(`http://localhost:3000/api/imagenes/delete/${imageId}`, { headers });
+    return this.http.delete<any>(`${environment.apiUrl}/imagenes/delete/${imageId}`, { headers });
   }
 }
 

@@ -18,6 +18,7 @@ import { FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angu
 import { EjerciciosService } from 'app/core/ejercicios/ejercicios.service';
 import { PacientesService } from 'app/core/pacientes/pacientes.service';
 import { AudioService } from 'app/core/audio-manager/audio.service';
+import { get } from 'lodash';
 @Component({
   selector: 'app-ejercicios',
   standalone: true,
@@ -370,6 +371,19 @@ export class EjerciciosComponent implements OnInit {
       // Remover si está presente
       const newSonidos = currentSonidos.filter((id: string) => id !== sonidoId);
       sonoControl?.patchValue(newSonidos);
+      
+      // Si estamos editando, eliminar del backend
+      if (this.esEdicion && this.ejercicio) {
+        this._ejerciciosService.removeSonidoFromEjercicio(this.ejercicio, sonidoId).subscribe(
+          (data: any) => {
+            console.log('Sonido eliminado del ejercicio:', data);
+          },
+          (error: any) => {
+            console.error('Error al eliminar sonido:', error);
+            alert('Error al eliminar el sonido del ejercicio');
+          }
+        );
+      }
     }
 
     // Limpiar el error de required si se selecciona al menos un sonido
@@ -402,19 +416,21 @@ export class EjerciciosComponent implements OnInit {
     
     // Cargar pacientes
     this._pacientesService.getPacientes().subscribe((data: any) => {
-      console.log(data);
+      console.log("pacientes de la bbdd",data);
       this.pacientes = data;
       this.pacientesFiltrados = [...data];
+      console.log("pacientes filtrados",this.pacientesFiltrados);
     });
   }
   getAccionesPaciente(): void {
     this._pacientesService.getAccionesPaciente().subscribe((data: any) => {
-      console.log(data);
+
       this.accionesPaciente = data;
     });
   }
 
   seleccionarPaciente(paciente: any): void {  
+    console.log('Paciente seleccionado:', paciente);
     this.pacienteSeleccionado = paciente;
     console.log(this.pacienteSeleccionado);
 this.ThirdFormGroup.patchValue({ id: this.pacienteSeleccionado.id });
@@ -555,6 +571,7 @@ console.log(this.ThirdFormGroup.value);
         console.log('Escenarios cargados:', escenarioIds);
         console.log('Escenarios completos:', escenarios);
 
+        this.getSonidosDisponibles();
         // Cargar sonidos del ejercicio
         this._audioService.getSonidosFromEjercicio(ejercicio.id).subscribe((sonidos: any) => {
           const sonidoIds = sonidos.map((sonido: any) => sonido.id);
@@ -571,6 +588,12 @@ console.log(this.ThirdFormGroup.value);
           this.pacientesEjercicioOriginal = [...pacientes]; // Guardar copia sin modificaciones
           console.log('Pacientes del ejercicio cargados:', pacientes);
 
+this._pacientesService.getPacientes().subscribe((data: any) => {
+      console.log("pacientes de la bbdd",data);
+      this.pacientes = data;
+      this.pacientesFiltrados = [...data];
+      console.log("pacientes filtrados",this.pacientesFiltrados);
+    });
           // Cargar ubicaciones de los pacientes
           this._ejerciciosService.getPacientesLocationInEjercicio(ejercicio.id).subscribe((locations: any) => {
             console.log('Ubicaciones cargadas desde BD:', locations);
@@ -583,17 +606,17 @@ console.log(this.ThirdFormGroup.value);
               const key = `${location.fila}-${location.columna}`;
               const pacienteCompleto = pacientes.find(p => p.id === location.paciente);
               
-              console.log(`📍 Ubicación BD: paciente_id=${location.paciente}, imagen="${location.imagen}", fila=${location.fila}, columna=${location.columna} → KEY="${key}"`);
+             // console.log(`📍 Ubicación BD: paciente_id=${location.paciente}, imagen="${location.imagen}", fila=${location.fila}, columna=${location.columna} → KEY="${key}"`);
               
               if (pacienteCompleto) {
-                console.log(`   ✓ Paciente encontrado: "${pacienteCompleto.nombre}"`);
+                //console.log(`   ✓ Paciente encontrado: "${pacienteCompleto.nombre}"`);
                 
                 // Siempre agregar a pacientesColocadosPorImagen
                 if (!this.pacientesColocadosPorImagen[location.imagen]) {
                   this.pacientesColocadosPorImagen[location.imagen] = {};
                 }
                 this.pacientesColocadosPorImagen[location.imagen][key] = pacienteCompleto;
-                console.log(`   → Agregado a pacientesColocadosPorImagen["${location.imagen}"]["${key}"]`);
+                //console.log(`   → Agregado a pacientesColocadosPorImagen["${location.imagen}"]["${key}"]`);
                 
                 imagenesConUbicaciones.add(location.imagen);
               } else {
@@ -613,9 +636,9 @@ console.log(this.ThirdFormGroup.value);
               // Ahora poblar pacientesColocados con la imagen seleccionada
               if (this.pacientesColocadosPorImagen[this.imagenSeleccionadaId]) {
                 this.pacientesColocados = { ...this.pacientesColocadosPorImagen[this.imagenSeleccionadaId] };
-                console.log('✅ pacientesColocados población:');
+                //console.log('✅ pacientesColocados población:');
                 Object.entries(this.pacientesColocados).forEach(([k, v]: [string, any]) => {
-                  console.log(`   [${k}] = ${v.nombre}`);
+                  //console.log(`   [${k}] = ${v.nombre}`);
                 });
               }
             } else {
@@ -979,9 +1002,9 @@ console.log(this.ThirdFormGroup.value);
   getPacienteEnCelda(row: number, col: number): any {
     const key = `${row}-${col}`;
     const paciente = this.pacientesColocados[key];
-    if (paciente) {
-      console.log(`✓ Encontrado paciente en celda [${row}-${col}]:`, paciente.nombre);
-    }
+    // if (paciente) {
+    //   console.log(`✓ Encontrado paciente en celda [${row}-${col}]:`, paciente.nombre);
+    // }
     return paciente;
   }
 
