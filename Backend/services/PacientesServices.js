@@ -3,7 +3,7 @@ const config = require('../config').config;
 
 const getPacientes = async () => {
     return new Promise((resolve, reject) => {
-        db.query('SELECT p.*, GROUP_CONCAT(a.nombre_accion SEPARATOR ", ") AS acciones, GROUP_CONCAT(ap.acciones_id) as acciones_ids, i.nombre_archivo FROM Pacientes p LEFT JOIN Acciones_paciente ap ON p.id = ap.paciente_id LEFT JOIN Acciones a ON ap.acciones_id = a.id LEFT JOIN Imagenes i ON p.imagen = i.id GROUP BY p.id', (err, results) => {
+        db.query('SELECT p.*, GROUP_CONCAT(a.nombre_accion SEPARATOR ", ") AS acciones, GROUP_CONCAT(ap.acciones_id) as acciones_ids, i.nombre_archivo FROM pacientes p LEFT JOIN acciones_paciente ap ON p.id = ap.paciente_id LEFT JOIN acciones a ON ap.acciones_id = a.id LEFT JOIN imagenes i ON p.imagen = i.id GROUP BY p.id', (err, results) => {
             if (err) return reject(err);
 
             // Process results to convert acciones_ids string to array
@@ -26,7 +26,7 @@ const createPaciente = async (body) => {
     const idPaciente = Date.now().toString(30) + Math.random().toString(30).substring(2);
     console.log(body.tiempoEmpeoramiento);
     return new Promise(async (resolve, reject) => {
-        db.query('INSERT INTO Pacientes(id,nombre,descripcion,color,Tempeora, imagen) VALUES (?, ?, ?, ?, ?, ?)', [idPaciente, body.nombre, body.descripcion, body.color, body.tiempoEmpeoramiento, body.imagenSeleccionada], async (err, results) => {
+        db.query('INSERT INTO pacientes(id,nombre,descripcion,color,Tempeora, imagen) VALUES (?, ?, ?, ?, ?, ?)', [idPaciente, body.nombre, body.descripcion, body.color, body.tiempoEmpeoramiento, body.imagenSeleccionada], async (err, results) => {
             if (err) return reject(err);
 
             // Si el insert de paciente ha ido bien, verificar si accionesPacientes es un array
@@ -62,7 +62,7 @@ const createPaciente = async (body) => {
 
 const updatePaciente = async (id, body) => {
     return new Promise((resolve, reject) => {
-        db.query('UPDATE Pacientes SET nombre = ?, descripcion = ?, color = ?, Tempeora = ?, imagen = ? WHERE id = ?', [body.nombre, body.descripcion, body.color, body.tiempoEmpeoramiento, body.imagenSeleccionada, id], (err, results) => {
+        db.query('UPDATE pacientes SET nombre = ?, descripcion = ?, color = ?, Tempeora = ?, imagen = ? WHERE id = ?', [body.nombre, body.descripcion, body.color, body.tiempoEmpeoramiento, body.imagenSeleccionada, id], (err, results) => {
             if (err) return reject(err);
             updatePacienteAcciones(id, body);
             resolve(results);
@@ -73,7 +73,7 @@ const updatePaciente = async (id, body) => {
 const updatePacienteAcciones = async (id, body) => {
     return new Promise((resolve, reject) => {
         // Paso 1: Obtener las acciones actuales del paciente
-        db.query('SELECT acciones_id FROM Acciones_paciente WHERE paciente_id = ?', [id], (err, results) => {
+        db.query('SELECT acciones_id FROM acciones_paciente WHERE paciente_id = ?', [id], (err, results) => {
             if (err) return reject(err);
 
             const currentActions = results.map(row => row.acciones_id);
@@ -83,7 +83,7 @@ const updatePacienteAcciones = async (id, body) => {
             const actionsToDelete = currentActions.filter(action => !newActions.includes(action));
             if (actionsToDelete.length > 0) {
                 const placeholders = actionsToDelete.map(() => '?').join(', ');
-                db.query(`DELETE FROM Acciones_paciente WHERE paciente_id = ? AND acciones_id IN (${placeholders})`, [id, ...actionsToDelete], (err, results) => {
+                db.query(`DELETE FROM acciones_paciente WHERE paciente_id = ? AND acciones_id IN (${placeholders})`, [id, ...actionsToDelete], (err, results) => {
                     if (err) return reject(err);
                 });
             }
@@ -92,7 +92,7 @@ const updatePacienteAcciones = async (id, body) => {
             const actionsToAdd = newActions.filter(action => !currentActions.includes(action));
             if (actionsToAdd.length > 0) {
                 const values = actionsToAdd.map(action => [id, action]);
-                db.query('INSERT INTO Acciones_paciente (paciente_id, acciones_id) VALUES ?', [values], (err, results) => {
+                db.query('INSERT INTO acciones_paciente (paciente_id, acciones_id) VALUES ?', [values], (err, results) => {
                     if (err) return reject(err);
                 });
             }
@@ -104,9 +104,9 @@ const updatePacienteAcciones = async (id, body) => {
 };
 const deletePaciente = async (id) => {
     return new Promise((resolve, reject) => {
-        db.query('DELETE FROM Acciones_paciente WHERE paciente_id = ?', [id], (err, results) => {
+        db.query('DELETE FROM acciones_paciente WHERE paciente_id = ?', [id], (err, results) => {
             if (err) return reject(err);
-            db.query('DELETE FROM Pacientes WHERE id = ?', [id], (err, results) => {
+            db.query('DELETE FROM pacientes WHERE id = ?', [id], (err, results) => {
                 if (err) return reject(err);
                 resolve(results);
             });
@@ -115,7 +115,7 @@ const deletePaciente = async (id) => {
 };
 const getAccionesPaciente = async () => {
     return new Promise((resolve, reject) => {
-        db.query('SELECT * FROM Acciones', (err, results) => {
+        db.query('SELECT * FROM acciones', (err, results) => {
             if (err) return reject(err);
             resolve(results);
         });
