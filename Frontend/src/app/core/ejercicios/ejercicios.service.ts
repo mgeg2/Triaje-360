@@ -35,6 +35,7 @@ export class EjerciciosService {
         const headers = new HttpHeaders().set('Authorization', `${token}`);
         return this._httpClient.get(`${environment.apiUrl}${environment.ejer.all}/${ejercicioId}/pacientes`, { headers });
     }
+
     getImagenesFromEjercicio(ejercicioId: any): Observable<any> {
         const token = this._authService.accessToken;
         const headers = new HttpHeaders().set('Authorization', `${token}`);

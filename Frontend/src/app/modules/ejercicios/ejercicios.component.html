@@ -197,7 +197,7 @@
                                                 (click)="selectEscenario(imagen)"
                                                 class="relative cursor-pointer rounded-lg overflow-hidden transition-all duration-200 hover:scale-105"
                                                 [ngClass]="{'border-4 border-blue-600 shadow-2xl scale-110': (secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id), 'border-4 border-gray-300': !(secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id)}">
-                                                <img [src]="'assets/escenarios/' + imagen.nombre_archivo + '.JPG'"
+                                                <img [src]="'assets/escenarios/' + imagen.nombre_archivo "
                                                     [alt]="imagen.descripcion" class="h-32 w-auto object-cover">
                                                 <!-- Número de orden cuando está seleccionado -->
                                                 <div *ngIf="(secondFormGroup.get('escenarios')?.value ?? []).includes(imagen.id)"
@@ -297,7 +297,7 @@
                                                 [style.border]="'3px solid ' + getColorHex(paciente.color)"
                                                 (click)="seleccionarPaciente(paciente)">
                                                 <!-- Solo la imagen del paciente como tarjeta -->
-                                                <img [src]="'assets/pacientes/'+ paciente.nombre_archivo +'.png' "
+                                                <img [src]="'assets/pacientes/'+ paciente.nombre_archivo  "
                                                     [alt]="paciente.descripcion" class="w-full h-32 object-cover">
                                                 <!-- Descripción en hover -->
                                                 <div class="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-2xl p-3">
@@ -373,7 +373,7 @@
                                                     <div *ngIf="ThirdFormGroup.get('imagenSeleccionada').value"
                                                         class="flex items-center gap-2 ml-auto">
                                                         <div class="w-10 h-10 rounded-lg border-2 border-blue-600 overflow-hidden bg-white flex-shrink-0">
-                                                            <img [src]="'assets/pacientes/' + getImagenSeleccionada()?.nombre_archivo+'.png'"
+                                                            <img [src]="'assets/pacientes/' + getImagenSeleccionada()?.nombre_archivo"
                                                                 class="w-full h-full object-contain p-0.5">
                                                         </div>
                                                         <button type="button" (click)="openImagenModal()"
@@ -410,7 +410,7 @@
                                                                 (click)="selectImagen(img.id)"
                                                                 class="flex-shrink-0 relative cursor-pointer rounded-lg overflow-hidden border-4 transition-all duration-200 hover:scale-105"
                                                                 [ngClass]="{'border-blue-500 shadow-lg': ThirdFormGroup.get('imagenSeleccionada').value === img.id, 'border-gray-300': ThirdFormGroup.get('imagenSeleccionada').value !== img.id}">
-                                                                <img [src]="'assets/pacientes/'+ img.nombre_archivo+'.png'"
+                                                                <img [src]="'assets/pacientes/'+ img.nombre_archivo"
                                                                     [alt]="img.descripcion"
                                                                     class="w-32 h-32 object-contain p-2">
                                                                 <div *ngIf="ThirdFormGroup.get('imagenSeleccionada').value === img.id"
@@ -566,7 +566,7 @@
                                             class="relative flex flex-col rounded-2xl overflow-visible cursor-pointer group transition-transform duration-300 m-2 hover:scale-105"
                                             [style.border]="'3px solid ' + getColorHex(paciente.color)">
                                             <!-- Solo la imagen del paciente como tarjeta -->
-                                            <img [src]="'assets/pacientes/'+ paciente.nombre_archivo+'.png' "
+                                            <img [src]="'assets/pacientes/'+ paciente.nombre_archivo "
                                                 [alt]="paciente.descripcion" class="w-full h-32 object-cover rounded-2xl"
                                                 >
                                             <!-- Botón de eliminación -->
@@ -596,7 +596,7 @@
                                                 (dragend)="onDragEnd($event)"
                                                 class="flex flex-col rounded-lg overflow-hidden cursor-move shadow-md hover:shadow-lg transition-shadow flex-shrink-0">
                                                 <!-- Solo la imagen del paciente como tarjeta -->
-                                                <img [src]="'assets/pacientes/'+ paciente.nombre_archivo+'.png'"
+                                                <img [src]="'assets/pacientes/'+ paciente.nombre_archivo"
                                                     [alt]="paciente.descripcion" class="w-12 h-12 object-cover hover:scale-105 transition-transform duration-200">
                                             </div>
                                         </div>
@@ -607,10 +607,10 @@
                                                 <div style="position: relative; display: block; width: 1120px; height: 268px;">
                                                     <!-- Imágenes del escenario -->
                                                     <div style="display: flex; width: 100%; height: 100%;">
-                                                        <img [src]="'assets/escenarios/Tiles/'+ imagenSeleccionadaId +'/b.png'" alt="" style="width: 25%; height: 100%; object-fit: cover;">
-                                                        <img [src]="'assets/escenarios/Tiles/'+ imagenSeleccionadaId +'/l.png'" alt="" style="width: 25%; height: 100%; object-fit: cover;">
-                                                        <img [src]="'assets/escenarios/Tiles/'+ imagenSeleccionadaId +'/f.png'" alt="" style="width: 25%; height: 100%; object-fit: cover;">
-                                                        <img [src]="'assets/escenarios/Tiles/'+ imagenSeleccionadaId +'/r.png'" alt="" style="width: 25%; height: 100%; object-fit: cover;">
+                                                        <img [src]="'assets/escenarios/Tiles/'+ imagenseleccionadaIDsinExtension +'/b.png'" alt="" style="width: 25%; height: 100%; object-fit: cover;">
+                                                        <img [src]="'assets/escenarios/Tiles/'+ imagenseleccionadaIDsinExtension +'/l.png'" alt="" style="width: 25%; height: 100%; object-fit: cover;">
+                                                        <img [src]="'assets/escenarios/Tiles/'+ imagenseleccionadaIDsinExtension +'/f.png'" alt="" style="width: 25%; height: 100%; object-fit: cover;">
+                                                        <img [src]="'assets/escenarios/Tiles/'+ imagenseleccionadaIDsinExtension +'/r.png'" alt="" style="width: 25%; height: 100%; object-fit: cover;">
                                                     </div>
                                                     <!-- Cuadrícula de drop zones horizontal -->
                                                     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-rows: repeat(4, 1fr); grid-template-columns: repeat(16, 1fr); gap: 0; border: 2px solid rgba(0, 0, 0, 0.8); overflow: hidden;">
@@ -623,7 +623,7 @@
                                                             [style.background-color]="getCellBackground(getRowFromIndex(cellIdx), getColFromIndex(cellIdx))"
                                                             (click)="onCellClick(getRowFromIndex(cellIdx), getColFromIndex(cellIdx))">
                                                             <div *ngIf="getPacienteEnCelda(getRowFromIndex(cellIdx), getColFromIndex(cellIdx))" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 4px; overflow: hidden;">
-                                                                <img [src]="'assets/pacientes/' + getPacienteEnCelda(getRowFromIndex(cellIdx), getColFromIndex(cellIdx))?.nombre_archivo + '.png'"
+                                                                <img [src]="'assets/pacientes/' + getPacienteEnCelda(getRowFromIndex(cellIdx), getColFromIndex(cellIdx))?.nombre_archivo "
                                                                     [alt]="getPacienteEnCelda(getRowFromIndex(cellIdx), getColFromIndex(cellIdx))?.nombre"
                                                                     style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                                             </div>
@@ -639,7 +639,7 @@
                                                 (click)="seleccionarImagenEscenario(imagen.nombre_archivo)"
                                                 class="p-2 w-20 h-20 flex items-center justify-center transition-all cursor-pointer hover:scale-105 relative rounded-lg border-2 flex-shrink-0"
                                                 [ngClass]="{'border-blue-500 shadow-lg bg-blue-50': imagenSeleccionadaId == imagen.nombre_archivo, 'border-gray-300 bg-white': imagenSeleccionadaId != imagen.nombre_archivo }">
-                                                <img [src]="'assets/escenarios/' + imagen.nombre_archivo + '.JPG'" [alt]="imagen.nombre_imagen" class="w-full h-full object-cover rounded">
+                                                <img [src]="'assets/escenarios/' + imagen.nombre_archivo " [alt]="imagen.nombre_imagen" class="w-full h-full object-cover rounded">
                                                 <div *ngIf="imagenSeleccionadaId == imagen.nombre_archivo" class="absolute top-0 right-0 bg-blue-500 text-white rounded-full p-0.5">
                                                     <mat-icon style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
                                                 </div>

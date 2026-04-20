@@ -46,6 +46,7 @@ export class EjerciciosComponent implements OnInit {
   pacienteSeleccionado: any;
   empeoramientoLimitado: any;
   imagenSeleccionadaId: any = null;
+  imagenseleccionadaIDsinExtension: any = null;
   pacientesColocados: { [key: string]: any } = {};
   pacientesColocadosPorImagen: { [imagenId: string]: { [key: string]: any } } = {};
   searchTermPacientes: string = '';
@@ -343,8 +344,56 @@ export class EjerciciosComponent implements OnInit {
       this._ejerciciosService.getImagenesFromEjercicio(ejercicio).subscribe((data: any) => {
         console.log(data);
         this.imagenesEscenarios = data;
-        this.imagenSeleccionadaId= data[0].nombre_archivo|| null;
-        console.log('Imagen seleccionada al cargar imágenes del ejercicio:', this.imagenSeleccionadaId);
+        
+        // En modo edición, cargar las ubicaciones de los pacientes
+        if (this.esEdicion) {
+          this._ejerciciosService.getPacientesLocationInEjercicio(ejercicio).subscribe((locations: any) => {
+            console.log('Ubicaciones cargadas:', locations);
+            
+            // Obtener pacientes del ejercicio
+            this._ejerciciosService.getPacientesEjercicio(ejercicio).subscribe((pacientes: any) => {
+              const imagenesConUbicaciones = new Set<string>();
+              
+              // Poblar pacientesColocadosPorImagen
+              locations.forEach((location: any) => {
+                const key = `${location.fila}-${location.columna}`;
+                const pacienteCompleto = pacientes.find(p => p.id === location.paciente);
+                
+                if (pacienteCompleto) {
+                  if (!this.pacientesColocadosPorImagen[location.imagen]) {
+                    this.pacientesColocadosPorImagen[location.imagen] = {};
+                  }
+                  this.pacientesColocadosPorImagen[location.imagen][key] = pacienteCompleto;
+                  imagenesConUbicaciones.add(location.imagen);
+                }
+              });
+              
+              // Seleccionar la primera imagen con ubicaciones
+              if (imagenesConUbicaciones.size > 0) {
+                const primerImagenConUbicacion = Array.from(imagenesConUbicaciones)[0];
+                this.imagenSeleccionadaId = primerImagenConUbicacion;
+                this.imagenseleccionadaIDsinExtension = this.imagenSeleccionadaId ? this.imagenSeleccionadaId.replace(/\.JPG$/i, '') : null;
+                
+                // Cargar pacientes de la imagen seleccionada
+                if (this.pacientesColocadosPorImagen[this.imagenSeleccionadaId]) {
+                  this.pacientesColocados = { ...this.pacientesColocadosPorImagen[this.imagenSeleccionadaId] };
+                }
+                
+                console.log('Imagen seleccionada al cargar imágenes del ejercicio:', this.imagenSeleccionadaId);
+                console.log('Pacientes colocados:', this.pacientesColocados);
+              } else {
+                // Si no hay ubicaciones guardadas, seleccionar la primera imagen
+                this.imagenSeleccionadaId = data[0].nombre_archivo || null;
+                this.imagenseleccionadaIDsinExtension = this.imagenSeleccionadaId ? this.imagenSeleccionadaId.replace(/\.JPG$/i, '') : null;
+                this.pacientesColocados = {};
+              }
+            });
+          });
+        } else {
+          // En modo creación, solo seleccionar la primera imagen
+          this.imagenSeleccionadaId = data[0].nombre_archivo || null;
+          this.imagenseleccionadaIDsinExtension = this.imagenSeleccionadaId ? this.imagenSeleccionadaId.split('.').slice(0, -1).join('.') : null;
+        }
       });
     }
   }
@@ -804,7 +853,7 @@ this._pacientesService.getPacientes().subscribe((data: any) => {
    */
   getImagenSeleccionada(): any {
     const imagenId = this.ThirdFormGroup.get('imagenSeleccionada')?.value;
-    console.log('ID de imagen seleccionada:', imagenId);
+    //console.log('ID de imagen seleccionada:', imagenId);
     return this.imagenesPacientes.find(img => img.id === imagenId);
   }
 
@@ -830,32 +879,46 @@ this._pacientesService.getPacientes().subscribe((data: any) => {
    * @param imagenId - El ID de la imagen a seleccionar
    */
   seleccionarImagenEscenario(imagenId: any): void {
-    console.log('Seleccionando imagen de escenario:', imagenId);
-    // Guardar el estado actual de pacientes colocados si hay una imagen seleccionada
-    if (this.imagenSeleccionadaId && this.imagenSeleccionadaId !== imagenId) {
-      // Guardar los pacientes colocados de la imagen anterior
-      this.pacientesColocadosPorImagen[this.imagenSeleccionadaId] = { ...this.pacientesColocados };
-      
-      // Limpiar para que desaparezcan
+    console.log('Seleccionando imagen de escenario con ID:', imagenId);
+    
+    // Si estamos deseleccionando la misma imagen
+    if (this.imagenSeleccionadaId === imagenId) {
+      console.log('Deseleccionando imagen:', imagenId);
+      // Guardar los pacientes colocados antes de deseleccionar
+      if (Object.keys(this.pacientesColocados).length > 0) {
+        this.pacientesColocadosPorImagen[imagenId] = { ...this.pacientesColocados };
+        console.log('Pacientes guardados antes de deseleccionar:', this.pacientesColocadosPorImagen[imagenId]);
+      }
+      this.imagenSeleccionadaId = null;
+      this.imagenseleccionadaIDsinExtension = null;
       this.pacientesColocados = {};
-      
-      // Cargar los pacientes de la nueva imagen si existen
-      if (this.pacientesColocadosPorImagen[imagenId]) {
-        this.pacientesColocados = { ...this.pacientesColocadosPorImagen[imagenId] };
+      return;
+    }
+    
+    // Si ya hay una imagen seleccionada, guardar sus pacientes
+    if (this.imagenSeleccionadaId) {
+      if (Object.keys(this.pacientesColocados).length > 0) {
+        this.pacientesColocadosPorImagen[this.imagenSeleccionadaId] = { ...this.pacientesColocados };
+        console.log('Pacientes guardados para imagen anterior:', this.imagenSeleccionadaId, this.pacientesColocadosPorImagen[this.imagenSeleccionadaId]);
       }
     }
     
-    // Si es la misma imagen, deselecciona. Si es diferente, selecciona solo esa
-    if (this.imagenSeleccionadaId === imagenId) {
-      this.imagenSeleccionadaId = null;
-      // Guardar antes de deseleccionar
-      this.pacientesColocadosPorImagen[imagenId] = { ...this.pacientesColocados };
-      this.pacientesColocados = {};
-    } else {
-      this.imagenSeleccionadaId = imagenId;
+    // Limpiar los pacientes colocados actuales
+    this.pacientesColocados = {};
+    
+    // Cargar los pacientes de la nueva imagen si existen
+    if (this.pacientesColocadosPorImagen[imagenId]) {
+      this.pacientesColocados = { ...this.pacientesColocadosPorImagen[imagenId] };
+      console.log('Pacientes cargados para nueva imagen:', imagenId, this.pacientesColocados);
     }
     
+    // Seleccionar la nueva imagen
+    this.imagenSeleccionadaId = imagenId;
+    // Remover extensión .JPG si existe
+    this.imagenseleccionadaIDsinExtension = imagenId.replace(/\.JPG$/i, '');
+    
     console.log('Imagen seleccionada:', this.imagenSeleccionadaId);
+    console.log('Imagen sin extensión:', this.imagenseleccionadaIDsinExtension);
     console.log('Pacientes colocados por imagen:', this.pacientesColocadosPorImagen);
     console.log('Pacientes disponibles:', this.pacientesDisponibles.map((p: any) => p.nombre));
   }

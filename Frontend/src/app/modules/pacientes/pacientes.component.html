@@ -88,7 +88,7 @@
                                 <div *ngIf="PacienteForm.get('imagenSeleccionada').value"
                                     class="flex items-center gap-2 ml-auto">
                                     <div class="w-10 h-10 rounded-lg border-2 border-blue-600 overflow-hidden bg-white flex-shrink-0">
-                                        <img [src]="'assets/pacientes/' + getImagenSeleccionada()?.nombre_archivo+'.png'"
+                                        <img [src]="'assets/pacientes/' + getImagenSeleccionada()?.nombre_archivo"
                                             class="w-full h-full object-contain p-0.5">
                                     </div>
                                     <button type="button" (click)="openImagenModal()"
@@ -125,7 +125,7 @@
                                             (click)="selectImagen(img.id)"
                                             class="flex-shrink-0 relative cursor-pointer rounded-lg overflow-hidden border-4 transition-all duration-200 hover:scale-105"
                                             [ngClass]="{'border-blue-500 shadow-lg': PacienteForm.get('imagenSeleccionada').value === img.id, 'border-gray-300': PacienteForm.get('imagenSeleccionada').value !== img.id}">
-                                            <img [src]="'assets/pacientes/'+ img.nombre_archivo+'.png'"
+                                            <img [src]="'assets/pacientes/'+ img.nombre_archivo"
                                                 [alt]="img.descripcion"
                                                 class="w-32 h-32 object-contain p-2">
                                             <div *ngIf="PacienteForm.get('imagenSeleccionada').value === img.id"
@@ -323,7 +323,7 @@
                         <div class="flex items-center">
                             <div
                                 class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-500 mr-3">
-                                <img [src]="'assets/pacientes/'+ paciente.nombre_archivo +'.png' "
+                                <img [src]="'assets/pacientes/'+ paciente.nombre_archivo "
                                     [alt]="paciente.descripcion"
                                     class="w-full h-20 object-contain hover:scale-105 transition-transform duration-300 p-1">
                             </div>

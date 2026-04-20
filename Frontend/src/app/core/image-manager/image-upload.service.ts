@@ -68,6 +68,7 @@ export class ImageUploadService {
 
     const hasExtension = /\.(png|jpg|jpeg|JPG|PNG|webp|WEBP)$/i.test(fileName);
     const fileNameWithExtension = hasExtension ? fileName : `${fileName}.JPG`;
+    console.log(`Ruta construida para imagen (lo que voy a devolver): ${fileNameWithExtension}`);
     return environment.assets.assets + `/${imageType}s/${fileNameWithExtension}`;
   }
 

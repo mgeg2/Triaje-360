@@ -43,8 +43,12 @@ export class Marzipano360Component implements OnInit, OnDestroy {
 
   @ViewChild('pano', { static: true }) panoElement: ElementRef | undefined;
   ejercicioId: string = '';
+  currentImageIndex: number = 0;
+  currentScene: any = null;
+  currentViewer: any = null;
 
   pacientesUbicados: any[] = [];
+  todosPacientes: any[] = [];
   imagenesEjercicio: any[] = [];
   pacienteSeleccionado: any = null;
   acciones: any[] = [];
@@ -98,9 +102,6 @@ export class Marzipano360Component implements OnInit, OnDestroy {
 
       // Obtener acciones disponibles
       this.obtenerAcciones();
-
-      // Obtener pacientes del ejercicio (sin color)
-      this.obtenerPacientesEjercicio();
 
       // Obtener imágenes del ejercicio en orden
       this.obtenerImagenesEjercicio();
@@ -179,13 +180,32 @@ export class Marzipano360Component implements OnInit, OnDestroy {
         // Las imágenes ya vienen ordenadas por 'orden' desde el backend
         this.imagenesEjercicio = imagenes;
         console.log('Imágenes del ejercicio en orden:', this.imagenesEjercicio);
-        this.iniciarMarzipano(this.imagenesEjercicio);
+        
+        // Obtener todos los pacientes del ejercicio
+        this.ejerciciosService.getPacientesEjercicio(this.ejercicioId).subscribe({
+          next: (pacientes) => {
+            console.log('Todos los pacientes del ejercicio:', pacientes);
+            // Almacenar todos los pacientes
+            this.todosPacientes = pacientes.map((paciente: any) => {
+              const { color, ...pacienteSinColor } = paciente;
+              return pacienteSinColor;
+            });
+            
+            // Filtrar pacientes de la primera imagen
+            this.cambiarImagen(0);
+            
+            // Iniciar Marzipano con la primera imagen
+            this.iniciarMarzipano(this.imagenesEjercicio);
+          },
+          error: (error) => {
+            console.error('Error al obtener pacientes del ejercicio:', error);
+          }
+        });
       },
       error: (error) => {
         console.error('Error al obtener imágenes del ejercicio:', error);
       }
     });
-
   }
 
   /**
@@ -310,12 +330,30 @@ export class Marzipano360Component implements OnInit, OnDestroy {
   iniciarMarzipano(imagenesEjercicio): void {
     console.log('Iniciando Marzipano con imágenes:', this.imagenesEjercicio);
     if (this.panoElement) {
-      console.log('Inicializando Marzipano en el elemento:', this.panoElement.nativeElement);
-      const viewer = new Marzipano.Viewer(this.panoElement.nativeElement);
+      // Limpiar viewer anterior si existe
+      if (this.currentViewer) {
+        try {
+          this.currentViewer.destroy();
+        } catch (e) {
+          console.warn('Error al destruir viewer anterior:', e);
+        }
+      }
 
+      // Limpiar elemento pano
+      const panoDiv = this.panoElement.nativeElement;
+      panoDiv.innerHTML = '';
+
+      console.log('Inicializando Marzipano en el elemento:', panoDiv);
+      const viewer = new Marzipano.Viewer(panoDiv);
+      this.currentViewer = viewer;
+      
+      // Obtener la imagen actual según el índice
+      const imagenActual = imagenesEjercicio[this.currentImageIndex];
+      
       // Configurar con 6 imágenes de cubo (0.png, 1.png, 2.png, 3.png, 4.png, 5.png)
+      const nombreSinExtension = imagenActual.nombre_archivo.split('.')[0];
       const source = Marzipano.ImageUrlSource.fromString(
-        `assets/escenarios/Tiles/${imagenesEjercicio[0].nombre_archivo}/{f}.png`
+        `assets/escenarios/Tiles/${nombreSinExtension}/{f}.png`
       );
 
       const geometry = new Marzipano.CubeGeometry(
@@ -355,6 +393,7 @@ export class Marzipano360Component implements OnInit, OnDestroy {
         view: view
       });
       scene.switchTo();
+      this.currentScene = scene;
 
       // Crear hotspots después de que la escena esté lista
       setTimeout(() => {
@@ -438,7 +477,7 @@ export class Marzipano360Component implements OnInit, OnDestroy {
       
       const imgElement = document.createElement('img');
       const ruta = 'assets/pacientes/';
-      const imagenSrc = paciente.nombre_archivo ? `${ruta}${paciente.nombre_archivo}.png` : 'assets/avatars/default.png';
+      const imagenSrc = paciente.nombre_archivo ? `${ruta}${paciente.nombre_archivo}` : 'assets/avatars/default.png';
       imgElement.src = imagenSrc;
       imgElement.alt = paciente.nombre;
       console.log(`Cargando imagen para ${paciente.nombre}: ${imagenSrc}`);
@@ -817,6 +856,50 @@ export class Marzipano360Component implements OnInit, OnDestroy {
    */
   volverAEjercicios(): void {
     this.router.navigate(['/ejercicios']);
+  }
+
+  /**
+   * Cambia a la imagen anterior
+   */
+  imagenAnterior(): void {
+    if (this.currentImageIndex > 0) {
+      this.cambiarImagen(this.currentImageIndex - 1);
+    }
+  }
+
+  /**
+   * Cambia a la imagen siguiente
+   */
+  imagenSiguiente(): void {
+    if (this.currentImageIndex < this.imagenesEjercicio.length - 1) {
+      this.cambiarImagen(this.currentImageIndex + 1);
+    }
+  }
+
+  /**
+   * Cambia a una imagen específica y actualiza el panorama
+   */
+  cambiarImagen(indice: number): void {
+    if (indice < 0 || indice >= this.imagenesEjercicio.length) {
+      console.error('Índice de imagen inválido:', indice);
+      return;
+    }
+
+    this.currentImageIndex = indice;
+    const imagenActual = this.imagenesEjercicio[this.currentImageIndex];
+    console.log(imagenActual)
+    console.log(`Cambiando a imagen ${this.currentImageIndex + 1}: ${imagenActual.nombre_archivo}`);
+    
+    // Filtrar pacientes que pertenecen a esta imagen
+    console.log(this.todosPacientes);
+    this.pacientesUbicados = this.todosPacientes.filter(paciente => paciente.posicion.imagen == imagenActual.nombre_archivo);
+    console.log(`Pacientes para imagen ${imagenActual.nombre_archivo}:`, this.pacientesUbicados);
+    
+    // Limpiar el mapa de imágenes
+    this.pacienteImagenesMap.clear();
+    
+    // Reinicializar Marzipano con la nueva imagen y sus pacientes
+    this.iniciarMarzipano(this.imagenesEjercicio);
   }
 }
 

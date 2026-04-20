@@ -200,6 +200,10 @@ export class ImageManagerComponent implements OnInit {
             f: cubeCanvas[5]  // front (5)
           };
 
+          // Rotar los tiles de up y down 180 grados para que tengan la orientación correcta en Marzipano
+          faces.u = this.rotateCanvas(cubeCanvas[2], 180);
+          faces.d = this.rotateCanvas(cubeCanvas[3], 180);
+
           // Convertir los canvas a blobs con sus nombres de letra
           const faceBlobs: { [key: string]: Blob } = {};
           let completedFaces = 0;
@@ -291,6 +295,32 @@ export class ImageManagerComponent implements OnInit {
         }
       });
     }
+  }
+
+  /**
+   * Rota un canvas el ángulo especificado (en grados)
+   */
+  rotateCanvas(canvas: HTMLCanvasElement, degrees: number): HTMLCanvasElement {
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Crear un nuevo canvas
+    const rotatedCanvas = document.createElement('canvas');
+    
+    // Para rotación de 180 grados, las dimensiones permanecen igual
+    rotatedCanvas.width = width;
+    rotatedCanvas.height = height;
+    
+    const ctx = rotatedCanvas.getContext('2d');
+    if (!ctx) return canvas;
+    
+    // Mover al centro, rotar, y dibujar
+    ctx.translate(width / 2, height / 2);
+    ctx.rotate((degrees * Math.PI) / 180);
+    ctx.translate(-width / 2, -height / 2);
+    ctx.drawImage(canvas, 0, 0);
+    
+    return rotatedCanvas;
   }
 }
 

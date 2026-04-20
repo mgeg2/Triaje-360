@@ -26,7 +26,7 @@ export const environment = {
         accionesPaciente: '/pacientes/accionesPaciente'
     },
     assets: {
-        assets:'c:/xampp/htdocs/TFG/Frontend/src/assets',
-        //assets:'assets'
+        //assets:'c:/xampp/htdocs/TFG/Frontend/src/assets',
+        assets:'assets'
     }
 };
