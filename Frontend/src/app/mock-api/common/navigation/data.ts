@@ -3,13 +3,6 @@ import { FuseNavigationItem } from '@fuse/components/navigation';
 
 export const adminNavigation: FuseNavigationItem[] = [
     {
-        id: 'example',
-        title: 'Example',
-        type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
-        link: '/example'
-    },
-    {
         id: 'asignaturas',
         title: 'Asignaturas',
         type: 'basic',
@@ -40,13 +33,7 @@ export const adminNavigation: FuseNavigationItem[] = [
     }
 ];
 export const profNavigation: FuseNavigationItem[] = [
-    {
-        id: 'example',
-        title: 'Example',
-        type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
-        link: '/example'
-    },
+ 
     {
         id: 'ejercicios',
         title: 'Ejercicios',
@@ -64,13 +51,7 @@ export const profNavigation: FuseNavigationItem[] = [
 
 ];
 export const aluNavigation: FuseNavigationItem[] = [
-    {
-        id: 'example',
-        title: 'Example',
-        type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
-        link: '/example'
-    },
+
     {
         id: 'ejercicios',
         title: 'Ejercicios',
