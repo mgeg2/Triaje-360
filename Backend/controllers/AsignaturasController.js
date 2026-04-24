@@ -52,7 +52,8 @@ const deleteAsignatura = async (req, res) => {
             await asignaturasService.deleteAsignatura(req.params.idAsignatura);
             res.status(200).json({ message: 'Asignatura eliminada correctamente' });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            const statusCode = error.status || 500;
+            res.status(statusCode).json({ message: error.message });
         }
     });
 };

@@ -28,6 +28,14 @@ export class ImageManagerComponent implements OnInit {
   showModal: boolean = false;
   currentImageType: 'paciente' | 'escenario' = 'paciente';
   
+  // Delete Confirmation Modal
+  showDeleteConfirmModal: boolean = false;
+  imageToDelete: { id: string; nombre_original: string } | null = null;
+  
+  // Delete Error Modal
+  showDeleteErrorModal: boolean = false;
+  deleteErrorMessage: string = '';
+  
   // Formulario
   selectedFileName: string = '';
   selectedFile: File | null = null;
@@ -282,19 +290,37 @@ export class ImageManagerComponent implements OnInit {
   }
 
   deleteImage(imageId: string, imageName: string): void {
-    if (confirm(`¿Estás seguro de que deseas eliminar la imagen "${imageName}"?`)) {
-      this.imageUploadService.deleteImage(imageId).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.loadImages();
-          }
-        },
-        error: (error) => {
-          console.error('Error al eliminar imagen:', error);
-          alert('Error al eliminar la imagen');
+    this.imageToDelete = { id: imageId, nombre_original: imageName };
+    this.showDeleteConfirmModal = true;
+  }
+
+  confirmDeleteImage(): void {
+    if (!this.imageToDelete) return;
+
+    this.imageUploadService.deleteImage(this.imageToDelete.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.closeDeleteConfirmModal();
+          this.loadImages();
         }
-      });
-    }
+      },
+      error: (error) => {
+        console.error('Error al eliminar imagen:', error);
+        this.deleteErrorMessage = 'Error al eliminar la imagen';
+        this.showDeleteErrorModal = true;
+        this.closeDeleteConfirmModal();
+      }
+    });
+  }
+
+  closeDeleteConfirmModal(): void {
+    this.showDeleteConfirmModal = false;
+    this.imageToDelete = null;
+  }
+
+  closeDeleteErrorModal(): void {
+    this.showDeleteErrorModal = false;
+    this.deleteErrorMessage = '';
   }
 
   /**

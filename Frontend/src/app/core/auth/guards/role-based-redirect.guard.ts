@@ -23,7 +23,7 @@ export const roleBasedRedirectGuard = () => {
         router.navigate(['/ejercicios']);
     } else {
         console.log('No role found, redirecting to example');
-        router.navigate(['/example']);
+        router.navigate(['/sign-in']);
     }
 
     // Return false to prevent the component from being loaded

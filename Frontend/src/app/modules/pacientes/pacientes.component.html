@@ -3,7 +3,7 @@
     <div
         class="relative flex flex-0 flex-col border-b px-6 py-8 sm:flex-row sm:items-center sm:justify-between md:px-8">
         <!-- Title -->
-        <div class="text-4xl font-extrabold tracking-tight">Pacientes</div>
+        <div class="text-4xl font-extrabold tracking-tight">Victimas</div>
         <!-- Actions -->
         <div class="mt-6 flex shrink-0 items-center sm:ml-4 sm:mt-0">
             <button class="ml-4" mat-flat-button [color]="'primary'" (click)="openNewEditModal()">
@@ -22,8 +22,9 @@
                         <mat-icon class="text-gray-400 hover:text-gray-600"
                             [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800">{{ isEditMode ? 'Editar Paciente' : 'Agregar Paciente' }}</h2>
-                    <p class="text-sm text-gray-500 mt-1">{{ isEditMode ? 'Modifique los datos del paciente' : 'Complete los datos del nuevo paciente' }}</p>
+                    <h2 class="text-2xl font-bold text-gray-800">{{ isEditMode ? 'Editar 
+                        victima' : 'Agregar Victima' }}</h2>
+                    <p class="text-sm text-gray-500 mt-1">{{ isEditMode ? 'Modifique los datos de la victima' : 'Complete los datos de la nueva victima' }}</p>
                 </div>
 
                 <!-- Content -->
@@ -38,7 +39,7 @@
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 <mat-form-field appearance="outline" class="w-full">
-                                    <mat-label>Nombre del Paciente</mat-label>
+                                    <mat-label>Nombre de la Victima</mat-label>
                                     <input matInput placeholder="Ej: Juan Pérez"
                                         formControlName="nombre" required>
                                     <mat-icon matPrefix class="text-primary-500">person</mat-icon>
@@ -110,7 +111,7 @@
                             <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-96 flex flex-col">
                                 <!-- Modal Header -->
                                 <div class="flex items-center justify-between p-4 border-b border-gray-200">
-                                    <h3 class="text-lg font-semibold text-gray-800">Seleccionar Imagen de Paciente</h3>
+                                    <h3 class="text-lg font-semibold text-gray-800">Seleccionar Imagen de Victima</h3>
                                     <button type="button" (click)="closeImagenModal()"
                                         class="p-1 hover:bg-gray-100 rounded-full transition-colors">
                                         <mat-icon class="text-gray-400">close</mat-icon>
@@ -245,7 +246,7 @@
                                         <input matInput type="number" placeholder="Ej: 5"
                                             formControlName="tiempoEmpeoramiento" required min="1">
                                         <mat-icon matPrefix class="text-primary-500">schedule</mat-icon>
-                                        <mat-hint>Tiempo en minutos antes de que el paciente
+                                        <mat-hint>Tiempo en minutos antes de que la victima
                                             empeore</mat-hint>
                                         <mat-error
                                             *ngIf="PacienteForm.get('tiempoEmpeoramiento').hasError('required') && PacienteForm.get('tiempoEmpeoramiento').touched">El
@@ -283,9 +284,9 @@
                 <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                     <mat-icon class="text-red-600">warning</mat-icon>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Eliminar Paciente</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Eliminar victima</h3>
                 <p class="text-sm text-gray-500">
-                    ¿Estás seguro que deseas eliminar el paciente <span class="font-bold">{{ pacienteToDelete?.nombre
+                    ¿Estás seguro que deseas eliminar la victima <span class="font-bold">{{ pacienteToDelete?.nombre
                         }}</span>?
                     Esta acción no se puede deshacer.
                 </p>
@@ -312,9 +313,9 @@
                 <!-- Color Strip -->
                 <div class="h-3 w-full relative" [style.background-color]="getColorHex(paciente.color)">
                     <button mat-icon-button (click)="openDeleteModal(paciente, $event)"
-                        class="absolute top-0 right-2 rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 hover:scale-110 z-10 group">
-                        <mat-icon class="text-gray-400 group-hover:text-red-600 transition-colors duration-200"
-                            style="font-size: 20px; width: 20px; height: 20px; line-height: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">close</mat-icon>
+                        class="absolute top-0 right-2 rounded-full w-7 h-7 flex items-center justify-center transition-all duration-200 hover:scale-110 z-10 group">
+                        <mat-icon class="text-red-600 group-hover:text-red-700 transition-colors duration-200"
+                            style="font-size: 24px; width: 24px; height: 24px; line-height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">delete_outline</mat-icon>
                     </button>
                 </div>
 

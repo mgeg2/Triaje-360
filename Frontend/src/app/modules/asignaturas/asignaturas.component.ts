@@ -5,6 +5,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { AsignaturasService } from 'app/core/asignaturas/asignaturas.service';
 import { CommonModule } from '@angular/common';
@@ -19,6 +20,7 @@ import { CommonModule } from '@angular/common';
     MatCheckboxModule,
     FormsModule,
     ReactiveFormsModule,
+    MatSnackBarModule,
      CommonModule
   ],
   templateUrl: './asignaturas.component.html',
@@ -89,7 +91,7 @@ export class AsignaturasComponent implements OnInit {
         }
       );
     }
-  constructor(private fb: FormBuilder, private _asignaturesService: AsignaturasService,) {
+  constructor(private fb: FormBuilder, private _asignaturesService: AsignaturasService, private snackBar: MatSnackBar) {
     this.asignaturaForm = this.fb.group({
       nombre: ['', Validators.required],
       codigo: ['', Validators.required],
@@ -216,10 +218,26 @@ export class AsignaturasComponent implements OnInit {
         this.getasignaturas();
         this.showDeleteModal = false;
         this.asignaturaToDelete = null;
+        // Show success message
+        this.snackBar.open('Asignatura eliminada correctamente', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom',
+          panelClass: ['success-snackbar']
+        });
       },
       (error) => {
         console.error('Error al eliminar asignatura:', error);
-        // close modal even if error (you can improve to show the error)
+        // Extract error message from response
+        const errorMessage = error.error?.message || 'Error al eliminar la asignatura';
+        // Show error message in snackbar
+        this.snackBar.open(errorMessage, 'Cerrar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom',
+          panelClass: ['error-snackbar']
+        });
+        // close modal even if error
         this.showDeleteModal = false;
         this.asignaturaToDelete = null;
       }

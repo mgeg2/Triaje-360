@@ -41,12 +41,41 @@ const getOneAsignaturas = (idAsignatura) => {
 
 const deleteAsignatura = (idAsignatura) => {
   return new Promise((resolve, reject) => {
-    db.query('DELETE FROM asignatura WHERE id = ?', [idAsignatura], (err, results) => {
+    // First check if asignatura exists and has no users or exercises associated
+    db.query('SELECT COUNT(*) as userCount FROM user_asignatura WHERE asignatura = ?', [idAsignatura], (err, userCountResults) => {
       if (err) return reject(err);
-      if (results.affectedRows === 0) {
-        return reject({ status: 404, message: 'Asignatura no encontrada' });
-      }
-      resolve({ message: 'Asignatura eliminada correctamente' });
+      
+      const userCount = userCountResults[0].userCount;
+      
+      // Check for associated exercises
+      db.query('SELECT COUNT(*) as exerciseCount FROM ejercicios WHERE asignatura = ?', [idAsignatura], (err, exerciseCountResults) => {
+        if (err) return reject(err);
+        
+        const exerciseCount = exerciseCountResults[0].exerciseCount;
+        
+        // Build error message if there are dependencies
+        let errorMessage = '';
+        if (userCount > 0) {
+          errorMessage += `${userCount} usuario(s) asociado(s)`;
+        }
+        if (exerciseCount > 0) {
+          if (errorMessage) errorMessage += ' y ';
+          errorMessage += `${exerciseCount} ejercicio(s) asociado(s)`;
+        }
+        
+        if (errorMessage) {
+          return reject({ status: 409, message: `No se puede eliminar la asignatura porque tiene ${errorMessage}. Debe remover estos elementos primero.` });
+        }
+
+        // If no users or exercises, proceed with deletion
+        db.query('DELETE FROM asignatura WHERE id = ?', [idAsignatura], (err, results) => {
+          if (err) return reject(err);
+          if (results.affectedRows === 0) {
+            return reject({ status: 404, message: 'Asignatura no encontrada' });
+          }
+          resolve({ message: 'Asignatura eliminada correctamente' });
+        });
+      });
     });
   });
 };

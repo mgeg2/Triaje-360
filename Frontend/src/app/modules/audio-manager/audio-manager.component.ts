@@ -23,6 +23,14 @@ export class AudioManagerComponent implements OnInit {
   // Modal
   showModal: boolean = false;
   
+  // Delete Confirmation Modal
+  showDeleteConfirmModal: boolean = false;
+  audioToDelete: { id: string; nombre_original: string } | null = null;
+  
+  // Delete Error Modal
+  showDeleteErrorModal: boolean = false;
+  deleteErrorMessage: string = '';
+  
   // Formulario
   selectedFileName: string = '';
   selectedFile: File | null = null;
@@ -178,18 +186,36 @@ export class AudioManagerComponent implements OnInit {
   }
 
   deleteAudio(audioId: string, audioName: string): void {
-    if (confirm(`¿Estás seguro de que deseas eliminar el audio "${audioName}"?`)) {
-      this.audioUploadService.deleteAudio(audioId).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.loadAudios();
-          }
-        },
-        error: (error) => {
-          console.error('Error al eliminar audio:', error);
-          alert('Error al eliminar el audio');
+    this.audioToDelete = { id: audioId, nombre_original: audioName };
+    this.showDeleteConfirmModal = true;
+  }
+
+  confirmDeleteAudio(): void {
+    if (!this.audioToDelete) return;
+
+    this.audioUploadService.deleteAudio(this.audioToDelete.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.closeDeleteConfirmModal();
+          this.loadAudios();
         }
-      });
-    }
+      },
+      error: (error) => {
+        console.error('Error al eliminar audio:', error);
+        this.deleteErrorMessage = 'Error al eliminar el audio';
+        this.showDeleteErrorModal = true;
+        this.closeDeleteConfirmModal();
+      }
+    });
+  }
+
+  closeDeleteConfirmModal(): void {
+    this.showDeleteConfirmModal = false;
+    this.audioToDelete = null;
+  }
+
+  closeDeleteErrorModal(): void {
+    this.showDeleteErrorModal = false;
+    this.deleteErrorMessage = '';
   }
 }
