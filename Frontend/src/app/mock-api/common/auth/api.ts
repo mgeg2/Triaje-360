@@ -76,8 +76,10 @@ export class AuthMockApi {
         this._fuseMockApiService
             .onPost('api/auth/sign-in-with-token')
             .reply(({ request }) => {
+                var token= localStorage.getItem('accessToken');
+                console.log('Token from localStorage:', token);
                 // Get the access token
-                const accessToken = request.body.accessToken;
+                const accessToken = request.body.accessToken || token;
 
                 // Verify the token
                 if (this._verifyJWTToken(accessToken)) {

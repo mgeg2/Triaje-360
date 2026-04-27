@@ -14,6 +14,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router } from '@angular/router';
+import { AuthService } from 'app/core/auth/auth.service';
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.types';
 import { Subject, takeUntil } from 'rxjs';
@@ -48,7 +49,8 @@ export class UserComponent implements OnInit, OnDestroy {
     constructor(
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
-        private _userService: UserService
+        private _userService: UserService,
+        private _authService: AuthService
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -89,6 +91,8 @@ export class UserComponent implements OnInit, OnDestroy {
      * Sign out
      */
     signOut(): void {
-        this._router.navigate(['/sign-out']);
+        localStorage.clear();
+        this._authService.authenticated = false;
+        this._router.navigate(['/sign-in']);
     }
 }

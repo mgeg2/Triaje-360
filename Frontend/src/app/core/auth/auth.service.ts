@@ -24,7 +24,19 @@ export class AuthService {
     }
 
     get accessToken(): string {
-        return localStorage.getItem('accessToken') ?? '';
+        var token = localStorage.getItem('accessToken');
+        
+        if (token === null) {
+            return '';
+        }
+        return token  
+
+    }
+    set authenticated(value: boolean) {
+        this._authenticated = value;
+    }   
+    get authenticated(): boolean {
+        return this._authenticated;
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -65,7 +77,10 @@ export class AuthService {
                 console.log(response);
                 // Store the access token in the local storage
                  this.accessToken = response.token;
-               
+               localStorage.setItem('role', response.user.role);
+               localStorage.setItem('accessToken', response.token);
+               localStorage.setItem('email', response.user.email);
+               localStorage.setItem('id', response.user.id);
                 // // Set the authenticated flag to true
                  this._authenticated = true;
                
@@ -82,39 +97,53 @@ export class AuthService {
     /**
      * Sign in using the access token
      */
-    signInUsingToken(): Observable<any> {
+    signInUsingToken() {
+        var token=localStorage.getItem('accessToken');
+        var role=localStorage.getItem('role');
+        var email=localStorage.getItem('email');
+        var id=localStorage.getItem('id');
+        if (token) {
+            console.log('Token from localStorage:', token);
+            this._authenticated = true;
+            
+            if(role){
+            sessionStorage.setItem('email', email|| '');
+            this._userService.user = { email: email||'', nickname: '', role: role,id: id||'', token: token };
+            }
+            return of(true);
+        }
         // Sign in using the token
-        return this._httpClient
-            .post('api/auth/sign-in-with-token', {
-                accessToken: this.accessToken,
-            })
-            .pipe(
-                catchError(() =>
-                    // Return false
-                    of(false)
-                ),
-                switchMap((response: any) => {
-                    // Replace the access token with the new one if it's available on
-                    // the response object.
-                    //
-                    // This is an added optional step for better security. Once you sign
-                    // in using the token, you should generate a new one on the server
-                    // side and attach it to the response object. Then the following
-                    // piece of code can replace the token with the refreshed one.
-                    if (response.accessToken) {
-                        this.accessToken = response.accessToken;
-                    }
+        // return this._httpClient
+        //     .post('api/auth/sign-in-with-token', {
+        //         accessToken: this.accessToken,
+        //     })
+        //     .pipe(
+        //         catchError(() =>
+        //             // Return false
+        //             of(false)
+        //         ),
+        //         switchMap((response: any) => {
+        //             // Replace the access token with the new one if it's available on
+        //             // the response object.
+        //             //
+        //             // This is an added optional step for better security. Once you sign
+        //             // in using the token, you should generate a new one on the server
+        //             // side and attach it to the response object. Then the following
+        //             // piece of code can replace the token with the refreshed one.
+        //             if (response.accessToken) {
+        //                 this.accessToken = response.accessToken;
+        //             }
 
-                    // Set the authenticated flag to true
-                    this._authenticated = true;
+        //             // Set the authenticated flag to true
+        //             this._authenticated = true;
 
-                    // Store the user on the user service
-                    this._userService.user = response.user;
+        //             // Store the user on the user service
+        //             this._userService.user = response.user;
 
-                    // Return true
-                    return of(true);
-                })
-            );
+        //             // Return true
+        //             return of(true);
+        //         })
+        //     );
     }
 
     /**
@@ -160,7 +189,7 @@ export class AuthService {
     /**
      * Check the authentication status
      */
-    check(): Observable<boolean> {
+    check() {
         // Check if the user is logged in
         if (this._authenticated) {
             return of(true);
