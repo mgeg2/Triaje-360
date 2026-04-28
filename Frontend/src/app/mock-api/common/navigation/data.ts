@@ -2,6 +2,12 @@
 import { FuseNavigationItem } from '@fuse/components/navigation';
 
 export const adminNavigation: FuseNavigationItem[] = [
+    {id:'usuarios',
+        title: 'Usuarios',
+        type: 'basic',
+        icon: 'heroicons_outline:users',
+        link: '/usuarios'
+    },
     {
         id: 'asignaturas',
         title: 'Asignaturas',

@@ -1,0 +1,218 @@
+<div class="bg-card flex min-w-0 flex-auto flex-col dark:bg-transparent sm:absolute sm:inset-0 sm:overflow-hidden">
+    <!-- Header -->
+    <div
+        class="relative flex flex-0 flex-col border-b px-6 py-8 sm:flex-row sm:items-center sm:justify-between md:px-8">
+        <!-- Title -->
+        <div class="text-4xl font-extrabold tracking-tight">Usuarios</div>
+        <!-- Actions -->
+        <div class="mt-6 flex shrink-0 items-center sm:ml-4 sm:mt-0">
+            <button class="ml-4" mat-flat-button [color]="'primary'" (click)="openNewEditModal()">
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1">Agregar Usuario</span>
+            </button>
+        </div>
+
+        <!-- Modal -->
+        <div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] relative overflow-hidden flex flex-col">
+                <!-- Header -->
+                <div class="bg-white border-b border-gray-200 px-8 py-4 flex-shrink-0">
+                    <button class="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        aria-label="Cerrar" (click)="closeNewEditModal()">
+                        <mat-icon class="text-gray-400 hover:text-gray-600"
+                            [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-800">{{ isEditMode ? 'Editar Usuario' : 'Agregar Usuario' }}</h2>
+                    <p class="text-sm text-gray-500 mt-1">{{ isEditMode ? 'Modifique los datos del usuario' : 'Complete los datos del nuevo usuario' }}</p>
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 overflow-y-auto px-8 py-6">
+                    <form [formGroup]="usuariosForm" class="space-y-4">
+                        <!-- Email -->
+                        <mat-form-field class="w-full">
+                            <mat-label>Email</mat-label>
+                            <input matInput formControlName="email" type="email" required>
+                            <mat-error *ngIf="usuariosForm.get('email')?.hasError('required')">El email es requerido</mat-error>
+                            <mat-error *ngIf="usuariosForm.get('email')?.hasError('email')">Email inválido</mat-error>
+                        </mat-form-field>
+
+                        <!-- Contraseña -->
+                        <mat-form-field class="w-full">
+                            <mat-label>Contraseña</mat-label>
+                            <input matInput formControlName="contraseña" type="password" required>
+                            <mat-error *ngIf="usuariosForm.get('contraseña')?.hasError('required')">La contraseña es requerida</mat-error>
+                            <mat-error *ngIf="usuariosForm.get('contraseña')?.hasError('minlength')">Mínimo 6 caracteres</mat-error>
+                        </mat-form-field>
+
+                        <!-- Repetir Contraseña -->
+                        <mat-form-field class="w-full">
+                            <mat-label>Repetir Contraseña</mat-label>
+                            <input matInput formControlName="repetirContraseña" type="password" required>
+                            <mat-error *ngIf="usuariosForm.get('repetirContraseña')?.hasError('required')">Debe repetir la contraseña</mat-error>
+                            <mat-error *ngIf="usuariosForm.hasError('passwordMismatch')">Las contraseñas no coinciden</mat-error>
+                        </mat-form-field>
+
+                        <!-- Role -->
+                        <mat-form-field class="w-full">
+                            <mat-label>Role</mat-label>
+                            <mat-select formControlName="role" required>
+                                <mat-option *ngFor="let option of roleOptions" [value]="option.value">
+                                    {{ option.label }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="usuariosForm.get('role')?.hasError('required')">El role es requerido</mat-error>
+                        </mat-form-field>
+                    </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="border-t border-gray-200 px-8 py-4 flex-shrink-0 bg-gray-50 flex justify-end space-x-3">
+                    <button mat-stroked-button (click)="closeNewEditModal()">Cancelar</button>
+                    <button mat-flat-button [color]="'primary'" (click)="saveUsuario()" [disabled]="usuariosForm.invalid">
+                        {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div *ngIf="showDeleteModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-md">
+                <div class="px-8 py-6">
+                    <h3 class="text-lg font-bold text-gray-900">Confirmar eliminación</h3>
+                    <p class="text-sm text-gray-600 mt-2">¿Está seguro que desea eliminar a <span class="font-semibold">{{ usuarioToDelete?.email }}</span>?</p>
+                </div>
+                <div class="border-t border-gray-200 px-8 py-4 bg-gray-50 flex justify-end space-x-3">
+                    <button mat-stroked-button (click)="cancelDelete()">Cancelar</button>
+                    <button mat-flat-button color="warn" (click)="confirmDelete()">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto sm:flex-row sm:items-center sm:justify-center sm:p-8">
+        <div class="w-full space-y-4">
+            <!-- Buscador -->
+            <div class="bg-white border border-gray-200 rounded-lg px-6 py-4 shadow-sm">
+                <!-- Buscador elegante -->
+                <mat-form-field class="w-full search-field">
+                    <mat-label>Buscar usuarios</mat-label>
+                    <mat-icon matPrefix [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                    <input matInput [(ngModel)]="searchTerm" type="text" placeholder="Busca por email o nickname...">
+                    <button *ngIf="searchTerm" mat-icon-button matSuffix (click)="searchTerm = ''">
+                        <mat-icon [svgIcon]="'heroicons_outline:x-mark'" class="text-gray-400"></mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+
+            <!-- Tabla -->
+            <div class="w-full bg-white rounded-lg shadow">
+            <!-- Table Header -->
+            <div class="hidden md:block">
+                <div class="grid grid-cols-4 gap-4 bg-gray-50 border-b border-gray-200 px-6 py-4 font-semibold text-sm text-gray-900">
+                    <div class="flex items-center gap-2 cursor-pointer group" (click)="setSortBy('email')">
+                        <span class="text-gray-900">Email</span>
+                        <mat-icon class="text-base opacity-0 group-hover:opacity-100 hover:text-blue-600 transition-all" [svgIcon]="getSortIcon('email')"></mat-icon>
+                    </div>
+                    <div class="flex items-center gap-2 cursor-pointer group" (click)="setSortBy('nickname')">
+                        <span class="text-gray-900">Nickname</span>
+                        <mat-icon class="text-base opacity-0 group-hover:opacity-100 hover:text-blue-600 transition-all" [svgIcon]="getSortIcon('nickname')"></mat-icon>
+                    </div>
+                    <div class="flex items-center gap-2 relative role-dropdown-area">
+                        <span class="text-gray-900">Role</span>
+                        <button (click)="toggleRoleDropdown()" class="group p-1 rounded hover:bg-gray-200 transition-colors">
+                            <mat-icon class="text-base opacity-0 group-hover:opacity-100 transition-all" [svgIcon]="'heroicons_outline:chevron-down'"></mat-icon>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div *ngIf="showRoleDropdown" class="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            <!-- Opciones -->
+                            <div class="py-2">
+                                <button *ngFor="let option of roleOptions" 
+                                    (click)="toggleRole(option.value)"
+                                    class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors flex items-center gap-2 group">
+                                    <input type="checkbox" [checked]="isRoleSelected(option.value)" 
+                                        class="w-4 h-4 cursor-pointer"/>
+                                    <span class="text-gray-700 group-hover:text-gray-900">{{ option.label }}</span>
+                                </button>
+                            </div>
+
+                            <!-- Separador -->
+                            <div class="border-t border-gray-200"></div>
+
+                            <!-- Limpiar -->
+                            <button *ngIf="selectedRoles.length > 0" 
+                                (click)="clearRoleFilters()"
+                                class="w-full px-4 py-2 text-left text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+                                Limpiar filtros
+                            </button>
+                        </div>
+                    </div>
+                    <div>Acciones</div>
+                </div>
+
+                <!-- Table Body -->
+                <div class="divide-y divide-gray-200">
+                    <div *ngIf="getFilteredAndSortedUsuarios().length === 0" class="px-6 py-8 text-center text-gray-500">
+                        No hay usuarios disponibles
+                    </div>
+                    <div *ngFor="let usuario of getFilteredAndSortedUsuarios()" class="grid grid-cols-4 gap-4 border-b border-gray-200 px-6 py-4 text-sm hover:bg-gray-50">
+                        <div class="text-gray-900 font-medium">{{ usuario.email }}</div>
+                        <div class="text-gray-600">{{ usuario.nickname }}</div>
+                        <div>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium" 
+                                [ngClass]="{
+                                    'bg-blue-100 text-blue-800': usuario.role === 'prof',
+                                    'bg-green-100 text-green-800': usuario.role === 'alu',
+                                    'bg-purple-100 text-purple-800': usuario.role === 'admin'
+                                }">
+                                {{ usuario.role }}
+                            </span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button mat-icon-button matTooltip="Editar" (click)="editUsuario(usuario)">
+                                <mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                            </button>
+                            <button mat-icon-button matTooltip="Eliminar" color="warn" (click)="deleteUsuario(usuario)">
+                                <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile View -->
+            <div class="md:hidden divide-y divide-gray-200">
+                <div *ngIf="getFilteredAndSortedUsuarios().length === 0" class="px-6 py-8 text-center text-gray-500">
+                    No hay usuarios disponibles
+                </div>
+                <div *ngFor="let usuario of getFilteredAndSortedUsuarios()" class="px-6 py-4 space-y-3 border-b border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-semibold text-gray-900">{{ usuario.email }}</div>
+                            <div class="text-sm text-gray-600">{{ usuario.nickname }}</div>
+                        </div>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium" 
+                            [ngClass]="{
+                                'bg-blue-100 text-blue-800': usuario.role === 'profesor',
+                                'bg-green-100 text-green-800': usuario.role === 'alumno',
+                                'bg-purple-100 text-purple-800': usuario.role === 'admin'
+                            }">
+                            {{ usuario.role }}
+                        </span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button mat-icon-button matTooltip="Editar" (click)="editUsuario(usuario)">
+                            <mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                        </button>
+                        <button mat-icon-button matTooltip="Eliminar" color="warn" (click)="deleteUsuario(usuario)">
+                            <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -184,6 +184,33 @@ const getAllProfs = () => {
     );
   });
 }
+const deleteUser = (id) => {
+  return new Promise((resolve, reject) => {
+    db.query('DELETE FROM users WHERE id = ?', [id], (err) => {
+      if (err) return reject(err);
+      resolve({ message: 'Usuario eliminado' });
+    });
+    });
+}
+const updateUser = (id, body) => {
+  return new Promise((resolve, reject) => {
+    const { email, nickname, password, role } = body;
+    if (!email || !nickname || !password || !role) {
+      return reject({ status: 400, message: 'Email, nickname, contraseña y rol son requeridos' });
+    }
+    bcrypt.hash(password, config.SALT_ROUNDS, function (err, hash) {
+      if (err) return reject({ status: 500, message: "Error al encriptar la contraseña" });
+      db.query(
+        'UPDATE users SET email = ?, nickname = ?, password = ?, role = ? WHERE id = ?',
+        [email, nickname, hash, role, id],
+        (err) => {
+          if (err) return reject(err);
+          resolve({ message: 'Usuario actualizado' });
+        }
+      );
+    });
+  });
+}
 module.exports = {
-  iniUser0, login, getAllUsers, getUsersfromAsignature, getNoUsersfromAsignature, postUser, getAllAlus, getAllProfs
+  iniUser0, login, getAllUsers, getUsersfromAsignature, getNoUsersfromAsignature, postUser, getAllAlus, getAllProfs, deleteUser, updateUser
 };

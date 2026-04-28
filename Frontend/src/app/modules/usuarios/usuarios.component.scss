@@ -1,0 +1,51 @@
+// Estilos del componente Usuarios
+
+// Mejorar el look del buscador
+::ng-deep {
+  .search-field {
+    .mdc-text-field {
+      background-color: #f9fafb;
+      border-radius: 0.5rem;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #f3f4f6;
+      }
+
+      &.mdc-text-field--focused {
+        background-color: #fff;
+      }
+    }
+
+    .mat-mdc-form-field-hint-wrapper {
+      display: none;
+    }
+  }
+
+  // Efecto hover en headers clickeables
+  .table-header-clickable {
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #eff6ff;
+      color: #2563eb;
+    }
+  }
+}
+
+// Animación suave para los iconos de ordenamiento
+.sort-icon {
+  transition: transform 0.2s ease;
+}
+
+// Mejorar la tabla responsive
+.table-container {
+  overflow-x: auto;
+}
+
+// Estilos para el botón de limpiar filtros
+.clear-filters-btn {
+  &:hover {
+    background-color: #e5e7eb;
+  }
+}

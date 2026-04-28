@@ -84,6 +84,7 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
+            {path: 'usuarios', loadChildren: () => import('app/modules/usuarios/usuarios.routes') },
             { path: 'asignaturas', loadChildren: () => import('app/modules/asignaturas/asignaturas.routes') },
             { path: 'ejercicios', loadChildren: () => import('app/modules/ejercicios/ejercicios.routes') },
             //{ path: 'resultados', loadChildren: () => import('app/modules/resultados/resultados.routes') },
