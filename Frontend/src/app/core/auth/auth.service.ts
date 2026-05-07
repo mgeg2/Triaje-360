@@ -98,52 +98,54 @@ export class AuthService {
      * Sign in using the access token
      */
     signInUsingToken() {
-        var token=localStorage.getItem('accessToken');
-        var role=localStorage.getItem('role');
-        var email=localStorage.getItem('email');
-        var id=localStorage.getItem('id');
-        if (token) {
-            console.log('Token from localStorage:', token);
-            this._authenticated = true;
-            
-            if(role){
-            sessionStorage.setItem('email', email|| '');
-            this._userService.user = { email: email||'', nickname: '', role: role,id: id||'', token: token };
-            }
-            return of(true);
+        var token = localStorage.getItem('accessToken');
+        
+        if (!token) {
+            return of(false);
         }
-        // Sign in using the token
-        // return this._httpClient
-        //     .post('api/auth/sign-in-with-token', {
-        //         accessToken: this.accessToken,
-        //     })
-        //     .pipe(
-        //         catchError(() =>
-        //             // Return false
-        //             of(false)
-        //         ),
-        //         switchMap((response: any) => {
-        //             // Replace the access token with the new one if it's available on
-        //             // the response object.
-        //             //
-        //             // This is an added optional step for better security. Once you sign
-        //             // in using the token, you should generate a new one on the server
-        //             // side and attach it to the response object. Then the following
-        //             // piece of code can replace the token with the refreshed one.
-        //             if (response.accessToken) {
-        //                 this.accessToken = response.accessToken;
-        //             }
 
-        //             // Set the authenticated flag to true
-        //             this._authenticated = true;
-
-        //             // Store the user on the user service
-        //             this._userService.user = response.user;
-
-        //             // Return true
-        //             return of(true);
-        //         })
-        //     );
+        // Enviar el token al backend para verificación y descodificación
+        return this._httpClient.post(environment.apiUrl + '/users/verify-token', { token }).pipe(
+            switchMap((response: any) => {
+                if (response.tokenValid) {
+                    // Si el token es válido, guardar el contenido descodificado
+                    this._authenticated = true;
+                    
+                    // Guardar el token re-cifrado
+                    this.accessToken = response.encryptedToken;
+                    
+                    // Guardar el contenido del token
+                    const { id, email, nickname, role } = response.content;
+                    localStorage.setItem('role', role);
+                    localStorage.setItem('email', email);
+                    localStorage.setItem('id', id);
+                    localStorage.setItem('nickname', nickname);
+                    
+                    // Actualizar el servicio de usuario
+                    this._userService.user = {
+                        email: email,
+                        nickname: nickname,
+                        role: role,
+                        id: id,
+                        token: response.encryptedToken
+                    };
+                    
+                    return of(true);
+                } else {
+                    return of(false);
+                }
+            }),
+            catchError(() => {
+                // Si hay error en la verificación, limpiar datos
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('role');
+                localStorage.removeItem('email');
+                localStorage.removeItem('id');
+                localStorage.removeItem('nickname');
+                this._authenticated = false;
+                return of(false);
+            })
+        );
     }
 
     /**
@@ -152,6 +154,10 @@ export class AuthService {
     signOut(): Observable<any> {
         // Remove the access token from the local storage
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('role');
+        localStorage.removeItem('email');
+        localStorage.removeItem('id');
+        localStorage.removeItem('nickname');
 
         // Set the authenticated flag to false
         this._authenticated = false;

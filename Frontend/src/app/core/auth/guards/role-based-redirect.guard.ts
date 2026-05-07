@@ -14,7 +14,7 @@ export const roleBasedRedirectGuard = () => {
     // Redirect based on role
     if (role === 'admin') {
         console.log('Redirecting to asignaturas');
-        router.navigate(['/asignaturas']);
+        router.navigate(['/usuarios']);
     } else if (role === 'prof') {
         console.log('Redirecting to ejercicios');
         router.navigate(['/ejercicios']);
