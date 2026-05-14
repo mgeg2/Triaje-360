@@ -466,7 +466,7 @@ export class Marzipano360Component implements OnInit, OnDestroy {
         return;
       }
       // Aplicar offset global para sincronizar con la rotación
-      const yaw = posicion.yaw + this.offsetYaw;
+      const yaw = posicion.yaw ;
       const pitch = posicion.pitch;
       
       console.log(`  ✓ Posición asignada: [${filaNum}][${columnaNum}], yaw=${yaw.toFixed(2)}, pitch=${pitch.toFixed(2)}, offsetYaw=${this.offsetYaw.toFixed(2)}`);
