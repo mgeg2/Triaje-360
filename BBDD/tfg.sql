@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-02-2026 a las 08:55:02
+-- Tiempo de generación: 14-05-2026 a las 07:33:15
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -29,18 +29,12 @@ USE `tfg`;
 -- Estructura de tabla para la tabla `acciones`
 --
 
-DROP TABLE IF EXISTS `acciones`;
 CREATE TABLE `acciones` (
   `id` varchar(250) NOT NULL,
   `nombre_accion` varchar(250) NOT NULL,
   `tiempo` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Truncar tablas antes de insertar `acciones`
---
-
-TRUNCATE TABLE `acciones`;
 --
 -- Volcado de datos para la tabla `acciones`
 --
@@ -58,7 +52,6 @@ INSERT INTO `acciones` (`id`, `nombre_accion`, `tiempo`) VALUES
 -- Estructura de tabla para la tabla `acciones_intento`
 --
 
-DROP TABLE IF EXISTS `acciones_intento`;
 CREATE TABLE `acciones_intento` (
   `id` int(11) NOT NULL,
   `intento_id` varchar(250) NOT NULL,
@@ -69,33 +62,29 @@ CREATE TABLE `acciones_intento` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `acciones_intento`
---
-
-TRUNCATE TABLE `acciones_intento`;
---
 -- Volcado de datos para la tabla `acciones_intento`
 --
 
 INSERT INTO `acciones_intento` (`id`, `intento_id`, `paciente_id`, `accion_id`, `color_asignado`, `created_at`) VALUES
-(1, '2ktkklr95hnne66tglmj', '2kst61rfr039g8r55srtj8', NULL, 'rojo', '2026-02-16 12:09:51'),
-(2, '2ktkklr95hnne66tglmj', '2kst61rfr039g8r55srtj8', '1', NULL, '2026-02-16 12:09:51'),
-(3, '2ktkklr95hnne66tglmj', '2kst61rfr039g8r55srtj8', '2', NULL, '2026-02-16 12:09:51'),
-(4, '2ktkklr95hnne66tglmj', '2kst625oef6p6hp5nt31', NULL, 'verde', '2026-02-16 12:09:51'),
-(5, '2ktkklr95hnne66tglmj', '2kst625oef6p6hp5nt31', '3', NULL, '2026-02-16 12:09:51'),
-(6, '2ktkklr95hnne66tglmj', '2kst625oef6p6hp5nt31', '5', NULL, '2026-02-16 12:09:51'),
-(7, '2ktnpb6g356siig5clifj', '2ktnoe6k6cq9kf4mqt04', NULL, 'negro', '2026-02-17 09:27:32'),
-(8, '2ktnpb6g356siig5clifj', '2ktnoe78f4enn3pddgct', NULL, 'negro', '2026-02-17 09:27:32'),
-(9, '2ktnpb6g356siig5clifj', '2ktnoe7gndcsfk912bsa', NULL, 'negro', '2026-02-17 09:27:32'),
-(10, '2ktnpb6g356siig5clifj', '2ktnoe7p3fp679hi7bij', NULL, 'negro', '2026-02-17 09:27:32'),
-(11, '2ktnqe9tb7k1kmo2b6oe', '2ktnoe6k6cq9kf4mqt04', NULL, 'negro', '2026-02-17 09:42:27'),
-(12, '2ktnqe9tb7k1kmo2b6oe', '2ktnoe78f4enn3pddgct', NULL, 'negro', '2026-02-17 09:42:27'),
-(13, '2ktnqe9tb7k1kmo2b6oe', '2ktnoe7gndcsfk912bsa', NULL, 'negro', '2026-02-17 09:42:27'),
-(14, '2ktnqe9tb7k1kmo2b6oe', '2ktnoe7p3fp679hi7bij', NULL, 'negro', '2026-02-17 09:42:27'),
-(15, '2ktnqh16cpctqjamdif6', '2ktnoe6k6cq9kf4mqt04', NULL, 'negro', '2026-02-17 09:43:40'),
-(16, '2ktnqh16cpctqjamdif6', '2ktnoe78f4enn3pddgct', NULL, 'negro', '2026-02-17 09:43:40'),
-(17, '2ktnqh16cpctqjamdif6', '2ktnoe7gndcsfk912bsa', NULL, 'negro', '2026-02-17 09:43:40'),
-(18, '2ktnqh16cpctqjamdif6', '2ktnoe7p3fp679hi7bij', NULL, 'negro', '2026-02-17 09:43:40');
+(19, '2l74b1cbdb970k09ilc7', '2l748jbn8kb40pj2gafs', NULL, 'verde', '2026-04-20 09:59:08'),
+(20, '2l74bd4rkqe1or3nqg7p', '2l748jbn8kb40pj2gafs', NULL, 'verde', '2026-04-20 10:04:25'),
+(21, '2l74c1orc1cbia0tdbfl', '2l74brtghs2fmbq1n683', NULL, 'verde', '2026-04-20 10:12:49'),
+(22, '2l74c1orc1cbia0tdbfl', '2l74brtm24n0bnkqarp3h', NULL, 'verde', '2026-04-20 10:12:49'),
+(23, '2l7benesehd30n1rgtc7', '2l74brtghs2fmbq1n683', NULL, 'amarillo', '2026-04-22 10:04:34'),
+(24, '2l7benesehd30n1rgtc7', '2l74brtm24n0bnkqarp3h', NULL, 'verde', '2026-04-22 10:04:34'),
+(25, '2l7bfs7etic59sme3n1d', '2l74brtrtsc0jgtktm5c', NULL, 'verde', '2026-04-22 10:20:12'),
+(26, '2l7ie8dbs17ctdq9etp4l', '2l74brqp5gc15s5mkna5', NULL, 'rojo', '2026-04-24 09:12:48'),
+(27, '2l7ie8dbs17ctdq9etp4l', '2l74brtrtsc0jgtktm5c', NULL, 'amarillo', '2026-04-24 09:12:48'),
+(28, '2l9emrjlted90mk5aei1', '2l74brtrtsc0jgtktm5c', NULL, 'verde', '2026-05-10 05:09:26'),
+(29, '2l9enn6n8e298nc2anaa', '2l74brtghs2fmbq1n683', NULL, 'verde', '2026-05-10 05:20:57'),
+(30, '2l9enn6n8e298nc2anaa', '2l74brtm24n0bnkqarp3h', NULL, 'verde', '2026-05-10 05:20:57'),
+(31, '2l9ennri7s9jsep57hjb', '2l74brtrtsc0jgtktm5c', NULL, 'verde', '2026-05-10 05:21:15'),
+(32, '2l9epj6gfo2hmh7tjkdn', '2l74brtrtsc0jgtktm5c', NULL, 'verde', '2026-05-10 05:46:08'),
+(33, '2l9epr4dqngjc8e78d3d', '2l74bnstkrhlaamjhj13', NULL, 'verde', '2026-05-10 05:49:43'),
+(34, '2l9epr4dqngjc8e78d3d', '2l74bnt57stsga3p9enf', NULL, 'rojo', '2026-05-10 05:49:43'),
+(35, '2l9epr4dqngjc8e78d3d', '2l74bntanc657f74c7f5', NULL, 'amarillo', '2026-05-10 05:49:43'),
+(36, '2l9epr4dqngjc8e78d3d', '2l74bntanc657f74c7f5', '1', NULL, '2026-05-10 05:49:43'),
+(37, '2l9epr4dqngjc8e78d3d', '2l74bntanc657f74c7f5', '5', NULL, '2026-05-10 05:49:43');
 
 -- --------------------------------------------------------
 
@@ -103,23 +92,20 @@ INSERT INTO `acciones_intento` (`id`, `intento_id`, `paciente_id`, `accion_id`, 
 -- Estructura de tabla para la tabla `acciones_paciente`
 --
 
-DROP TABLE IF EXISTS `acciones_paciente`;
 CREATE TABLE `acciones_paciente` (
   `paciente_id` varchar(250) NOT NULL,
   `acciones_id` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `acciones_paciente`
---
-
-TRUNCATE TABLE `acciones_paciente`;
---
 -- Volcado de datos para la tabla `acciones_paciente`
 --
 
 INSERT INTO `acciones_paciente` (`paciente_id`, `acciones_id`) VALUES
-('2klasdqob647mok0kbqbc', '1');
+('2l6nk419kanm9hjaan0p', '2'),
+('2l6nk419kanm9hjaan0p', '3'),
+('2l6nl3jkne26kebir4il', '2'),
+('2l6nk24s1cjfg4e54bfs', '3');
 
 -- --------------------------------------------------------
 
@@ -127,7 +113,6 @@ INSERT INTO `acciones_paciente` (`paciente_id`, `acciones_id`) VALUES
 -- Estructura de tabla para la tabla `acciones_paciente_ejercicio`
 --
 
-DROP TABLE IF EXISTS `acciones_paciente_ejercicio`;
 CREATE TABLE `acciones_paciente_ejercicio` (
   `id` int(11) NOT NULL,
   `paciente_id` varchar(250) NOT NULL,
@@ -136,17 +121,20 @@ CREATE TABLE `acciones_paciente_ejercicio` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `acciones_paciente_ejercicio`
+-- Volcado de datos para la tabla `acciones_paciente_ejercicio`
 --
 
-TRUNCATE TABLE `acciones_paciente_ejercicio`;
+INSERT INTO `acciones_paciente_ejercicio` (`id`, `paciente_id`, `acciones_id`, `ejercicio_id`) VALUES
+(96, '2l74brtghs2fmbq1n683', '3', '2l74brkhs1br3qk1ameji'),
+(97, '2l74brtm24n0bnkqarp3h', '3', '2l74brkhs1br3qk1ameji'),
+(98, '2l74brtrtsc0jgtktm5c', '3', '2l74brkhs1br3qk1ameji');
+
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `asignatura`
 --
 
-DROP TABLE IF EXISTS `asignatura`;
 CREATE TABLE `asignatura` (
   `id` varchar(250) NOT NULL,
   `codigo` int(11) NOT NULL,
@@ -155,16 +143,10 @@ CREATE TABLE `asignatura` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `asignatura`
---
-
-TRUNCATE TABLE `asignatura`;
---
 -- Volcado de datos para la tabla `asignatura`
 --
 
 INSERT INTO `asignatura` (`id`, `codigo`, `nombre`, `curso`) VALUES
-('2kd9fckc7t9tla26e1cj', 21008, 'ESTRUCTURA DE DATOS Y ALGORITMIA', '24/25'),
 ('2kjp366a8h24hm4qmnmk', 21019, 'Estructuracion de Contenidos', '24/25');
 
 -- --------------------------------------------------------
@@ -173,7 +155,6 @@ INSERT INTO `asignatura` (`id`, `codigo`, `nombre`, `curso`) VALUES
 -- Estructura de tabla para la tabla `ejercicios`
 --
 
-DROP TABLE IF EXISTS `ejercicios`;
 CREATE TABLE `ejercicios` (
   `id` varchar(250) NOT NULL,
   `nombre` varchar(250) NOT NULL,
@@ -185,17 +166,12 @@ CREATE TABLE `ejercicios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `ejercicios`
---
-
-TRUNCATE TABLE `ejercicios`;
---
 -- Volcado de datos para la tabla `ejercicios`
 --
 
 INSERT INTO `ejercicios` (`id`, `nombre`, `descripcion`, `fechaInicio`, `fechaFin`, `numerointentos`, `asignatura`) VALUES
-('2kst61k5mq5alpbsk19j', 'ngbsn g', 'tjyytnsyt', '2026-02-19', '2026-02-18', 0, '2kd9fckc7t9tla26e1cj'),
-('2ktnodpn3ka1i748idfp', 'dqwerty', 'qwertyy', '2026-02-18', '2026-02-25', 0, '2kd9fckc7t9tla26e1cj');
+('2l74bnk91h127t3k0ie7', 'prueba con 1 escenario', 'prueba con un escenario para el miercoles', '2026-04-13', '2026-04-20', 0, '2kjp366a8h24hm4qmnmk'),
+('2l74brkhs1br3qk1ameji', 'prueba con 2 escenarios', 'prueba con dos escenarios', '2026-04-21', '2026-04-28', 0, '2kjp366a8h24hm4qmnmk');
 
 -- --------------------------------------------------------
 
@@ -203,7 +179,6 @@ INSERT INTO `ejercicios` (`id`, `nombre`, `descripcion`, `fechaInicio`, `fechaFi
 -- Estructura de tabla para la tabla `imagenes`
 --
 
-DROP TABLE IF EXISTS `imagenes`;
 CREATE TABLE `imagenes` (
   `id` varchar(250) NOT NULL,
   `nombre_original` varchar(255) NOT NULL,
@@ -215,35 +190,16 @@ CREATE TABLE `imagenes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `imagenes`
---
-
-TRUNCATE TABLE `imagenes`;
---
 -- Volcado de datos para la tabla `imagenes`
 --
 
 INSERT INTO `imagenes` (`id`, `nombre_original`, `nombre_archivo`, `tipo`, `fecha_subida`, `descripcion`, `created_at`) VALUES
-('1', 'paciente1.png', 'paciente1', 'paciente', '2026-02-16 12:03:25', 'paciente con corte en la clavicula', '2026-02-16 12:03:25'),
-('2', 'paciente2.png', 'paciente2', 'paciente', '2026-02-16 12:03:25', 'paciente sangrante con corte profundo en la clavicula', '2026-02-16 12:03:25'),
-('2ktko2e6r663i0rbcjoe', 'escenario1.JPG', '2ktko2e6rofj5k4pir7h', 'escenario', '2026-02-16 13:55:06', NULL, '2026-02-16 12:55:06'),
-('2ktkolnmfb553l3ksgmq', 'escenario6.JPG', '2ktkolnmfbb5h28c1ikp', 'escenario', '2026-02-16 14:03:48', NULL, '2026-02-16 13:03:48'),
-('2ktkp1b5fqo2r285i37', 'escenario1.JPG', '2ktkp1b5fa1rina5l121', 'escenario', '2026-02-16 14:08:07', NULL, '2026-02-16 13:08:07'),
-('2ktkp796fscg31pt8jlo', 'escenario1.JPG', '2ktkp796f89capp7dtbl', 'escenario', '2026-02-16 14:10:47', NULL, '2026-02-16 13:10:47'),
-('2ktkp9et70378kr55thpl8', '2ktknchrd60532gl08cg.JPG', '2ktkp9et72tm040m8boce', 'escenario', '2026-02-16 14:11:46', NULL, '2026-02-16 13:11:46'),
-('2ktkpg1jkgmpobc7ogia', 'escenario1.JPG', '2ktkpg1jk1r0opidejpo', 'escenario', '2026-02-16 14:14:43', NULL, '2026-02-16 13:14:43'),
-('2l0fbpkh9f735gdtl8hf', 'Captura de pantalla 2025-12-12 155328.png', '2l0fbpkh787dd5gf5ams', 'paciente', '2026-02-23 11:55:03', NULL, '2026-02-23 10:55:03'),
-('2l0fbqqg4t2hh2j7shd6', 'Captura de pantalla 2026-02-17 093850.png', '2l0fbqqg4mc3ln1i1gkm', 'escenario', '2026-02-23 11:55:35', NULL, '2026-02-23 10:55:35'),
-('2l0fc5dd87a1d6b8as419', 'Captura de pantalla 2026-01-12 125602.png', '2l0fc5dd89gtbobtg341', 'escenario', '2026-02-23 11:59:27', NULL, '2026-02-23 10:59:27'),
-('2l0fca5rsl11bjka34j8', 'Captura de pantalla 2025-11-14 093109.png', '2l0fca5rs3p3sg4li5h7b', 'escenario', '2026-02-23 12:01:35', NULL, '2026-02-23 11:01:35'),
-('2l0fcespmid9he9dapm', 'Captura de pantalla 2026-01-12 125602.png', '2l0fcespmr16312t298h', 'escenario', '2026-02-23 12:03:43', NULL, '2026-02-23 11:03:43'),
-('2l0fcigksadgf1r0p754', 'Captura de pantalla 2026-01-12 122933.png', '2l0fcigksm94bc0gei9q', 'escenario', '2026-02-23 12:05:21', NULL, '2026-02-23 11:05:21'),
-('3', 'paciente3.png', 'paciente3', 'paciente', '2026-02-16 12:03:25', 'paciente con hematoma en la cabeza', '2026-02-16 12:03:25'),
-('4', 'paciente4.png', 'paciente4', 'paciente', '2026-02-16 12:03:25', 'paciente manchado de sangre', '2026-02-16 12:03:25'),
-('5', 'escenario1.JPG', 'escenario1', 'escenario', '2026-02-16 12:03:25', 'escenario1', '2026-02-16 12:03:25'),
-('6', 'escenario2.JPG', 'escenario2', 'escenario', '2026-02-16 12:03:25', 'escenario2', '2026-02-16 12:03:25'),
-('7', 'escenario3.JPG', 'escenario3', 'escenario', '2026-02-16 12:03:25', 'escenario3', '2026-02-16 12:03:25'),
-('8', 'escenario4.JPG', 'escenario4', 'escenario', '2026-02-16 12:03:25', 'escenario4', '2026-02-16 12:03:25');
+('2l6ngo9phnjn6009gd92', 'corte_cabeza.png', '2l6ngo9pf7h62bpj805m.png', 'paciente', '2026-04-17 11:01:56', NULL, '2026-04-17 09:01:56'),
+('2l6nh7i10el7qlel9t6b', 'embarazada_.png', '2l6nh7i0tpdei83i7mga.png', 'paciente', '2026-04-17 11:07:55', NULL, '2026-04-17 09:07:55'),
+('2l6nh8fni83stinbmj53', 'ElmodeloREAL_principal-1.png', '2l6nh8fngejekd1j9in1.png', 'paciente', '2026-04-17 11:08:20', NULL, '2026-04-17 09:08:20'),
+('2l6nhhilc1r1tcostai76', 'paciente6.png', '2l6nhhilain9tgh7bihb.png', 'paciente', '2026-04-17 11:12:25', NULL, '2026-04-17 09:12:25'),
+('2l74blchlo33gtrnja2t', 'R360-1.JPG', '2l74blchlk0h5ch1k176.JPG', 'escenario', '2026-04-20 12:08:08', NULL, '2026-04-20 10:08:08'),
+('2l74blqg72d3nh4423758', 'R360-2.JPG', '2l74blqg7jk8t6m9jdnr.JPG', 'escenario', '2026-04-20 12:08:20', NULL, '2026-04-20 10:08:20');
 
 -- --------------------------------------------------------
 
@@ -251,7 +207,6 @@ INSERT INTO `imagenes` (`id`, `nombre_original`, `nombre_archivo`, `tipo`, `fech
 -- Estructura de tabla para la tabla `imagenes_ejercicio`
 --
 
-DROP TABLE IF EXISTS `imagenes_ejercicio`;
 CREATE TABLE `imagenes_ejercicio` (
   `imagen` varchar(250) NOT NULL,
   `ejercicio` varchar(250) NOT NULL,
@@ -259,17 +214,13 @@ CREATE TABLE `imagenes_ejercicio` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `imagenes_ejercicio`
---
-
-TRUNCATE TABLE `imagenes_ejercicio`;
---
 -- Volcado de datos para la tabla `imagenes_ejercicio`
 --
 
 INSERT INTO `imagenes_ejercicio` (`imagen`, `ejercicio`, `orden`) VALUES
-('5 ', '2kst61k5mq5alpbsk19j', 1),
-('5', '2ktnodpn3ka1i748idfp', 1);
+('2l74blchlo33gtrnja2t', '2l74bnk91h127t3k0ie7', 1),
+('2l74blchlo33gtrnja2t', '2l74brkhs1br3qk1ameji', 1),
+('2l74blqg72d3nh4423758', '2l74brkhs1br3qk1ameji', 2);
 
 -- --------------------------------------------------------
 
@@ -277,7 +228,6 @@ INSERT INTO `imagenes_ejercicio` (`imagen`, `ejercicio`, `orden`) VALUES
 -- Estructura de tabla para la tabla `intentos_ejercicio`
 --
 
-DROP TABLE IF EXISTS `intentos_ejercicio`;
 CREATE TABLE `intentos_ejercicio` (
   `id` varchar(250) NOT NULL,
   `usuario_id` varchar(250) NOT NULL,
@@ -290,21 +240,38 @@ CREATE TABLE `intentos_ejercicio` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `intentos_ejercicio`
---
-
-TRUNCATE TABLE `intentos_ejercicio`;
---
 -- Volcado de datos para la tabla `intentos_ejercicio`
 --
 
 INSERT INTO `intentos_ejercicio` (`id`, `usuario_id`, `ejercicio_id`, `tiempo_realizado`, `fecha_inicio`, `fecha_finalizacion`, `numero_intento`, `created_at`) VALUES
-('2ktkkde373l1h93m5o28e', '2kqoqg64o005247d974bg48', '2kst61k5mq5alpbsk19j', 198, '2026-02-16 13:02:45', '2026-02-16 13:06:03', 1, '2026-02-16 12:06:03'),
-('2ktkkef5hfr12i7e70k7', '2kqoqg64o005247d974bg48', '2kst61k5mq5alpbsk19j', 125, '2026-02-16 13:04:26', '2026-02-16 13:06:31', 2, '2026-02-16 12:06:31'),
-('2ktkklr95hnne66tglmj', '2kqoqg64o005247d974bg48', '2kst61k5mq5alpbsk19j', 221, '2026-02-16 13:06:10', '2026-02-16 13:09:51', 3, '2026-02-16 12:09:51'),
-('2ktnpb6g356siig5clifj', '2kqoqg64o005247d974bg48', '2ktnodpn3ka1i748idfp', 27, '2026-02-17 10:27:05', '2026-02-17 10:27:32', 1, '2026-02-17 09:27:32'),
-('2ktnqe9tb7k1kmo2b6oe', '2kqoqg64o005247d974bg48', '2ktnodpn3ka1i748idfp', 20, '2026-02-17 10:42:06', '2026-02-17 10:42:26', 2, '2026-02-17 09:42:26'),
-('2ktnqh16cpctqjamdif6', '2kqoqg64o005247d974bg48', '2ktnodpn3ka1i748idfp', 16, '2026-02-17 10:43:24', '2026-02-17 10:43:40', 3, '2026-02-17 09:43:40');
+('2l6nqrbspaos1064hm56', '2kqoqg64o005247d974bg48', '2l6npdi985ibbi50d5k5', 5, '2026-04-17 13:18:14', '2026-04-17 13:18:19', 1, '2026-04-17 11:18:19'),
+('2l6nr28a5c077s7e7kt1', '2kqoqg64o005247d974bg48', '2l6npdi985ibbi50d5k5', 121, '2026-04-17 13:18:30', '2026-04-17 13:20:31', 2, '2026-04-17 11:20:31'),
+('2l6nr698imp0ef4a0k8h', '2kqoqg64o005247d974bg48', '2l6npdi985ibbi50d5k5', 100, '2026-04-17 13:20:40', '2026-04-17 13:22:20', 3, '2026-04-17 11:22:20'),
+('2l748mfm0tb8picnm4j9', '2kqoqg64o005247d974bg48', '2l747bimef8iegifrqom', 27, '2026-04-20 11:27:41', '2026-04-20 11:28:08', 1, '2026-04-20 09:28:08'),
+('2l748ohlc1qoqajd11888', '2kqoqg64o005247d974bg48', '2l747bimef8iegifrqom', 21, '2026-04-20 11:28:42', '2026-04-20 11:29:03', 2, '2026-04-20 09:29:03'),
+('2l749453jb02gs38mflt', '2kqoqg64o005247d974bg48', '2l747bimef8iegifrqom', 103, '2026-04-20 11:31:39', '2026-04-20 11:33:22', 3, '2026-04-20 09:33:22'),
+('2l74a6mq742tl84l0tjtg', '2kqoqg64o005247d974bg48', '2l748j2sthd1rne6g5st', 150, '2026-04-20 11:45:32', '2026-04-20 11:48:02', 1, '2026-04-20 09:48:02'),
+('2l74a7nce168gb7cp44c2', '2kqoqg64o005247d974bg48', '2l748j2sthd1rne6g5st', 18, '2026-04-20 11:48:12', '2026-04-20 11:48:30', 2, '2026-04-20 09:48:30'),
+('2l74afopsgc09n56h62c', '2kqoqg64o005247d974bg48', '2l748j2sthd1rne6g5st', 52, '2026-04-20 11:51:15', '2026-04-20 11:52:07', 3, '2026-04-20 09:52:07'),
+('2l74al5anitem812ljpr', '2kqoqg64o005247d974bg48', '2l747bimef8iegifrqom', 6, '2026-04-20 11:54:25', '2026-04-20 11:54:31', 4, '2026-04-20 09:54:31'),
+('2l74b05e8erlcg7jl925', '2kqoqg64o005247d974bg48', '2l748j2sthd1rne6g5st', 135, '2026-04-20 11:56:19', '2026-04-20 11:58:34', 4, '2026-04-20 09:58:34'),
+('2l74b1cbdb970k09ilc7', '2kqoqg64o005247d974bg48', '2l748j2sthd1rne6g5st', 20, '2026-04-20 11:58:48', '2026-04-20 11:59:08', 5, '2026-04-20 09:59:08'),
+('2l74bd4rkqe1or3nqg7p', '2kqoqg64o005247d974bg48', '2l748j2sthd1rne6g5st', 56, '2026-04-20 12:03:29', '2026-04-20 12:04:25', 6, '2026-04-20 10:04:25'),
+('2l74c1orc1cbia0tdbfl', '2kqoqg64o005247d974bg48', '2l74brkhs1br3qk1ameji', 54, '2026-04-20 12:11:55', '2026-04-20 12:12:49', 1, '2026-04-20 10:12:49'),
+('2l7benesehd30n1rgtc7', '2kqoqg64o005247d974bg48', '2l74brkhs1br3qk1ameji', 1064, '2026-04-22 11:46:50', '2026-04-22 12:04:34', 2, '2026-04-22 10:04:34'),
+('2l7bfs7etic59sme3n1d', '2kqoqg64o005247d974bg48', '2l74brkhs1br3qk1ameji', 12, '2026-04-22 12:20:00', '2026-04-22 12:20:12', 3, '2026-04-22 10:20:12'),
+('2l7bg00q21arapg56b474', '2kqoqg64o005247d974bg48', '2l74bnk91h127t3k0ie7', 3, '2026-04-22 12:20:57', '2026-04-22 12:21:00', 1, '2026-04-22 10:21:00'),
+('2l7ie8dbs17ctdq9etp4l', '2kqoqg64o005247d974bg48', '2l74brkhs1br3qk1ameji', 53, '2026-04-24 11:11:55', '2026-04-24 11:12:48', 4, '2026-04-24 09:12:48'),
+('2l82m32ns6g8c6rk2f5lk', '2kqoqg64o005247d974bg48', '2l74bnk91h127t3k0ie7', 31, '2026-04-28 11:27:52', '2026-04-28 11:28:23', 2, '2026-04-28 09:28:23'),
+('2l9els5gle4g78repf1m', '2kqoqg64o005247d974bg48', '2l74bnk91h127t3k0ie7', 4, '2026-05-10 06:56:07', '2026-05-10 06:56:11', 3, '2026-05-10 04:56:11'),
+('2l9empobefs66cb2818i', '2kqoqg64o005247d974bg48', '2l74bnk91h127t3k0ie7', 19, '2026-05-10 07:08:17', '2026-05-10 07:08:36', 4, '2026-05-10 05:08:36'),
+('2l9emrjlted90mk5aei1', '2kqoqg64o005247d974bg48', '2l74brkhs1br3qk1ameji', 47, '2026-05-10 07:08:39', '2026-05-10 07:09:26', 5, '2026-05-10 05:09:26'),
+('2l9enll2g63iqctierqbe', '2kqoqg64o005247d974bg48', '2l74bnk91h127t3k0ie7', 4, '2026-05-10 07:20:11', '2026-05-10 07:20:15', 5, '2026-05-10 05:20:15'),
+('2l9enn6n8e298nc2anaa', '2kqoqg64o005247d974bg48', '2l74brkhs1br3qk1ameji', 39, '2026-05-10 07:20:18', '2026-05-10 07:20:57', 6, '2026-05-10 05:20:57'),
+('2l9ennri7s9jsep57hjb', '2kqoqg64o005247d974bg48', '2l74brkhs1br3qk1ameji', 14, '2026-05-10 07:21:01', '2026-05-10 07:21:15', 7, '2026-05-10 05:21:15'),
+('2l9epj6gfo2hmh7tjkdn', '2kqoqg64o005247d974bg48', '2l74brkhs1br3qk1ameji', 14, '2026-05-10 07:45:54', '2026-05-10 07:46:08', 8, '2026-05-10 05:46:08'),
+('2l9eplhri6i7sa09gdnh', '2kqoqg64o005247d974bg48', '2l74bnk91h127t3k0ie7', 62, '2026-05-10 07:46:11', '2026-05-10 07:47:13', 6, '2026-05-10 05:47:13'),
+('2l9epr4dqngjc8e78d3d', '2kqoqg64o005247d974bg48', '2l74bnk91h127t3k0ie7', 137, '2026-05-10 07:47:26', '2026-05-10 07:49:43', 7, '2026-05-10 05:49:43');
 
 -- --------------------------------------------------------
 
@@ -312,7 +279,6 @@ INSERT INTO `intentos_ejercicio` (`id`, `usuario_id`, `ejercicio_id`, `tiempo_re
 -- Estructura de tabla para la tabla `pacientes`
 --
 
-DROP TABLE IF EXISTS `pacientes`;
 CREATE TABLE `pacientes` (
   `id` varchar(250) NOT NULL,
   `nombre` varchar(250) NOT NULL,
@@ -323,31 +289,14 @@ CREATE TABLE `pacientes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `pacientes`
---
-
-TRUNCATE TABLE `pacientes`;
---
 -- Volcado de datos para la tabla `pacientes`
 --
 
 INSERT INTO `pacientes` (`id`, `nombre`, `descripcion`, `color`, `Tempeora`, `imagen`) VALUES
-('2klas48lfbfolkgcm31h', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3'),
-('2klas48lfbfolkgcm31h9', 'niño ojo', 'niño con el ojo inflamado esta llorando', 'amarillo', 7, '3'),
-('2klas48lfbfolkgcm31o', 'niño ojo', 'niño con el ojo inflamado esta llorando', 'amarillo', 7, '3'),
-('2klas48lfbfolkgcm31oi', 'niño ojo', 'niño con el ojo inflamado esta llorando', 'amarillo', 7, '3'),
-('2klas7gf058t9sfo5rr0', 'abrasion', 'Hombre joven con multiples abrasiones y heridas no profundas, presenta deformidad en el fémur derecho y aplastamiento de la mano izquierda. Está alerta.', 'amarillo', 0, '1'),
-('2klas7gf058t9sfo5rr0h', 'abrasion', 'Hombre joven con multiples abrasiones y heridas no profundas, presenta deformidad en el fémur derecho y aplastamiento de la mano izquierda. Está alerta.', 'amarillo', 0, '1'),
-('2klas7gf058t9sfo5rr0hh', 'abrasion', 'Hombre joven con multiples abrasiones y heridas no profundas, presenta deformidad en el fémur derecho y aplastamiento de la mano izquierda. Está alerta.', 'amarillo', 0, '1'),
-('2klas7gf058t9sfo5rr0j', 'abrasion', 'Hombre joven con multiples abrasiones y heridas no profundas, presenta deformidad en el fémur derecho y aplastamiento de la mano izquierda. Está alerta.', 'amarillo', 0, '1'),
-('2klasdqob647mok0kbqb', 'chico cuello', 'Chica con corte en el cuello y quemaduras faciales de segundo y tercer grado, constantes normales.', 'rojo', 0, '4'),
-('2klasdqob647mok0kbqbb', 'chico cuello', 'Chica con corte en el cuello y quemaduras faciales de segundo y tercer grado, constantes normales.', 'rojo', 0, '4'),
-('2klasdqob647mok0kbqbc', 'chico cuello', 'Chica con corte en el cuello y quemaduras faciales de segundo y tercer grado, constantes normales.', 'rojo', 0, '4'),
-('2klasdqob647mok0kbqbcj', 'chico cuello', 'Chica con corte en el cuello y quemaduras faciales de segundo y tercer grado, constantes normales.', 'rojo', 0, '4'),
-('2kst5t687hert5qrb', 'corte hombre', 'geegtth rth', 'amarillo', 0, '2'),
-('2kst5t687hert5qrb6', 'corte hombre', 'geegtth rth', 'amarillo', 0, '2'),
-('2kst5t687hert5qrb6d', 'corte hombre', 'geegtth rth', 'amarillo', 0, '2'),
-('2kst5t687hert5qrb6ds', 'corte hombre', 'geegtth rth', 'amarillo', 0, '2');
+('2l6nja5ipifce7ds3mt6', 'paciente brecha', 'paciente con brecha en cabeza', 'verde', 0, '2l6nhhilc1r1tcostai76'),
+('2l6nk24s1cjfg4e54bfs', 'paciente embarazada', 'paciente embarazada con contusion en la barriga', 'amarillo', 0, '2l6nh7i10el7qlel9t6b'),
+('2l6nk419kanm9hjaan0p', 'paciente aplastado', 'paciente con  aplastamiento de miembro inferior derecho', 'rojo', 0, '2l6nh8fni83stinbmj53'),
+('2l6nl3jkne26kebir4il', 'paciente contusion', 'paciente con contusion en la cabeza', 'rojo', 0, '2l6ngo9phnjn6009gd92');
 
 -- --------------------------------------------------------
 
@@ -355,7 +304,6 @@ INSERT INTO `pacientes` (`id`, `nombre`, `descripcion`, `color`, `Tempeora`, `im
 -- Estructura de tabla para la tabla `pacientes_ejercicio`
 --
 
-DROP TABLE IF EXISTS `pacientes_ejercicio`;
 CREATE TABLE `pacientes_ejercicio` (
   `id` varchar(250) NOT NULL,
   `nombre` varchar(250) NOT NULL,
@@ -367,35 +315,19 @@ CREATE TABLE `pacientes_ejercicio` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `pacientes_ejercicio`
---
-
-TRUNCATE TABLE `pacientes_ejercicio`;
---
 -- Volcado de datos para la tabla `pacientes_ejercicio`
 --
 
 INSERT INTO `pacientes_ejercicio` (`id`, `nombre`, `descripcion`, `color`, `Tempeora`, `imagen`, `ejercicio`) VALUES
-('2kst61pj18mfa3638pih', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3', '2kst61k5mq5alpbsk19j'),
-('2kst61qs38p9dhch4nk', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3', '2kst61k5mq5alpbsk19j'),
-('2kst61rfr039g8r55srtj8', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3', '2kst61k5mq5alpbsk19j'),
-('2kst61rtmc3ormgp0d0j', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3', '2kst61k5mq5alpbsk19j'),
-('2kst620dt5s2a665c90g', 'abrasion', 'Hombre joven con multiples abrasiones y heridas no profundas, presenta deformidad en el fémur derecho y aplastamiento de la mano izquierda. Está alerta.', 'amarillo', 0, '1', '2kst61k5mq5alpbsk19j'),
-('2kst620rgdpqkaoqlkf5', 'abrasion', 'Hombre joven con multiples abrasiones y heridas no profundas, presenta deformidad en el fémur derecho y aplastamiento de la mano izquierda. Está alerta.', 'amarillo', 0, '1', '2kst61k5mq5alpbsk19j'),
-('2kst6219o5nmk0q1h7l4h', 'abrasion', 'Hombre joven con multiples abrasiones y heridas no profundas, presenta deformidad en el fémur derecho y aplastamiento de la mano izquierda. Está alerta.', 'amarillo', 0, '1', '2kst61k5mq5alpbsk19j'),
-('2kst621l149emme1s1nm', 'abrasion', 'Hombre joven con multiples abrasiones y heridas no profundas, presenta deformidad en el fémur derecho y aplastamiento de la mano izquierda. Está alerta.', 'amarillo', 0, '1', '2kst61k5mq5alpbsk19j'),
-('2kst625oef6p6hp5nt31', 'chico cuello', 'Chica con corte en el cuello y quemaduras faciales de segundo y tercer grado, constantes normales.', 'rojo', 0, '4', '2kst61k5mq5alpbsk19j'),
-('2kst6268becljsab69ad', 'chico cuello', 'Chica con corte en el cuello y quemaduras faciales de segundo y tercer grado, constantes normales.', 'rojo', 0, '4', '2kst61k5mq5alpbsk19j'),
-('2kst626kae38546cnr8j', 'chico cuello', 'Chica con corte en el cuello y quemaduras faciales de segundo y tercer grado, constantes normales.', 'rojo', 0, '4', '2kst61k5mq5alpbsk19j'),
-('2kst6273negrs3t24bn', 'chico cuello', 'Chica con corte en el cuello y quemaduras faciales de segundo y tercer grado, constantes normales.', 'rojo', 0, '4', '2kst61k5mq5alpbsk19j'),
-('2kst62cf1rab3r03gn15', 'corte hombre', 'geegtth rth', 'amarillo', 0, '2', '2kst61k5mq5alpbsk19j'),
-('2kst62cts0o3i2glt4bdr', 'corte hombre', 'geegtth rth', 'amarillo', 0, '2', '2kst61k5mq5alpbsk19j'),
-('2kst62dc81hdekojdb4n6', 'corte hombre', 'geegtth rth', 'amarillo', 0, '2', '2kst61k5mq5alpbsk19j'),
-('2kst62dnlefe1aa1oahj', 'corte hombre', 'geegtth rth', 'amarillo', 0, '2', '2kst61k5mq5alpbsk19j'),
-('2ktnoe6k6cq9kf4mqt04', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3', '2ktnodpn3ka1i748idfp'),
-('2ktnoe78f4enn3pddgct', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3', '2ktnodpn3ka1i748idfp'),
-('2ktnoe7gndcsfk912bsa', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3', '2ktnodpn3ka1i748idfp'),
-('2ktnoe7p3fp679hi7bij', 'niño ojo abra', 'niño con el ojo inflamado esta llorando', 'amarillo', 1, '3', '2ktnodpn3ka1i748idfp');
+('2l74bnstkrhlaamjhj13', 'paciente brecha', 'paciente con brecha en cabeza', 'verde', 0, '2l6nhhilc1r1tcostai76', '2l74bnk91h127t3k0ie7'),
+('2l74bnt57stsga3p9enf', 'paciente brecha', 'paciente con brecha en cabeza', 'verde', 0, '2l6nhhilc1r1tcostai76', '2l74bnk91h127t3k0ie7'),
+('2l74bntanc657f74c7f5', 'paciente brecha', 'paciente con brecha en cabeza', 'verde', 0, '2l6nhhilc1r1tcostai76', '2l74bnk91h127t3k0ie7'),
+('2l74brqjs28t078g8lso5', 'paciente brecha', 'paciente con brecha en cabeza', 'verde', 0, '2l6nhhilc1r1tcostai76', '2l74brkhs1br3qk1ameji'),
+('2l74brqp5gc15s5mkna5', 'paciente brecha', 'paciente con brecha en cabeza', 'verde', 0, '2l6nhhilc1r1tcostai76', '2l74brkhs1br3qk1ameji'),
+('2l74brr1hdf2jkn5k8ns', 'paciente brecha', 'paciente con brecha en cabeza', 'verde', 0, '2l6nhhilc1r1tcostai76', '2l74brkhs1br3qk1ameji'),
+('2l74brtghs2fmbq1n683', 'paciente embarazada', 'paciente embarazada con contusion en la barriga', 'amarillo', 0, '2l6nh7i10el7qlel9t6b', '2l74brkhs1br3qk1ameji'),
+('2l74brtm24n0bnkqarp3h', 'paciente embarazada', 'paciente embarazada con contusion en la barriga', 'amarillo', 0, '2l6nh7i10el7qlel9t6b', '2l74brkhs1br3qk1ameji'),
+('2l74brtrtsc0jgtktm5c', 'paciente embarazada', 'paciente embarazada con contusion en la barriga', 'amarillo', 0, '2l6nh7i10el7qlel9t6b', '2l74brkhs1br3qk1ameji');
 
 -- --------------------------------------------------------
 
@@ -403,7 +335,6 @@ INSERT INTO `pacientes_ejercicio` (`id`, `nombre`, `descripcion`, `color`, `Temp
 -- Estructura de tabla para la tabla `sonidos`
 --
 
-DROP TABLE IF EXISTS `sonidos`;
 CREATE TABLE `sonidos` (
   `id` varchar(250) NOT NULL,
   `nombre_original` varchar(255) NOT NULL,
@@ -414,17 +345,10 @@ CREATE TABLE `sonidos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `sonidos`
---
-
-TRUNCATE TABLE `sonidos`;
---
 -- Volcado de datos para la tabla `sonidos`
 --
 
 INSERT INTO `sonidos` (`id`, `nombre_original`, `nombre_archivo`, `fecha_subida`, `descripcion`, `created_at`) VALUES
-('2ktnnfoh971gof340if', 'freesound_community-crowd-shouting-6325.mp3', '2ktnnfoh9kbq69plaj7c', '2026-02-17 10:02:37', NULL, '2026-02-17 09:02:37'),
-('2ktnng99tjhkrinor0ij', 'universfield-woman-crying-02-291097.mp3', '2ktnng99tre3fcmb751h', '2026-02-17 10:02:50', NULL, '2026-02-17 09:02:50'),
 ('2ktnngkedm45g71tjkbf', 'freesound_community-crowd-shouting-6325.mp3', '2ktnngked72g4dollodd', '2026-02-17 10:03:00', NULL, '2026-02-17 09:03:00'),
 ('2ktnnh1ps5pi3cs4slgk', '462410__luchito_9717__ambulance.wav', '2ktnnh1psj9j3gqnipn7', '2026-02-17 10:03:10', NULL, '2026-02-17 09:03:10');
 
@@ -434,7 +358,6 @@ INSERT INTO `sonidos` (`id`, `nombre_original`, `nombre_archivo`, `fecha_subida`
 -- Estructura de tabla para la tabla `sonidos_ejercicio`
 --
 
-DROP TABLE IF EXISTS `sonidos_ejercicio`;
 CREATE TABLE `sonidos_ejercicio` (
   `id` int(11) NOT NULL,
   `sonido_id` varchar(250) NOT NULL,
@@ -443,11 +366,6 @@ CREATE TABLE `sonidos_ejercicio` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Truncar tablas antes de insertar `sonidos_ejercicio`
---
-
-TRUNCATE TABLE `sonidos_ejercicio`;
 --
 -- Volcado de datos para la tabla `sonidos_ejercicio`
 --
@@ -461,12 +379,40 @@ INSERT INTO `sonidos_ejercicio` (`id`, `sonido_id`, `ejercicio_id`, `posicion`, 
 (6, '2ktnngkedm45g71tjkbf', '2ktnocle3n5likaqo1e2', 2, '2026-02-17 09:14:49'),
 (7, '2ktnnfoh971gof340if', '2ktnocle3n5likaqo1e2', 3, '2026-02-17 09:14:49'),
 (8, '2ktnng99tjhkrinor0ij', '2ktnocle3n5likaqo1e2', 4, '2026-02-17 09:14:49'),
-(9, '2ktnnh1ps5pi3cs4slgk', '2ktnodpn3ka1i748idfp', 1, '2026-02-17 09:15:21'),
-(10, '2ktnnfoh971gof340if', '2ktnodpn3ka1i748idfp', 2, '2026-02-17 09:15:21'),
-(11, '2ktnngkedm45g71tjkbf', '2ktnodpn3ka1i748idfp', 3, '2026-02-17 09:15:21'),
-(12, '2ktnng99tjhkrinor0ij', '2ktnodpn3ka1i748idfp', 4, '2026-02-17 09:15:21'),
 (13, '2ktnnh1ps5pi3cs4slgk', '2l0fd68rd3aeel4nfqdfn', 1, '2026-02-23 11:13:27'),
-(14, '2ktnngkedm45g71tjkbf', '2l0fd68rd3aeel4nfqdfn', 2, '2026-02-23 11:13:27');
+(14, '2ktnngkedm45g71tjkbf', '2l0fd68rd3aeel4nfqdfn', 2, '2026-02-23 11:13:27'),
+(18, '2ktnngkedm45g71tjkbf', '2l0qflts3d1ra1cs0kb4', 1, '2026-02-26 14:03:07'),
+(19, '2ktnng99tjhkrinor0ij', '2l0qflts3d1ra1cs0kb4', 2, '2026-02-26 14:03:07'),
+(20, '2ktnnh1ps5pi3cs4slgk', '2l0qflts3d1ra1cs0kb4', 3, '2026-02-26 14:03:07'),
+(21, '2ktnnh1ps5pi3cs4slgk', '2ktnodpn3ka1i748idfp', 1, '2026-02-26 14:10:28'),
+(22, '2ktnng99tjhkrinor0ij', '2ktnodpn3ka1i748idfp', 2, '2026-02-26 14:10:28'),
+(23, '2ktnngkedm45g71tjkbf', '2ktnodpn3ka1i748idfp', 3, '2026-02-26 14:10:28'),
+(24, '2ktnngkedm45g71tjkbf', '2l6nl4bi4ak2pbkcmkfl', 1, '2026-04-17 10:00:37'),
+(25, '2ktnng99tjhkrinor0ij', '2l6nl8m15sse8h6p83t9', 1, '2026-04-17 10:02:29'),
+(26, '2ktnngkedm45g71tjkbf', '2l6nl9f26fk3l08pne7e', 1, '2026-04-17 10:02:52'),
+(27, '2ktnngkedm45g71tjkbf', '2l6nlhfbpkca8i7qh0ca', 1, '2026-04-17 10:06:26'),
+(28, '2ktnngkedm45g71tjkbf', '2l6noeg3jtdfm7cs5ofl', 1, '2026-04-17 10:45:36'),
+(29, '2ktnngkedm45g71tjkbf', '2l6nogpctt6btc1qnt77', 1, '2026-04-17 10:46:37'),
+(30, '2ktnnh1ps5pi3cs4slgk', '2l6nok4ar44s51psoi20j', 1, '2026-04-17 10:48:08'),
+(39, '2ktnngkedm45g71tjkbf', '2l6npdi985ibbi50d5k5', 1, '2026-04-17 11:17:29'),
+(47, '2ktnng99tjhkrinor0ij', '2l6nr76jilec3dgnjhp6', 1, '2026-04-17 11:32:58'),
+(48, '2ktnngkedm45g71tjkbf', '2l74719odmdpi0c12m5g', 1, '2026-04-20 09:05:10'),
+(49, '2ktnngkedm45g71tjkbf', '2l7472ms1ee8s1qh5c8k', 1, '2026-04-20 09:05:49'),
+(51, '2ktnngkedm45g71tjkbf', '2l747d1jqc9529skaffh', 1, '2026-04-20 09:10:25'),
+(52, '2ktnngkedm45g71tjkbf', '2l747bimef8iegifrqom', 1, '2026-04-20 09:13:36'),
+(53, '2ktnngkedm45g71tjkbf', '2l747la53pbgqaheq4cm', 1, '2026-04-20 09:14:09'),
+(54, '2ktnnh1ps5pi3cs4slgk', '2l7483j1cm0787b1i6b4', 1, '2026-04-20 09:19:42'),
+(55, '2ktnng99tjhkrinor0ij', '2l7486gfmbpf48j7gdqb', 1, '2026-04-20 09:21:00'),
+(60, '2ktnnh1ps5pi3cs4slgk', '2l748j2sthd1rne6g5st', 1, '2026-04-20 10:02:40'),
+(66, '2ktnngkedm45g71tjkbf', '2l7eodb329222o7tq8h6', 1, '2026-04-23 08:30:04'),
+(67, '2ktnnh1ps5pi3cs4slgk', '2l7eohnkd198747m27f0o', 1, '2026-04-23 08:32:39'),
+(68, '2ktnngkedm45g71tjkbf', '2l7eti2q8hj7jh5p64qc', 1, '2026-04-23 09:40:09'),
+(71, '2ktnngkedm45g71tjkbf', '2l74bnk91h127t3k0ie7', 1, '2026-04-23 10:05:25'),
+(72, '2ktnngkedm45g71tjkbf', '2l7f1j93r0966pld425bc', 1, '2026-04-23 10:07:56'),
+(73, '2ktnnh1ps5pi3cs4slgk', '2l91tjjr8j83qt5l5ebq', 1, '2026-05-06 14:55:24'),
+(74, '2ktnnh1ps5pi3cs4slgk', '2l922go6kmb9m6r8emji', 1, '2026-05-06 15:34:37'),
+(75, '2ktnngkedm45g71tjkbf', '2l922p3lr2h1sie4onnoo', 1, '2026-05-06 15:38:22'),
+(76, '2ktnnh1ps5pi3cs4slgk', '2l927af674d29eho37j8', 1, '2026-05-06 16:39:17');
 
 -- --------------------------------------------------------
 
@@ -474,7 +420,6 @@ INSERT INTO `sonidos_ejercicio` (`id`, `sonido_id`, `ejercicio_id`, `posicion`, 
 -- Estructura de tabla para la tabla `ubicacion_pacientes_ejercicio`
 --
 
-DROP TABLE IF EXISTS `ubicacion_pacientes_ejercicio`;
 CREATE TABLE `ubicacion_pacientes_ejercicio` (
   `paciente` varchar(250) NOT NULL,
   `ejercicio` varchar(250) NOT NULL,
@@ -484,35 +429,19 @@ CREATE TABLE `ubicacion_pacientes_ejercicio` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `ubicacion_pacientes_ejercicio`
---
-
-TRUNCATE TABLE `ubicacion_pacientes_ejercicio`;
---
 -- Volcado de datos para la tabla `ubicacion_pacientes_ejercicio`
 --
 
 INSERT INTO `ubicacion_pacientes_ejercicio` (`paciente`, `ejercicio`, `imagen`, `fila`, `columna`) VALUES
-('2kst61pj18mfa3638pih', '2kst61k5mq5alpbsk19j', 'escenario1', 1, 9),
-('2kst61qs38p9dhch4nk', '2kst61k5mq5alpbsk19j', 'escenario1', 2, 9),
-('2kst61rfr039g8r55srtj8', '2kst61k5mq5alpbsk19j', 'escenario1', 3, 9),
-('2kst61rtmc3ormgp0d0j', '2kst61k5mq5alpbsk19j', 'escenario1', 4, 9),
-('2kst620dt5s2a665c90g', '2kst61k5mq5alpbsk19j', 'escenario1', 1, 10),
-('2kst620rgdpqkaoqlkf5', '2kst61k5mq5alpbsk19j', 'escenario1', 2, 10),
-('2kst6219o5nmk0q1h7l4h', '2kst61k5mq5alpbsk19j', 'escenario1', 3, 10),
-('2kst621l149emme1s1nm', '2kst61k5mq5alpbsk19j', 'escenario1', 4, 10),
-('2kst625oef6p6hp5nt31', '2kst61k5mq5alpbsk19j', 'escenario1', 1, 11),
-('2kst6268becljsab69ad', '2kst61k5mq5alpbsk19j', 'escenario1', 2, 11),
-('2kst626kae38546cnr8j', '2kst61k5mq5alpbsk19j', 'escenario1', 3, 11),
-('2kst6273negrs3t24bn', '2kst61k5mq5alpbsk19j', 'escenario1', 4, 11),
-('2kst62cf1rab3r03gn15', '2kst61k5mq5alpbsk19j', 'escenario1', 1, 12),
-('2kst62cts0o3i2glt4bdr', '2kst61k5mq5alpbsk19j', 'escenario1', 2, 12),
-('2kst62dc81hdekojdb4n6', '2kst61k5mq5alpbsk19j', 'escenario1', 3, 12),
-('2kst62dnlefe1aa1oahj', '2kst61k5mq5alpbsk19j', 'escenario1', 4, 12),
-('2ktnoe6k6cq9kf4mqt04', '2ktnodpn3ka1i748idfp', 'escenario1', 3, 6),
-('2ktnoe78f4enn3pddgct', '2ktnodpn3ka1i748idfp', 'escenario1', 2, 15),
-('2ktnoe7gndcsfk912bsa', '2ktnodpn3ka1i748idfp', 'escenario1', 3, 3),
-('2ktnoe7p3fp679hi7bij', '2ktnodpn3ka1i748idfp', 'escenario1', 2, 11);
+('2l74bnstkrhlaamjhj13', '2l74bnk91h127t3k0ie7', '2l74blchlk0h5ch1k176.JPG', 4, 2),
+('2l74bnt57stsga3p9enf', '2l74bnk91h127t3k0ie7', '2l74blchlk0h5ch1k176.JPG', 3, 11),
+('2l74bntanc657f74c7f5', '2l74bnk91h127t3k0ie7', '2l74blchlk0h5ch1k176.JPG', 3, 9),
+('2l74brqjs28t078g8lso5', '2l74brkhs1br3qk1ameji', '2l74blchlk0h5ch1k176.JPG', 3, 16),
+('2l74brqp5gc15s5mkna5', '2l74brkhs1br3qk1ameji', '2l74blchlk0h5ch1k176.JPG', 3, 2),
+('2l74brr1hdf2jkn5k8ns', '2l74brkhs1br3qk1ameji', '2l74blqg7jk8t6m9jdnr.JPG', 2, 13),
+('2l74brtghs2fmbq1n683', '2l74brkhs1br3qk1ameji', '2l74blqg7jk8t6m9jdnr.JPG', 4, 14),
+('2l74brtm24n0bnkqarp3h', '2l74brkhs1br3qk1ameji', '2l74blqg7jk8t6m9jdnr.JPG', 2, 4),
+('2l74brtrtsc0jgtktm5c', '2l74brkhs1br3qk1ameji', '2l74blchlk0h5ch1k176.JPG', 3, 9);
 
 -- --------------------------------------------------------
 
@@ -520,7 +449,6 @@ INSERT INTO `ubicacion_pacientes_ejercicio` (`paciente`, `ejercicio`, `imagen`, 
 -- Estructura de tabla para la tabla `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` varchar(250) NOT NULL,
   `email` varchar(250) NOT NULL,
@@ -529,11 +457,6 @@ CREATE TABLE `users` (
   `role` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Truncar tablas antes de insertar `users`
---
-
-TRUNCATE TABLE `users`;
 --
 -- Volcado de datos para la tabla `users`
 --
@@ -553,25 +476,18 @@ INSERT INTO `users` (`id`, `email`, `nickname`, `password`, `role`) VALUES
 -- Estructura de tabla para la tabla `user_asignatura`
 --
 
-DROP TABLE IF EXISTS `user_asignatura`;
 CREATE TABLE `user_asignatura` (
   `usuario` varchar(250) NOT NULL,
   `asignatura` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Truncar tablas antes de insertar `user_asignatura`
---
-
-TRUNCATE TABLE `user_asignatura`;
---
 -- Volcado de datos para la tabla `user_asignatura`
 --
 
 INSERT INTO `user_asignatura` (`usuario`, `asignatura`) VALUES
-('2kjp343f38on5ig47301', '2kd9fckc7t9tla26e1cj'),
 ('2kjp343f38on5ig47301', '2kjp366a8h24hm4qmnmk'),
-('2kqoqg64o005247d974bg48', '2kd9fckc7t9tla26e1cj');
+('2kqoqg64o005247d974bg48', '2kjp366a8h24hm4qmnmk');
 
 --
 -- Índices para tablas volcadas
@@ -704,19 +620,19 @@ ALTER TABLE `user_asignatura`
 -- AUTO_INCREMENT de la tabla `acciones_intento`
 --
 ALTER TABLE `acciones_intento`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT de la tabla `acciones_paciente_ejercicio`
 --
 ALTER TABLE `acciones_paciente_ejercicio`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
 
 --
 -- AUTO_INCREMENT de la tabla `sonidos_ejercicio`
 --
 ALTER TABLE `sonidos_ejercicio`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- Restricciones para tablas volcadas
@@ -748,14 +664,14 @@ ALTER TABLE `acciones_paciente_ejercicio`
 -- Filtros para la tabla `ejercicios`
 --
 ALTER TABLE `ejercicios`
-  ADD CONSTRAINT `asig` FOREIGN KEY (`asignatura`) REFERENCES `asignatura` (`id`);
+  ADD CONSTRAINT `asig` FOREIGN KEY (`asignatura`) REFERENCES `asignatura` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `imagenes_ejercicio`
 --
 ALTER TABLE `imagenes_ejercicio`
-  ADD CONSTRAINT `ejercicio` FOREIGN KEY (`ejercicio`) REFERENCES `ejercicios` (`id`),
-  ADD CONSTRAINT `imagen` FOREIGN KEY (`imagen`) REFERENCES `imagenes` (`id`);
+  ADD CONSTRAINT `ejercicio` FOREIGN KEY (`ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `imagen` FOREIGN KEY (`imagen`) REFERENCES `imagenes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `intentos_ejercicio`
@@ -774,15 +690,15 @@ ALTER TABLE `pacientes`
 -- Filtros para la tabla `pacientes_ejercicio`
 --
 ALTER TABLE `pacientes_ejercicio`
-  ADD CONSTRAINT `esta en el ejercicio` FOREIGN KEY (`ejercicio`) REFERENCES `ejercicios` (`id`),
-  ADD CONSTRAINT `imagenes_paciente` FOREIGN KEY (`imagen`) REFERENCES `imagenes` (`id`);
+  ADD CONSTRAINT `esta en el ejercicio` FOREIGN KEY (`ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `imagenes_paciente` FOREIGN KEY (`imagen`) REFERENCES `imagenes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `user_asignatura`
 --
 ALTER TABLE `user_asignatura`
-  ADD CONSTRAINT `alumno` FOREIGN KEY (`usuario`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `asignatura` FOREIGN KEY (`asignatura`) REFERENCES `asignatura` (`id`);
+  ADD CONSTRAINT `alumno` FOREIGN KEY (`usuario`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `asignatura` FOREIGN KEY (`asignatura`) REFERENCES `asignatura` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
