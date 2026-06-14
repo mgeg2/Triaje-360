@@ -148,9 +148,9 @@ export class UsuariosComponent implements OnInit {
     
     // Preparar datos sin el campo repetirContraseña
     const datosEnvio = {
+       email: formData.email,
       nickname: nickname,
-      email: formData.email,
-      contraseña: formData.contraseña,
+      password: formData.contraseña,
       role: formData.role
     };
 

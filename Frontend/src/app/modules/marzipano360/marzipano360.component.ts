@@ -135,7 +135,12 @@ export class Marzipano360Component implements OnInit, OnDestroy {
     this.pacientesService.getAccionesPaciente().subscribe({
       next: (acciones) => {
         this.acciones = acciones;
-        console.log('Acciones obtenidas:', this.acciones);
+        console.log('=== ACCIONES OBTENIDAS ===');
+        console.log('Total acciones:', this.acciones.length);
+        console.log('Acciones:', this.acciones);
+        this.acciones.forEach((a: any, idx: number) => {
+          console.log(`  ${idx + 1}. ${a.nombre_accion || a.name} (ID: ${a.id})`);
+        });
       },
       error: (error) => {
         console.error('Error al obtener acciones:', error);
@@ -185,10 +190,12 @@ export class Marzipano360Component implements OnInit, OnDestroy {
         this.ejerciciosService.getPacientesEjercicio(this.ejercicioId).subscribe({
           next: (pacientes) => {
             console.log('Todos los pacientes del ejercicio:', pacientes);
-            // Almacenar todos los pacientes
+            // Almacenar todos los pacientes con su color inicial
             this.todosPacientes = pacientes.map((paciente: any) => {
-              const { color, ...pacienteSinColor } = paciente;
-              return pacienteSinColor;
+              return {
+                ...paciente,
+                colorInicial: paciente.color || 'verde'  // Guardar color inicial para el empeoramiento
+              };
             });
             
             // Filtrar pacientes de la primera imagen
@@ -482,9 +489,8 @@ export class Marzipano360Component implements OnInit, OnDestroy {
       imgElement.alt = paciente.nombre;
       console.log(`Cargando imagen para ${paciente.nombre}: ${imagenSrc}`);
       
-      // Crear clase de borde solo si hay color asignado
-      const borderColor = paciente.color ? this.colorBordeMap[paciente.color] : '';
-      imgElement.className = `w-15 h-15 rounded-full object-contain cursor-pointer border-4 border-transparent ${borderColor} transition-all duration-300 shadow-md flex-shrink-0 block`;
+      // No mostrar borde de color inicialmente (será asignado al guardarse en el modal)
+      imgElement.className = `w-15 h-15 rounded-full object-contain cursor-pointer border-4 border-transparent transition-all duration-300 shadow-md flex-shrink-0 block`;
       
       // Guardar referencia al elemento de imagen para actualizar color después
       paciente.imgElement = imgElement;
@@ -529,8 +535,13 @@ export class Marzipano360Component implements OnInit, OnDestroy {
    */
   mostrarDescripcion(paciente: any): void {
     this.pacienteSeleccionado = paciente;
-    this.accionesSeleccionadas = paciente.acciones || [];
-    this.colorSeleccionado = paciente.color || '';
+    
+    // NO cargar acciones previas - el alumno no debe saber qué se hizo antes
+    this.accionesSeleccionadas = [];
+    this.colorSeleccionado = ''; // No mostrar color inicial (no queremos que se vea cuál es)
+    console.log('Modal abierto para:', paciente.nombre);
+    console.log('Acciones disponibles:', this.acciones);
+    console.log('Acciones previas del paciente (ocultas):', paciente.acciones);
   }
 
   /**
@@ -574,25 +585,16 @@ export class Marzipano360Component implements OnInit, OnDestroy {
 
 
   /**
-   * Selecciona un color para el paciente
+   * Selecciona un color para el paciente (solo en el modal, sin actualizar en panorama aún)
    */
   seleccionarColor(color: string): void {
     this.colorSeleccionado = color;
-
-    // Actualizar el borde del paciente en el marzipano
-    if (this.pacienteSeleccionado && this.pacienteSeleccionado.id) {
-      const imgElement = this.pacienteImagenesMap.get(this.pacienteSeleccionado.id);
-      if (imgElement) {
-        // Remover todas las clases de borde
-        imgElement.className = imgElement.className.replace(/border-(black|red-600|yellow-400|green-600|blue-500)/g, '');
-
-        // Agregar la nueva clase de borde
-        const borderColor = this.colorBordeMap[color] || 'border-blue-500';
-        imgElement.classList.add(borderColor);
-
-        console.log(`Color actualizado para paciente ${this.pacienteSeleccionado.nombre}: ${color}`);
-      }
+    
+    // Solo actualizar en el objeto paciente, el borde se aplicará al guardar
+    if (this.pacienteSeleccionado) {
+      this.pacienteSeleccionado.color = color;
     }
+    console.log(`Color seleccionado en modal para ${this.pacienteSeleccionado?.nombre}: ${color}`);
   }
 
   /**
@@ -610,17 +612,29 @@ export class Marzipano360Component implements OnInit, OnDestroy {
       // Guardar directamente en el objeto paciente seleccionado
       this.pacienteSeleccionado.acciones = this.accionesSeleccionadas;
       this.pacienteSeleccionado.color = this.colorSeleccionado;
+      // Marcar que ha sido intervenido manualmente (deja de empeorar automáticamente)
+      this.pacienteSeleccionado.interveniuoManualmente = true;
       
       // Asegurar que también se actualice en pacientesUbicados
       const pacienteEnLista = this.pacientesUbicados.find(p => p.id === this.pacienteSeleccionado.id);
       if (pacienteEnLista) {
         pacienteEnLista.acciones = this.accionesSeleccionadas;
         pacienteEnLista.color = this.colorSeleccionado;
+        pacienteEnLista.interveniuoManualmente = true;
+      }
+
+      // Asegurar que también se actualice en todosPacientes
+      const pacienteEnTodos = this.todosPacientes.find(p => p.id === this.pacienteSeleccionado.id);
+      if (pacienteEnTodos) {
+        pacienteEnTodos.acciones = this.accionesSeleccionadas;
+        pacienteEnTodos.color = this.colorSeleccionado;
+        pacienteEnTodos.interveniuoManualmente = true;
       }
 
       console.log('Acciones y color guardados para paciente:', this.pacienteSeleccionado.nombre, {
         acciones: this.accionesSeleccionadas,
-        color: this.colorSeleccionado
+        color: this.colorSeleccionado,
+        interveniuoManualmente: true
       });
       console.log('Pacientes actualizados:', this.pacientesUbicados);
       
@@ -686,11 +700,27 @@ export class Marzipano360Component implements OnInit, OnDestroy {
 
   /**
    * Verifica y actualiza los colores de los pacientes según el tiempo de empeoramiento
+   * El paciente empeora cada X minutos comenzando desde su color inicial
+   * EXCEPTO: Si ha sido intervenido manualmente (color asignado en el modal)
+   * 
+   * IMPORTANTE: Verifica TODOS los pacientes del ejercicio, incluso los de otros escenarios
+   * Ej: si Tempeora=3min y colorInicial=amarillo, empeora en min 3, 6, 9, etc.
    */
   verificarYActualizarColoresPacientes(): void {
-    this.pacientesUbicados.forEach((paciente: any) => {
+    console.log('=== VERIFICACIÓN DE COLORES (cada 5 segundos) ===');
+    console.log(`Tiempo transcurrido: ${this.obtenerFormatoTiempo()} (${this.tiempoRestante}s)`);
+    console.log(`Total pacientes a verificar: ${this.todosPacientes.length}`);
+
+    this.todosPacientes.forEach((paciente: any) => {
+      // Si fue intervenido manualmente, no empeora automáticamente
+      if (paciente.interveniuoManualmente) {
+        console.log(`  🛡️ ${paciente.nombre}: Intervenido manualmente - NO empeora automáticamente`);
+        return;
+      }
+
       // No actualizar si el paciente ya es negro (peor estado)
       if (paciente.color === 'negro') {
+        console.log(`  ⚫ ${paciente.nombre}: Ya está en NEGRO (fallecido) - Sin cambios`);
         return;
       }
 
@@ -699,30 +729,49 @@ export class Marzipano360Component implements OnInit, OnDestroy {
 
       // Si no hay tiempo de empeoramiento definido, no hacer nada
       if (tiempoEmpeoramiento <= 0) {
+        console.log(`  ${paciente.nombre}: Sin tiempo de empeoramiento definido - Sin cambios`);
         return;
       }
 
       // Convertir minutos a segundos
       const tiempoEmpeoraminutoEnSegundos = tiempoEmpeoramiento * 60;
 
-      // Si el tiempo restante es menor o igual al tiempo de empeoramiento,
-      // cambiar el color al siguiente en la escala
-      if (this.tiempoRestante <= tiempoEmpeoraminutoEnSegundos) {
-        const colorActual = paciente.color || 'verde';
-        const indiceActual = this.coloresOrdenados.indexOf(colorActual);
+      const colorActual = paciente.color || 'verde';
+      const colorInicial = paciente.colorInicial || 'verde';
+      const indiceInicial = this.coloresOrdenados.indexOf(colorInicial);
+      const indiceActual = this.coloresOrdenados.indexOf(colorActual);
 
+      // Calcular cuántas veces ha empeorado desde el color inicial
+      // Si empezó en amarillo (índice 1) y está en amarillo (índice 1), ha empeorado 0 veces
+      // Si empezó en amarillo (índice 1) y está en rojo (índice 2), ha empeorado 1 vez
+      const vecesEmpeorrado = indiceActual - indiceInicial;
+
+      // Próximo empeoramiento será en: tiempoEmpeora × (vecesEmpeorrado + 1)
+      const proximoTiempoDeEmpeoramiento = tiempoEmpeoraminutoEnSegundos * (vecesEmpeorrado + 1);
+
+      console.log(`  ${paciente.nombre}:`);
+      console.log(`      - Tempeora: ${tiempoEmpeoramiento}min (${tiempoEmpeoraminutoEnSegundos}s)`);
+      console.log(`      - Color inicial: ${colorInicial} (índice: ${indiceInicial})`);
+      console.log(`      - Color actual: ${colorActual} (índice: ${indiceActual})`);
+      console.log(`      - Veces empeorado: ${vecesEmpeorrado}`);
+      console.log(`      - Próximo empeoramiento en: ${proximoTiempoDeEmpeoramiento}s`);
+
+      // Si el tiempo transcurrido alcanza el próximo empeoramiento
+      if (this.tiempoRestante >= proximoTiempoDeEmpeoramiento) {
         // Cambiar al siguiente color (peor) si no es el último (negro)
         if (indiceActual < this.coloresOrdenados.length - 1) {
           const nuevoColor = this.coloresOrdenados[indiceActual + 1];
-
-          if (nuevoColor !== colorActual) {
-            paciente.color = nuevoColor;
-            // Solo guardar en BD, sin actualizar la UI (para que el usuario no se entere)
-            this.guardarColorPacienteEnBD(paciente);
-          }
+          console.log(`      ✓ EMPEORAMIENTO: ${colorActual} → ${nuevoColor}`);
+          paciente.color = nuevoColor;
+          // Guardar en BD
+          this.guardarColorPacienteEnBD(paciente);
         }
+      } else {
+        const tiempoFaltante = proximoTiempoDeEmpeoramiento - this.tiempoRestante;
+        console.log(`      ⏳ Empeoramiento en: ${tiempoFaltante}s`);
       }
     });
+    console.log('==========================================\n');
   }
 
   /**
@@ -781,12 +830,13 @@ export class Marzipano360Component implements OnInit, OnDestroy {
   }
 
   /**
-   * Recolecta todas las acciones de todos los pacientes para guardarlas
+   * Recolecta todas las acciones de TODOS los pacientes del ejercicio para guardarlas
+   * Itera sobre todosPacientes, no solo los del escenario actual
    */
   private recolectarAccionesPacientes(): any[] {
     const pacientesConAcciones: any[] = [];
 
-    this.pacientesUbicados.forEach((paciente: any) => {
+    this.todosPacientes.forEach((paciente: any) => {
       if (paciente.acciones && paciente.acciones.length > 0) {
         pacientesConAcciones.push({
           pacienteId: paciente.id,
