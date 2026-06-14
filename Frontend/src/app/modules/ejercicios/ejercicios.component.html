@@ -86,7 +86,7 @@
                             <mat-icon class="text-gray-400 hover:text-gray-600"
                                 [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
                         </button>
-                        <h2 class="text-2xl font-bold text-gray-800">{{ esEdicion ? 'Editar Ejercicio' : 'Agregar Ejercicio' }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">{{ esEdicion ? 'Editar Ejercicio' : 'Añadir Ejercicio' }}</h2>
                         <p class="text-sm text-gray-500 mt-1">{{ esEdicion ? 'Modifique los datos del ejercicio' : 'Complete los datos del nuevo ejercicio' }}</p>
                     </div>
 
@@ -278,7 +278,7 @@
                                     <div class="flex flex-col w-[140px]">
                                         <!-- Search input -->
                                         <mat-form-field appearance="outline" class="w-full mb-2 flex-shrink-0">
-                                            <mat-label>Buscar Victima</mat-label>
+                                            <mat-label>Buscar</mat-label>
                                             <input matInput placeholder="Nombre o descripción..."
                                                 [value]="searchTermPacientes"
                                                 (input)="filterPacientes($event.target.value)">
@@ -306,7 +306,7 @@
                                             </div>
                                             <!-- No results message -->
                                             <div *ngIf="pacientesFiltrados.length === 0" class="p-4 text-center text-gray-500 text-sm">
-                                                No se encontraron victimas
+                                                No se encontraron Pacientes
                                             </div>
                                         </div>
                                     </div>
@@ -323,7 +323,7 @@
                                                 </h3>
                                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                     <mat-form-field appearance="outline" class="w-full">
-                                                        <mat-label>Nombre de la victima</mat-label>
+                                                        <mat-label>Nombre del paciente</mat-label>
                                                         <input matInput placeholder="Ej: Juan Pérez"
                                                             formControlName="nombre" required>
                                                         <mat-icon matPrefix class="text-primary-500">person</mat-icon>
@@ -368,7 +368,7 @@
                                                 <h3
                                                     class="text-base font-semibold text-gray-700 mb-2 flex items-center gap-2">
                                                     <mat-icon class="text-primary-600">image</mat-icon>
-                                                    Imagen de Victima
+                                                    Imagen de Paciente
                                                     <!-- Selected Image Display -->
                                                     <div *ngIf="ThirdFormGroup.get('imagenSeleccionada').value"
                                                         class="flex items-center gap-2 ml-auto">
@@ -395,7 +395,7 @@
                                                 <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-96 flex flex-col">
                                                     <!-- Modal Header -->
                                                     <div class="flex items-center justify-between p-4 border-b border-gray-200">
-                                                        <h3 class="text-lg font-semibold text-gray-800">Seleccionar Imagen de Victima</h3>
+                                                        <h3 class="text-lg font-semibold text-gray-800">Seleccionar Imagen de Paciente</h3>
                                                         <button type="button" (click)="closeImagenModal()"
                                                             class="p-1 hover:bg-gray-100 rounded-full transition-colors">
                                                             <mat-icon class="text-gray-400">close</mat-icon>
@@ -514,7 +514,7 @@
                                                             (ngModelChange)="updateEmpeoramientoValidation()"
                                                             [ngModelOptions]="{standalone: true}" color="primary"
                                                             class="text-sm">
-                                                            <span class="font-semibold text-amber-900">la victima puede empeorar</span>
+                                                            <span class="font-semibold text-amber-900">El paciente puede empeorar</span>
                                                         </mat-checkbox>
                                                         <p class="text-xs text-amber-700 mt-2 ml-8">
                                                             <mat-icon class="text-amber-600 align-middle"
@@ -530,7 +530,7 @@
                                                             <input matInput type="number" placeholder="Ej: 5"
                                                                 formControlName="tiempoEmpeoramiento" required min="1">
                                                             <mat-icon matPrefix class="text-primary-500">schedule</mat-icon>
-                                                            <mat-hint>Tiempo en minutos antes de que la victima
+                                                            <mat-hint>Tiempo en minutos antes de que el paciente
                                                                 empeore</mat-hint>
                                                             <mat-error
                                                                 *ngIf="ThirdFormGroup.get('tiempoEmpeoramiento').hasError('required') && ThirdFormGroup.get('tiempoEmpeoramiento').touched">El
@@ -585,7 +585,7 @@
                                 </div>
                             </mat-step>
                             <!-- Cuarto paso -->
-                            <mat-step [editable]="esEdicion" label="ubicar pacientes">
+                            <mat-step [editable]="esEdicion" label="Ubicar Pacientes">
                                 <div class="flex flex-col gap-6  h-full">
                                     <!-- Primer div: Pacientes (scroll horizontal) -->
                                     <div class="relative z-50 w-full overflow-x-auto border border-gray-300 rounded-lg  bg-gray-50">

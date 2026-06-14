@@ -12,21 +12,21 @@ export const adminNavigation: FuseNavigationItem[] = [
         id: 'asignaturas',
         title: 'Asignaturas',
         type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
+        icon: 'heroicons_outline:clipboard',
         link: '/asignaturas'
     },
     {
         id: 'pacientes',
         title: 'Pacientes',
         type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
+        icon: 'heroicons_outline:lifebuoy',
         link: '/pacientes'
     },
     {
         id:'image-manager',
         title: 'Gestor de Imágenes',
         type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
+        icon: 'heroicons_outline:photo',
         link: '/image-manager'
     },
 
@@ -34,7 +34,7 @@ export const adminNavigation: FuseNavigationItem[] = [
         id:'audio-manager',
         title: 'Gestor de Audios',
         type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
+        icon: 'heroicons_outline:musical-note',
         link: '/audio-manager'
     }
 ];
@@ -51,7 +51,7 @@ export const profNavigation: FuseNavigationItem[] = [
         id: 'pacientes',
         title: 'Pacientes',
         type: 'basic',
-        icon: 'heroicons_outline:chart-pie',
+        icon: 'heroicons_outline:lifebuoy',
         link: '/pacientes'
     }
 
@@ -62,7 +62,7 @@ export const aluNavigation: FuseNavigationItem[] = [
         id: 'ejercicios',
         title: 'Ejercicios',
         type: 'basic',
-        icon: 'heroicons_outline:users',
+        icon: 'heroicons_outline:clipboard',
         link: '/ejercicios'
     }
 ];

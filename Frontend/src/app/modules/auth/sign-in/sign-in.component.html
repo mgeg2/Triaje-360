@@ -7,7 +7,7 @@
 
         <!-- Title -->
         <div class="text-4xl font-extrabold text-center mb-8">
-            Sign in
+            Inicia sesión 
         </div>
 
         <!-- Alert -->
@@ -27,21 +27,21 @@
         <form [formGroup]="signInForm" #signInNgForm="ngForm">
             <!-- Email field -->
             <mat-form-field class="w-full">
-                <mat-label>Email address</mat-label>
+                <mat-label>Correo electrónico</mat-label>
                 <input id="email" matInput [formControlName]="'email'" />
                 @if (signInForm.get('email').hasError('required')) {
-                    <mat-error> Email address is required </mat-error>
+                    <mat-error> El correo electrónico es requerido </mat-error>
                 }
                 @if (signInForm.get('email').hasError('email')) {
                     <mat-error>
-                        Please enter a valid email address
+                        Por favor, introduce una dirección de correo electrónico válida
                     </mat-error>
                 }
             </mat-form-field>
 
             <!-- Password field -->
             <mat-form-field class="w-full">
-                <mat-label>Password</mat-label>
+                <mat-label>Contraseña</mat-label>
                 <input
                     id="password"
                     matInput
@@ -72,7 +72,7 @@
                         ></mat-icon>
                     }
                 </button>
-                <mat-error> Password is required </mat-error>
+                <mat-error> La contraseña es requerida </mat-error>
             </mat-form-field>
 
             <!-- Actions -->
@@ -81,7 +81,7 @@
                     [color]="'primary'"
                     [formControlName]="'rememberMe'"
                 >
-                    Remember me
+                    Recordarme
                 </mat-checkbox>
             </div>
 
@@ -93,7 +93,7 @@
                 (click)="signIn()"
             >
                 @if (!signInForm.disabled) {
-                    <span> Sign in </span>
+                    <span> Iniciar sesión </span>
                 }
                 @if (signInForm.disabled) {
                     <mat-progress-spinner

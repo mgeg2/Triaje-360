@@ -8,7 +8,7 @@
         <div class="mt-6 flex shrink-0 items-center sm:ml-4 sm:mt-0">
             <button class="ml-4" mat-flat-button [color]="'primary'" (click)="openNewEditModal()">
                 <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                <span class="ml-2 mr-1">Agregar Usuario</span>
+                <span class="ml-2 mr-1">Añadir</span>
             </button>
         </div>
 
@@ -22,7 +22,7 @@
                         <mat-icon class="text-gray-400 hover:text-gray-600"
                             [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
                     </button>
-                    <h2 class="text-2xl font-bold text-gray-800">{{ isEditMode ? 'Editar Usuario' : 'Agregar Usuario' }}</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">{{ isEditMode ? 'Editar Usuario' : 'Añadir Usuario' }}</h2>
                     <p class="text-sm text-gray-500 mt-1">{{ isEditMode ? 'Modifique los datos del usuario' : 'Complete los datos del nuevo usuario' }}</p>
                 </div>
 

@@ -9,7 +9,7 @@
             <!-- Add product button -->
             <button class="ml-4" mat-flat-button [color]="'primary'" (click)="openNewEditModal()">
                 <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                <span class="ml-2 mr-1">Add</span>
+                <span class="ml-2 mr-1">Añadir</span>
             </button>
         </div>
 
@@ -17,7 +17,7 @@
         @if (showModal) {
         <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div class="bg-white p-8 rounded shadow-lg w-96">
-                <h2 class="text-xl font-bold mb-4">{{ isEditMode ? 'Editar Asignatura' : 'Agregar Asignatura' }}</h2>
+                <h2 class="text-xl font-bold mb-4">{{ isEditMode ? 'Editar Asignatura' : 'Añadir Asignatura' }}</h2>
                 <form [formGroup]="asignaturaForm">
                     <mat-form-field class="w-full mb-4">
                         <mat-label>Nombre</mat-label>
@@ -28,11 +28,11 @@
                         }
                     </mat-form-field>
                     <mat-form-field class="w-full mb-4">
-                        <mat-label>Codigo</mat-label>
-                        <input matInput placeholder="Codigo" formControlName="codigo">
+                        <mat-label>Código</mat-label>
+                        <input matInput placeholder="Código" formControlName="codigo">
                         @if (asignaturaForm.get('codigo').hasError('required') && asignaturaForm.get('codigo').touched)
                         {
-                        <mat-error>El codigo es obligatorio</mat-error>
+                        <mat-error>El código es obligatorio</mat-error>
                         }
                     </mat-form-field>
 
@@ -68,12 +68,12 @@
                     <div class="hidden md:block">
                         Curso
                     </div>
-                    <div class="sm:block">Codigo</div>
+                    <div class="sm:block">Código</div>
                     <div class="hidden sm:block">
                         Nombre
                     </div>
                     <div class="hidden lg:block">
-                        Opciones
+                        Acciones
                     </div>
                     <div></div>
 
@@ -198,7 +198,7 @@
             <div class="flex flex-1 flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
                 <mat-icon class="mb-4 text-6xl text-secondary" [svgIcon]="'heroicons_outline:folder-open'"></mat-icon>
                 <h2 class="mb-2 text-2xl font-bold text-secondary">No hay asignaturas</h2>
-                <p class="mb-6 text-secondary">Parece que no tienes asignaturas. Haz clic en "Add" para crear
+                <p class="mb-6 text-secondary">Parece que no tienes asignaturas. Haz clic en "Añadir" para crear
                     una
                     nueva.</p>
             </div>

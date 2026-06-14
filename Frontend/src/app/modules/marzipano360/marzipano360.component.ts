@@ -270,7 +270,7 @@ export class Marzipano360Component implements OnInit, OnDestroy {
       
       // Si no tiene extensión, intentar con .mp3 por defecto
       if (!tieneExtension) {
-        rutaSonido = `assets/sonidos/${sonido.nombre_archivo}.mp3`;
+        rutaSonido = `assets/sonidos/${sonido.nombre_archivo}`;
       }
       
       audioElement.src = rutaSonido;
