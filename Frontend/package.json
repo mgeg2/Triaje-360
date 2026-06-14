@@ -29,6 +29,8 @@
         "crypto-js": "4.2.0",
         "equirect-cubemap-faces-js": "^2.3.0",
         "highlight.js": "11.11.1",
+        "jspdf": "^4.2.1",
+        "jspdf-autotable": "^5.0.8",
         "lodash-es": "4.17.21",
         "luxon": "3.5.0",
         "marzipano": "^0.10.2",

@@ -13,6 +13,7 @@ router.get('/imagenes/:tipo', EjerciciosController.getImagenes);
 router.get('/resultados/usuario', EjerciciosController.obtenerResultadosUsuario);
 router.get('/resultados/:intentoId', EjerciciosController.obtenerDetallesResultado);
 router.post('/resultados/:intentoId/acciones', EjerciciosController.guardarAccionesIntento);
+router.get('/intento/:intentoId/pacientes', EjerciciosController.getPacientesByIntento);
 
 // Rutas de sonidos (antes de las dinámicas)
 router.post('/sonidos', EjerciciosController.postSonidosToEjercicio);

@@ -737,6 +737,26 @@ const removeSonidoFromEjercicio = async (ejercicioId, sonidoId) => {
     });
 };
 
+const getPacientesByIntento = async (intentoId) => {
+    return new Promise((resolve, reject) => {
+        // Primero obtener el ejercicio_id del intento
+        db.query('SELECT ejercicio_id FROM intentos_ejercicio WHERE id = ?', [intentoId], (err, resultsIntento) => {
+            if (err) return reject(err);
+            if (!resultsIntento || resultsIntento.length === 0) {
+                return reject({ status: 404, message: 'Intento no encontrado' });
+            }
+            
+            const ejercicioId = resultsIntento[0].ejercicio_id;
+            
+            // Luego obtener todos los pacientes de ese ejercicio
+            db.query('SELECT * FROM pacientes_ejercicio WHERE ejercicio = ?', [ejercicioId], (err, resultsPacientes) => {
+                if (err) return reject(err);
+                resolve({ status: 200, pacientes: resultsPacientes, ejercicio_id: ejercicioId });
+            });
+        });
+    });
+};
+
             module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -756,5 +776,6 @@ const removeSonidoFromEjercicio = async (ejercicioId, sonidoId) => {
     guardarAccionesIntento,
     postSonidosToEjercicio,
     getSonidosFromEjercicio,
-    removeSonidoFromEjercicio
+    removeSonidoFromEjercicio,
+    getPacientesByIntento
 }

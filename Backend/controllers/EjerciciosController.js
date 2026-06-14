@@ -294,6 +294,20 @@ const removeSonidoFromEjercicio = async (req, res) => {
     });
 };
 
+const getPacientesByIntento = async (req, res) => {
+    jwt.comprobartoken(req, res, async function () {
+        if (req.role !== 'alu' && req.role !== 'prof' && req.role !== 'admin') {
+            return res.status(403).json({ message: 'Acceso denegado' });
+        }
+        try {
+            const result = await EjerciciosService.getPacientesByIntento(req.params.intentoId);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(error.status || 500).json({ message: error.message });
+        }
+    });
+};
+
 module.exports = {
     getAllEjercicios,
     postEjercicio,
@@ -314,5 +328,6 @@ module.exports = {
     guardarAccionesIntento,
     postSonidosToEjercicio,
     getSonidosFromEjercicio,
-    removeSonidoFromEjercicio
+    removeSonidoFromEjercicio,
+    getPacientesByIntento
 };

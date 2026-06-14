@@ -109,6 +109,12 @@ export class EjerciciosService {
         return this._httpClient.post(`${environment.apiUrl}${environment.ejer.all}/resultados/${intentoId}/acciones`, data, { headers });
     }
 
+    getPacientesByIntento(intentoId: string): Observable<any> {
+        const token = this._authService.accessToken;
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        return this._httpClient.get(`${environment.apiUrl}${environment.ejer.all}/intento/${intentoId}/pacientes`, { headers });
+    }
+
     removeSonidoFromEjercicio(ejercicioId: string, sonidoId: string): Observable<any> {
         const token = this._authService.accessToken;
         const headers = new HttpHeaders().set('Authorization', `${token}`);
