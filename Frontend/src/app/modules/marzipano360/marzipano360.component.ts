@@ -607,44 +607,65 @@ export class Marzipano360Component implements OnInit, OnDestroy {
   /**
    * Guarda las acciones seleccionadas para el paciente
    */
-  guardarAcciones(): void {
-    if (this.pacienteSeleccionado) {
-      // Guardar directamente en el objeto paciente seleccionado
-      this.pacienteSeleccionado.acciones = this.accionesSeleccionadas;
+ guardarAcciones(): void {
+  if (this.pacienteSeleccionado) {
+    const tieneAcciones =
+      Array.isArray(this.accionesSeleccionadas) &&
+      this.accionesSeleccionadas.length > 0;
+
+    const tieneColor = !!this.colorSeleccionado;
+
+    this.pacienteSeleccionado.acciones = this.accionesSeleccionadas;
+
+    if (tieneColor) {
       this.pacienteSeleccionado.color = this.colorSeleccionado;
-      // Marcar que ha sido intervenido manualmente (deja de empeorar automáticamente)
+    }
+
+    const huboIntervencionManual = tieneAcciones || tieneColor;
+
+    if (huboIntervencionManual) {
       this.pacienteSeleccionado.interveniuoManualmente = true;
-      
-      // Asegurar que también se actualice en pacientesUbicados
-      const pacienteEnLista = this.pacientesUbicados.find(p => p.id === this.pacienteSeleccionado.id);
-      if (pacienteEnLista) {
-        pacienteEnLista.acciones = this.accionesSeleccionadas;
+    }
+
+    const pacienteEnLista = this.pacientesUbicados.find(
+      p => p.id === this.pacienteSeleccionado.id
+    );
+
+    if (pacienteEnLista) {
+      pacienteEnLista.acciones = this.accionesSeleccionadas;
+
+      if (tieneColor) {
         pacienteEnLista.color = this.colorSeleccionado;
+      }
+
+      if (huboIntervencionManual) {
         pacienteEnLista.interveniuoManualmente = true;
       }
+    }
 
-      // Asegurar que también se actualice en todosPacientes
-      const pacienteEnTodos = this.todosPacientes.find(p => p.id === this.pacienteSeleccionado.id);
-      if (pacienteEnTodos) {
-        pacienteEnTodos.acciones = this.accionesSeleccionadas;
+    const pacienteEnTodos = this.todosPacientes.find(
+      p => p.id === this.pacienteSeleccionado.id
+    );
+
+    if (pacienteEnTodos) {
+      pacienteEnTodos.acciones = this.accionesSeleccionadas;
+
+      if (tieneColor) {
         pacienteEnTodos.color = this.colorSeleccionado;
-        pacienteEnTodos.interveniuoManualmente = true;
       }
 
-      console.log('Acciones y color guardados para paciente:', this.pacienteSeleccionado.nombre, {
-        acciones: this.accionesSeleccionadas,
-        color: this.colorSeleccionado,
-        interveniuoManualmente: true
-      });
-      console.log('Pacientes actualizados:', this.pacientesUbicados);
-      
-      // Actualizar visualmente en el marzipano
-      this.actualizarColorPacienteEnUI(this.pacienteSeleccionado);
-      
-      this.cerrarModal();
+      if (huboIntervencionManual) {
+        pacienteEnTodos.interveniuoManualmente = true;
+      }
     }
-  }
 
+    if (tieneColor) {
+      this.actualizarColorPacienteEnUI(this.pacienteSeleccionado);
+    }
+
+    this.cerrarModal();
+  }
+}
   /**
    * Inicia el temporizador (cuenta hacia delante sin límite)
    */
@@ -833,30 +854,39 @@ export class Marzipano360Component implements OnInit, OnDestroy {
    * Recolecta todas las acciones de TODOS los pacientes del ejercicio para guardarlas
    * Itera sobre todosPacientes, no solo los del escenario actual
    */
-  private recolectarAccionesPacientes(): any[] {
-    const pacientesConAcciones: any[] = [];
+private recolectarAccionesPacientes(): any[] {
+  const pacientesConAcciones: any[] = [];
 
-    this.todosPacientes.forEach((paciente: any) => {
-      if (paciente.acciones && paciente.acciones.length > 0) {
-        pacientesConAcciones.push({
-          pacienteId: paciente.id,
-          acciones: paciente.acciones,
-          color: paciente.color || 'verde'
-        });
-      } else if (paciente.color) {
-        // Aunque no tenga acciones, guardar el color
-        pacientesConAcciones.push({
-          pacienteId: paciente.id,
-          acciones: [],
-          color: paciente.color
-        });
-      }
-    });
+  this.todosPacientes.forEach((paciente: any) => {
+    const tieneAccionesUsuario =
+      Array.isArray(paciente.acciones) && paciente.acciones.length > 0;
 
-    console.log('Acciones recolectadas:', pacientesConAcciones);
-    return pacientesConAcciones;
-  }
+    const tieneColorManual =
+      paciente.interveniuoManualmente === true && !!paciente.color;
 
+    const haEmpeoradoAutomaticamente =
+      paciente.interveniuoManualmente !== true &&
+      paciente.color &&
+      paciente.colorInicial &&
+      paciente.color !== paciente.colorInicial;
+
+    if (
+      tieneAccionesUsuario ||
+      tieneColorManual ||
+      haEmpeoradoAutomaticamente
+    ) {
+      pacientesConAcciones.push({
+        pacienteId: paciente.id,
+        acciones: paciente.acciones || [],
+        color: paciente.color || paciente.colorInicial || 'verde',
+        empeoroAutomaticamente: haEmpeoradoAutomaticamente
+      });
+    }
+  });
+
+  console.log('Acciones recolectadas:', pacientesConAcciones);
+  return pacientesConAcciones;
+}
   /**
    * Guarda el tiempo transcurrido del ejercicio en la base de datos
    */

@@ -218,9 +218,9 @@ export class ResultadosComponent implements OnInit, OnDestroy {
 
         // Aquí ya puedes activar tus tablas
          yPosition = this.agregarTablaTriage(doc, yPosition, estadisticas);
-        // yPosition = this.agregarTablaAcciones(doc, yPosition, intento);
-        // yPosition = this.agregarTablaSobretraje(doc, yPosition, estadisticas);
-        // yPosition = this.agregarTablaInfratraje(doc, yPosition, estadisticas);
+        
+        yPosition = this.agregarTablaSobretraje(doc, yPosition, estadisticas);
+        //yPosition = this.agregarTablaInfratraje(doc, yPosition, estadisticas);
         // this.agregarTablaMortalidad(doc, yPosition, estadisticas);
 
         const nombreArchivo = `Intento_${intento.id}_${intento.ejercicio_nombre.replace(/\s+/g, '_')}.pdf`;
@@ -296,94 +296,84 @@ export class ResultadosComponent implements OnInit, OnDestroy {
     return (doc as any).lastAutoTable.finalY + 10;
   }
 
-  // /**
-  //  * Agrega tabla de acciones al PDF
-  //  */
-  // private agregarTablaAcciones(doc: any, yPosition: number, intento: any): number {
-  //   doc.setFontSize(12);
-  //   doc.setFont('helvetica', 'bold');
-  //   doc.text('Acciones y Pacientes', 10, yPosition);
-  //   yPosition += 8;
+  
+  /**
+   * Agrega tabla SOBRETRAJE al PDF
+   */
+private agregarTablaSobretraje(doc: any, yPosition: number, estadisticas: any): number {
+  if (yPosition > 250) {
+    doc.addPage();
+    yPosition = 10;
+  }
 
-  //   const acciones = this.detallesResultado[intento.id];
-  //   const tableData = acciones.map((accion: any) => [
-  //     accion.paciente_nombre || 'N/A',
-  //     accion.nombre_accion || 'N/A',
-  //     accion.color_asignado || 'N/A',
-  //     this.formatearFecha(accion.created_at)
-  //   ]);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('SOBRETRIAJE', 10, yPosition);
+  yPosition += 8;
 
-  //   autoTable(doc, {
-  //     head: [['Paciente', 'Acción', 'Color Asignado', 'Fecha']],
-  //     body: tableData,
-  //     startY: yPosition,
-  //     margin: { left: 10, right: 10 },
-  //     headStyles: {
-  //       fillColor: [41, 128, 185],
-  //       textColor: [255, 255, 255],
-  //       fontStyle: 'bold'
-  //     },
-  //     bodyStyles: {
-  //       textColor: [0, 0, 0]
-  //     },
-  //     alternateRowStyles: {
-  //       fillColor: [245, 245, 245]
-  //     }
-  //   });
+  const verdesSobretriados = estadisticas.sobretriaje.verdesTriadosAmarilloORojo;
+  const amarillosSobretriados = estadisticas.sobretriaje.amarillosTriadosRojo;
+  const totalSobretriados = estadisticas.sobretriaje.totalSobretriados;
 
-  //   return (doc as any).lastAutoTable.finalY + 10;
-  // }
+  const totalVerdes = estadisticas.verde.total;
+  const totalAmarillos = estadisticas.amarillo.total;
+  const totalVerdesAmarillos = estadisticas.sobretriaje.totalVerdesAmarillos;
 
-  // /**
-  //  * Agrega tabla SOBRETRAJE al PDF
-  //  */
-  // private agregarTablaSobretraje(doc: any, yPosition: number, estadisticas: any): number {
-  //   // Verificar si hay espacio en la página
-  //   if (yPosition > 250) {
-  //     doc.addPage();
-  //     yPosition = 10;
-  //   }
+  const porcentajeVerdes =
+    totalVerdes > 0
+      ? ((verdesSobretriados / totalVerdes) * 100).toFixed(2) + '%'
+      : '0%';
 
-  //   doc.setFontSize(12);
-  //   doc.setFont('helvetica', 'bold');
-  //   doc.text('SOBRETRAJE (Verdes triados como no verdes)', 10, yPosition);
-  //   yPosition += 8;
+  const porcentajeAmarillos =
+    totalAmarillos > 0
+      ? ((amarillosSobretriados / totalAmarillos) * 100).toFixed(2) + '%'
+      : '0%';
 
-  //   // Calcular sobretraje: verdes que fueron triados pero no eran verdes
-  //   const sobertriaje = estadisticas.verde.triado;
-  //   const porcentajeSobertriaje = estadisticas.verde.total > 0 ? ((sobertriaje / estadisticas.verde.total) * 100).toFixed(2) : '0';
+  const porcentajeTotal =
+    totalVerdesAmarillos > 0
+      ? ((totalSobretriados / totalVerdesAmarillos) * 100).toFixed(2) + '%'
+      : '0%';
 
-  //   const tableData = [
-  //     ['Concepto', 'Número', '%'],
-  //     ['Nº de Verdes Triados', sobertriaje.toString(), porcentajeSobertriaje + '%'],
-  //     [
-  //       'Total Sobretraje',
-  //       sobertriaje.toString(),
-  //       '((Verdes triados) / (Total verdes)) x 100'
-  //     ]
-  //   ];
+  const tableData = [
+    ['Concepto', 'Número', '%'],
+    [
+      'Verdes triados como amarillo o rojo',
+      verdesSobretriados.toString(),
+      porcentajeVerdes
+    ],
+    [
+      'Amarillos triados como rojo',
+      amarillosSobretriados.toString(),
+      porcentajeAmarillos
+    ],
+    [
+      'Total sobretriaje',
+      totalSobretriados.toString(),
+      porcentajeTotal
+    ]
+  ];
 
-  //   autoTable(doc, {
-  //     head: [tableData[0]],
-  //     body: tableData.slice(1),
-  //     startY: yPosition,
-  //     margin: { left: 10, right: 10 },
-  //     headStyles: {
-  //       fillColor: [255, 255, 0],
-  //       textColor: [0, 0, 0],
-  //       fontStyle: 'bold'
-  //     },
-  //     bodyStyles: {
-  //       textColor: [0, 0, 0]
-  //     }
-  //   });
+  autoTable(doc, {
+    head: [tableData[0]],
+    body: tableData.slice(1),
+    startY: yPosition,
+    margin: { left: 10, right: 10 },
+    headStyles: {
+      fillColor: [255, 255, 0],
+      textColor: [0, 0, 0],
+      fontStyle: 'bold'
+    },
+    bodyStyles: {
+      textColor: [0, 0, 0]
+    }
+  });
 
-  //   return (doc as any).lastAutoTable.finalY + 10;
-  // }
+  return (doc as any).lastAutoTable.finalY + 10;
+}
 
-  // /**
-  //  * Agrega tabla INFRATRAJE al PDF
-  //  */
+  /**
+   * Agrega tabla INFRATRAJE al PDF
+   */
   // private agregarTablaInfratraje(doc: any, yPosition: number, estadisticas: any): number {
   //   // Verificar si hay espacio en la página
   //   if (yPosition > 250) {
@@ -428,9 +418,9 @@ export class ResultadosComponent implements OnInit, OnDestroy {
   //   return (doc as any).lastAutoTable.finalY + 10;
   // }
 
-  // /**
-  //  * Agrega tabla MORTALIDAD EVITABLE al PDF
-  //  */
+  /**
+   * Agrega tabla MORTALIDAD EVITABLE al PDF
+   */
   // private agregarTablaMortalidad(doc: any, yPosition: number, estadisticas: any): void {
   //   // Verificar si hay espacio en la página
   //   if (yPosition > 250) {
@@ -463,57 +453,118 @@ export class ResultadosComponent implements OnInit, OnDestroy {
   //       textColor: [0, 0, 0]
   //     }
   //   });
+  // }
 
-  private calcularEstadisticasPacientes(intentoId: string):any{
-    
-    console.log(intentoId);
-    const acciones = this.detallesResultado[intentoId] || [];
-    const pacientes = this.pacientesPorIntento[intentoId] || [];
-    
-    console.log('intentoId:', intentoId);
-    console.log('pacientes array:', pacientes);
-    console.log('pacientes length:', pacientes.length);
-    console.log('acciones array:', acciones);
-    // Contar pacientes por color en el ejercicio original
-    const contadores: { [key: string]: any } = {
-      negro: { triado: 0, total: 0 },
-      rojo: { triado: 0, total: 0 },
-      amarillo: { triado: 0, total: 0 },
-      verde: { triado: 0, total: 0 }
-    };
+private calcularEstadisticasPacientes(intentoId: string): any {
+  const acciones = this.detallesResultado[intentoId] || [];
+  const pacientes = this.pacientesPorIntento[intentoId] || [];
 
-    // Total: contar pacientes del ejercicio por color original
-    if (pacientes && pacientes.length > 0) {
-      pacientes.forEach((paciente: any) => {
-        console.log('paciente:', paciente);
-        let color: string = (paciente.color?.toLowerCase() ) as string;
-        console.log('color:', color);
-        // Validar que sea un color válido
-        if (!contadores[color]) {
-          color = 'verde';
-        }
-        
-        contadores[color].total++;
-      });
-    } else {
-      console.log('No hay pacientes para contar');
+  const coloresValidos = ['negro', 'rojo', 'amarillo', 'verde'];
+
+  const contadores: { [key: string]: any } = {
+    negro: { triado: 0, total: 0 },
+    rojo: { triado: 0, total: 0 },
+    amarillo: { triado: 0, total: 0 },
+    verde: { triado: 0, total: 0 },
+    sobretriaje: {
+      verdesTriadosAmarilloORojo: 0,
+      amarillosTriadosRojo: 0,
+      totalSobretriados: 0,
+      totalVerdesAmarillos: 0
+    }
+  };
+
+  const pacientesPorId = new Map<string, any>();
+  const colorAsignadoPorPaciente = new Map<string, string>();
+
+  pacientes.forEach((paciente: any) => {
+    const pacienteId = String(
+      paciente.id ??
+      paciente.paciente_id ??
+      paciente.pacienteId ??
+      paciente.id_paciente ??
+      ''
+    );
+
+    let colorOriginal = String(paciente.color ?? '').trim().toLowerCase();
+
+    if (!coloresValidos.includes(colorOriginal)) {
+      colorOriginal = 'verde';
     }
 
-    // Triados: contar pacientes a los que le asignaste ese color en el intento
-    acciones.forEach((accion: any) => {
-      let color: string = (accion.color_asignado?.toLowerCase() || 'verde') as string;
-      
-      // Validar que sea un color válido
-      if (!contadores[color]) {
-        color = 'verde';
-      }
-      
-      contadores[color].triado++;
-    });
+    contadores[colorOriginal].total++;
 
-    console.log('Estadísticas calculadas:', contadores);
-    return contadores;
-  }
+    if (pacienteId) {
+      pacientesPorId.set(pacienteId, {
+        ...paciente,
+        colorOriginal
+      });
+    }
+  });
+
+  acciones.forEach((accion: any) => {
+    const accionPacienteId =
+      accion.paciente_id ??
+      accion.pacienteId ??
+      accion.id_paciente ??
+      accion.paciente?.id ??
+      (
+        typeof accion.paciente === 'string' || typeof accion.paciente === 'number'
+          ? accion.paciente
+          : ''
+      );
+
+    const pacienteId = String(accionPacienteId ?? '');
+
+    let colorAsignado = String(accion.color_asignado ?? '').trim().toLowerCase();
+
+    if (!coloresValidos.includes(colorAsignado)) {
+      colorAsignado = 'verde';
+    }
+
+    if (pacienteId) {
+      colorAsignadoPorPaciente.set(pacienteId, colorAsignado);
+    }
+  });
+
+  colorAsignadoPorPaciente.forEach((colorAsignado: string, pacienteId: string) => {
+    contadores[colorAsignado].triado++;
+
+    const paciente = pacientesPorId.get(pacienteId);
+
+    if (!paciente) {
+      return;
+    }
+
+    const colorOriginal = paciente.colorOriginal;
+
+    if (
+      colorOriginal === 'verde' &&
+      (colorAsignado === 'amarillo' || colorAsignado === 'rojo')
+    ) {
+      contadores.sobretriaje.verdesTriadosAmarilloORojo++;
+    }
+
+    if (
+      colorOriginal === 'amarillo' &&
+      colorAsignado === 'rojo'
+    ) {
+      contadores.sobretriaje.amarillosTriadosRojo++;
+    }
+  });
+
+  contadores.sobretriaje.totalSobretriados =
+    contadores.sobretriaje.verdesTriadosAmarilloORojo +
+    contadores.sobretriaje.amarillosTriadosRojo;
+
+  contadores.sobretriaje.totalVerdesAmarillos =
+    contadores.verde.total +
+    contadores.amarillo.total;
+
+  console.log('Estadísticas calculadas:', contadores);
+
+  return contadores;
+}
    obtenerPacientesIntento(intentoId: string): Observable<any[]> {
   return this.ejerciciosService.getPacientesByIntento(intentoId).pipe(
     map((data: any) => {
