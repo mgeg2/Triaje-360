@@ -561,8 +561,6 @@ private calcularEstadisticasPacientes(intentoId: string): any {
   });
 
   colorAsignadoPorPaciente.forEach((colorAsignado: string, pacienteId: string) => {
-    contadores[colorAsignado].triado++;
-
     const paciente = pacientesPorId.get(pacienteId);
 
     if (!paciente) {
@@ -570,6 +568,14 @@ private calcularEstadisticasPacientes(intentoId: string): any {
     }
 
     const colorOriginal = paciente.colorOriginal;
+
+    if (colorAsignado === 'verde') {
+      if (colorOriginal === 'verde') {
+        contadores.verde.triado++;
+      }
+    } else {
+      contadores[colorAsignado].triado++;
+    }
 
     if (
       colorOriginal === 'verde' &&
