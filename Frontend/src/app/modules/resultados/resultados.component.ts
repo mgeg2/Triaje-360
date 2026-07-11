@@ -218,9 +218,8 @@ export class ResultadosComponent implements OnInit, OnDestroy {
 
         // Aquí ya puedes activar tus tablas
          yPosition = this.agregarTablaTriage(doc, yPosition, estadisticas);
-        
-        yPosition = this.agregarTablaSobretraje(doc, yPosition, estadisticas);
-        yPosition = this.agregarTablaInfratraje(doc, yPosition, estadisticas);
+
+        yPosition = this.agregarTablaCruceTriage(doc, yPosition, estadisticas);
         // this.agregarTablaMortalidad(doc, yPosition, estadisticas);
 
         const nombreArchivo = `Intento_${intento.id}_${intento.ejercicio_nombre.replace(/\s+/g, '_')}.pdf`;
@@ -290,6 +289,172 @@ export class ResultadosComponent implements OnInit, OnDestroy {
       },
       bodyStyles: {
         textColor: [0, 0, 0]
+      }
+    });
+
+    return (doc as any).lastAutoTable.finalY + 10;
+  }
+
+  /**
+   * Agrega una tabla cruzada de real vs triado con resumen de sobretriaje e infratriaje.
+   */
+  private agregarTablaCruceTriage(doc: any, yPosition: number, estadisticas: any): number {
+    if (yPosition > 250) {
+      doc.addPage();
+      yPosition = 10;
+    }
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('SOBRETRIAJE / INFRATRIAJE', 10, yPosition);
+    yPosition += 8;
+
+    const colores = ['negro', 'rojo', 'amarillo', 'verde'];
+    const etiquetas: { [key: string]: string } = {
+      negro: 'N',
+      rojo: 'R',
+      amarillo: 'A',
+      verde: 'V'
+    };
+    const rojoSobre = [255, 210, 210];
+    const rojoSobreFuerte = [235, 120, 120];
+    const azulInfra = [210, 230, 255];
+    const azulInfraFuerte = [120, 170, 235];
+    const neutro = [245, 245, 245];
+
+    const matriz = estadisticas.matrizTriage || {};
+
+    const obtenerValor = (real: string, triado: string): number => {
+      return matriz?.[real]?.[triado] ?? 0;
+    };
+
+    const calcularInfraPorReal = (real: string): number => {
+      const indiceReal = colores.indexOf(real);
+      return colores
+        .slice(indiceReal + 1)
+        .reduce((total, triado) => total + obtenerValor(real, triado), 0);
+    };
+
+    const calcularSobrePorTriado = (triado: string): number => {
+      const indiceTriado = colores.indexOf(triado);
+      return colores
+        .slice(indiceTriado + 1)
+        .reduce((total, real) => total + obtenerValor(real, triado), 0);
+    };
+
+    const rows = colores.map((real) => [
+      etiquetas[real],
+      obtenerValor(real, 'negro').toString(),
+      obtenerValor(real, 'rojo').toString(),
+      obtenerValor(real, 'amarillo').toString(),
+      obtenerValor(real, 'verde').toString(),
+      calcularInfraPorReal(real).toString()
+    ]);
+
+    const tableData = [
+      ['Real/Triado', 'N', 'R', 'A', 'V', 'Infra'],
+      ...rows,
+      [
+        'Sobre',
+        calcularSobrePorTriado('negro').toString(),
+        calcularSobrePorTriado('rojo').toString(),
+        calcularSobrePorTriado('amarillo').toString(),
+        calcularSobrePorTriado('verde').toString(),
+        ''
+      ]
+    ];
+
+    autoTable(doc, {
+      head: [tableData[0]],
+      body: tableData.slice(1),
+      startY: yPosition,
+      margin: { left: 10, right: 10 },
+      headStyles: {
+        fillColor: [255, 230, 180],
+        textColor: [0, 0, 0],
+        fontStyle: 'bold'
+      },
+      bodyStyles: {
+        textColor: [0, 0, 0],
+        lineWidth: 0.3,
+        lineColor: [120, 120, 120]
+      },
+      didParseCell: (data: any) => {
+        const rowIndex = data.row.index;
+        const columnIndex = data.column.index;
+
+        data.cell.styles.lineWidth = 0.3;
+        data.cell.styles.lineColor = [120, 120, 120];
+
+        if (data.section === 'head') {
+          if (columnIndex === 1) {
+            data.cell.styles.fillColor = [255, 255, 255];
+            data.cell.styles.textColor = [0, 0, 0];
+          }
+          if (columnIndex === 2) {
+            data.cell.styles.fillColor = rojoSobre;
+          } else if (columnIndex === 3) {
+            data.cell.styles.fillColor = [255, 235, 140];
+          } else if (columnIndex === 4) {
+            data.cell.styles.fillColor = [170, 220, 170];
+          } else if (columnIndex === 5) {
+            data.cell.styles.fillColor = azulInfraFuerte;
+            data.cell.styles.textColor = [255, 255, 255];
+          }
+          return;
+        }
+
+        if (columnIndex === 0) {
+          if (rowIndex === 1) {
+            data.cell.styles.fillColor = [255, 210, 210];
+          } else if (rowIndex === 2) {
+            data.cell.styles.fillColor = [255, 235, 140];
+          } else if (rowIndex === 3) {
+            data.cell.styles.fillColor = [170, 220, 170];
+          } else if (rowIndex === 4) {
+            data.cell.styles.fillColor = rojoSobreFuerte;
+            data.cell.styles.textColor = [255, 255,255];
+          }
+          data.cell.styles.fontStyle = 'bold';
+          return;
+        }
+
+        if (rowIndex === 4 && columnIndex === 5) {
+          data.cell.styles.fillColor = [255, 255, 255];
+          data.cell.styles.lineWidth = 0;
+          data.cell.styles.textColor = [255, 255, 255];
+          return;
+        }
+
+        if(rowIndex === 4){
+           data.cell.styles.textColor = [255, 255, 255];
+        }
+
+        if (rowIndex === 4) {
+          data.cell.styles.fillColor = rojoSobreFuerte;
+          return;
+        }
+
+        if (columnIndex >= 1 && columnIndex <= 4) {
+          const realIndex = rowIndex;
+          const triadoIndex = columnIndex - 1;
+
+          if (triadoIndex < realIndex) {
+            data.cell.styles.fillColor = rojoSobre;
+          } else if (triadoIndex > realIndex) {
+            data.cell.styles.fillColor = azulInfra;
+          } else {
+            data.cell.styles.fillColor = [170, 220, 170];
+            data.cell.styles.fontStyle = 'bold';
+          }
+          return;
+        }
+
+        if (columnIndex === 5) {
+          data.cell.styles.fillColor = azulInfraFuerte;
+          data.cell.styles.textColor = [255, 255, 255];
+          return;
+        }
       }
     });
 
@@ -493,6 +658,12 @@ private calcularEstadisticasPacientes(intentoId: string): any {
     rojo: { triado: 0, total: 0 },
     amarillo: { triado: 0, total: 0 },
     verde: { triado: 0, total: 0 },
+    matrizTriage: {
+      negro: { negro: 0, rojo: 0, amarillo: 0, verde: 0 },
+      rojo: { negro: 0, rojo: 0, amarillo: 0, verde: 0 },
+      amarillo: { negro: 0, rojo: 0, amarillo: 0, verde: 0 },
+      verde: { negro: 0, rojo: 0, amarillo: 0, verde: 0 }
+    },
     sobretriaje: {
       verdesTriadosAmarilloORojo: 0,
       amarillosTriadosRojo: 0,
@@ -568,6 +739,8 @@ private calcularEstadisticasPacientes(intentoId: string): any {
     }
 
     const colorOriginal = paciente.colorOriginal;
+
+    contadores.matrizTriage[colorOriginal][colorAsignado]++;
 
     if (colorAsignado === 'verde') {
       if (colorOriginal === 'verde') {
